@@ -1,0 +1,15 @@
+name: electrodeLocalization
+channels:
+ - defaults
+dependencies:
+ - python=3.8
+ - numpy=1.19.*
+ - pandas=1.0.*
+ - scipy=1.5.*
+ - pip
+ - pip:
+   - nibabel==3.2.*
+   - matplotlib==3.3.*
+   - seaborn==0.11.*
+  
+  

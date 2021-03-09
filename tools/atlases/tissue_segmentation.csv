@@ -1,0 +1,6 @@
+"tissue_segmentation","FSL FIRST and FAST Algorithm"
+"region","label"
+0,"outside"
+1,"CSF"
+2,"GrayMatter"
+3,"WhiteMatter"
