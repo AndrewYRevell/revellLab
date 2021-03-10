@@ -49,9 +49,9 @@ class DataClassJson:
         
         if not fpath == None:
             echobase.check_path(fpath)
-            fname = os.path.join(fpath, f"sub-{sub}_task-{eventsKey}_run-{startUsec}to{stopUsec}_ieeg.csv")
-            fnameMetadata = os.path.join(fpath, f"sub-{sub}_task-{eventsKey}_run-{startUsec}to{stopUsec}_ieeg.csv.json")
-            fnameEvents = os.path.join(fpath, f"sub-{sub}_task-{eventsKey}_run-{startUsec}to{stopUsec}_events.tsv")
+            fname = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_ieeg.eeg")
+            fnameMetadata = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_ieeg.json")
+            fnameEvents = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_events.tsv")
             
             if os.path.exists(fname):
                 print(f"\nFile exist. Loading {fname}")
@@ -90,9 +90,9 @@ class DataClassJson:
         
         if not fpath == None:
             echobase.check_path(fpath)
-            fname = os.path.join(fpath, f"sub-{sub}_task-{eventsKey}_run-{startUsec}to{stopUsec}_ieeg.csv")
-            fnameMetadata = os.path.join(fpath, f"sub-{sub}_task-{eventsKey}_run-{startUsec}to{stopUsec}_ieeg.json")
-            fnameEvents = os.path.join(fpath, f"sub-{sub}_task-{eventsKey}_run-{startUsec}to{stopUsec}_events.tsv")
+            fname = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_ieeg.eeg")
+            fnameMetadata = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_ieeg.json")
+            fnameEvents = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_events.tsv")
             
             if os.path.exists(fname):
                 print(f"\nFile exist. Loading {fname}")
@@ -122,10 +122,11 @@ class DataClassJson:
     def saveEEG(self, fname, fnameMetadata, fnameEvents, df, fs, eventsKey, fname_iEEG, startUsec, stopUsec, secondsBefore = None, duration = None, ictalStartUsec = None, ictalStopUsec  = None , eventsSave = False):
         df.to_csv(fname, index=True, header=True, sep=',')
         #saving metadata
-        metadata ={"TaskName": eventsKey, "TaskDescription": fname_iEEG, 
-               "RecordingDuration": (stopUsec-startUsec)/1e6,
-               "SamplingFrequency": fs,
-               "PowerLineFrequency": 60, "SoftwareFilters": "n/a"}   
+        metadata ={"TaskName": eventsKey, "TaskDescription": fname_iEEG,
+                   "iEEGReference": "unknown",
+                   "RecordingDuration": (stopUsec-startUsec)/1e6,
+                   "SamplingFrequency": fs,
+                   "PowerLineFrequency": 60, "SoftwareFilters": "n/a"}   
         with open(fnameMetadata, 'w', encoding='utf-8') as f: json.dump(metadata, f, ensure_ascii=False, indent=4)
         if eventsSave:
             ictalStartIndex  = int(secondsBefore*fs)
