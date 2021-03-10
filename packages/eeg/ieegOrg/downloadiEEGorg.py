@@ -45,11 +45,11 @@ python3.6 -c 'import get_iEEG_data; get_iEEG_data.get_iEEG_data("arevell", "pass
 with open(outputfile, 'rb') as f: data, fs = pickle.load(f)
 """
 
-from ieeg.auth import Session
+from revellLab.packages.eeg.ieegOrg.ieegpy.ieeg.auth import Session
 import pandas as pd
 import numpy as np
 
-def get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, ignoreElectrodes, channels = "all"):
+def get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, channels = "all", ignoreElectrodes = []):
     print("\nGetting data from iEEG.org:")
     print(f"fname_iEEG: {fname_iEEG}")
     print(f"startUsec: {startUsec}")

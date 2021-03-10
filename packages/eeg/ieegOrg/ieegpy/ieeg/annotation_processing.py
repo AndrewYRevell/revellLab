@@ -16,8 +16,8 @@
 import math as m
 import datetime
 
-from ieeg.mprov_listener import MProvWriter, AnnotationActivity
-from ieeg.processing import Window
+from revellLab.packages.eeg.ieegOrg.ieegpy.ieeg.mprov_listener import MProvWriter, AnnotationActivity
+from revellLab.packages.eeg.ieegOrg.ieegpy.ieeg.processing import Window
 
 
 class SlidingWindowAnnotator:

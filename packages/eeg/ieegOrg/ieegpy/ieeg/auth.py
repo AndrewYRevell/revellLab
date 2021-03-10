@@ -17,8 +17,8 @@
 
 import xml.etree.ElementTree as ET
 from deprecation import deprecated
-from ieeg.dataset import Dataset as DS
-from ieeg.ieeg_api import IeegApi
+from revellLab.packages.eeg.ieegOrg.ieegpy.ieeg.dataset import Dataset as DS
+from revellLab.packages.eeg.ieegOrg.ieegpy.ieeg.ieeg_api import IeegApi
 
 class Session:
     """

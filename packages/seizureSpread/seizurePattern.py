@@ -32,15 +32,10 @@ import sklearn.metrics as metrics
 import matplotlib.pyplot as plt
 
 #import custom
-path = os.path.join("/media","arevell","sharedSSD","linux","papers","paper002") #Parent directory of project
-sys.path.append(os.path.join(path, "seizure_spread", "code", "tools"))
-sys.path.append(os.path.join(path, "seizure_spread/tools/ieegpy"))
-import echobase
-import echomodel 
-import echoimage
-import download_iEEG_data as downloadiEEG
-import DataClassSfc
-import DataClassJson
+from revellLab.packages.eeg.echobase import echobase
+from revellLab.packages.seizureSpread import echomodel
+from revellLab.packages.eeg.ieegOrg import downloadiEEGorg
+from revellLab.packages.dataClass import DataClassSfc, DataClassJson
 
 
 #%%

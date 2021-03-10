@@ -15,7 +15,7 @@
 '''
 import xml.etree.ElementTree as ET
 import requests
-from ieeg.ieeg_auth import IeegAuth
+from revellLab.packages.eeg.ieegOrg.ieegpy.ieeg.ieeg_auth import IeegAuth
 
 
 class IeegApi:

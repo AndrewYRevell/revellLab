@@ -1084,7 +1084,7 @@ def elliptic(data_hat, fs, wp, ws, gpass, gstop):
     return data_hat_filt
 
 
-def elliptic_bandFilter(data, fs, param):
+def elliptic_bandFilter(data, fs, param = param):
     """
     This function serves as a wrapper for the elliptic filter, in order to filter data into frequency bands 
     by first filtering out 60Hz and then filtering data for each frequency band. 
@@ -1204,6 +1204,11 @@ def preprocess(df, fs, fsds, montage = "bipolar", prewhiten = True):
     return data, data_ref, data_ar, data_filt, channels
 
 #%%
+        
+def movingaverage(x, window_size):
+        window = np.ones(int(window_size))/float(window_size)
+        return np.convolve(x, window, 'valid')
+
 
 
 def distanceBetweenPoints(p1, p2):
@@ -1281,7 +1286,7 @@ def check_path(path):
         raise IOError('%s does not exists' % path)
 
 
-def make_path(path):
+def makepathWithError(path):
     '''
     Make new path if path does not exist
     Parameters
@@ -1293,6 +1298,17 @@ def make_path(path):
         os.makedirs(path)
     else:
         raise IOError('Path: %s, already exists' % path)
+
+def makePath(path):
+    '''
+    Make new path if path does not exist
+    Parameters
+    ----------
+        path: str
+            Make the specified path
+    '''
+    if not os.path.exists(path):
+        os.makedirs(path)
 
 
 def check_path_overwrite(path):

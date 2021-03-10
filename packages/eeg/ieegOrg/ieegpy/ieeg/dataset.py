@@ -17,7 +17,7 @@ from collections import namedtuple
 import numpy as np
 import pandas as pd
 from deprecation import deprecated
-from ieeg.ieeg_api import IeegConnectionError
+from revellLab.packages.eeg.ieegOrg.ieegpy.ieeg.ieeg_api import IeegConnectionError
 
 
 class TimeSeriesDetails:

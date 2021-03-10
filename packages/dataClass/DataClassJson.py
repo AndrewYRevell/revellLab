@@ -16,16 +16,14 @@ import seaborn as sns
 import scipy.signal as signal
 import matplotlib.pyplot as plt
 from dataclasses import dataclass
-from os.path import join as ospj
+from os.path import join
 from sklearn.preprocessing import OneHotEncoder
 
 #import custom
-path = ospj("/media","arevell","sharedSSD","linux","papers","paper002") #Parent directory of project
-sys.path.append(ospj(path, "seizure_spread", "code", "tools"))
-sys.path.append(ospj(path, "seizure_spread/tools/ieegpy"))
-import echobase
-import echomodel 
-import download_iEEG_data as downloadiEEG
+path = join("/media","arevell","sharedSSD","linux","papers","paper002") #Parent directory of project
+from revellLab.packages.eeg.echobase import echobase
+from revellLab.packages.seizureSpread import echomodel
+from revellLab.packages.eeg.ieegOrg import downloadiEEGorg
 
 
 #%%
@@ -35,91 +33,114 @@ import download_iEEG_data as downloadiEEG
 class DataClassJson:
     jsonFile: dict = "unknown"
     
-    def get_iEEGData(self, RID, eventsKey, idKey, username, password, fpath = None, startUsec = None, stopUsec= None, startKey = "EEC", IGNORE_ELECTRODES = True, channels = "all"):
-        fname_iEEG = self.jsonFile["SUBJECTS"][RID]["Events"][eventsKey][idKey]["FILE"]
+    def get_iEEGData(self, sub, eventsKey, idKey, username, password,  BIDS = None, dataset= None, session = None, startUsec = None, stopUsec= None, startKey = "EEC", IGNORE_ELECTRODES = True, channels = "all"):
+        fname_iEEG = self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey]["FILE"]
         if IGNORE_ELECTRODES == True: #if you want to ignore electrodes, then set to True
-            ignoreElectrodes =  self.jsonFile["SUBJECTS"][RID]["IGNORE_ELECTRODES"]
+            ignoreElectrodes =  self.jsonFile["SUBJECTS"][sub]["IGNORE_ELECTRODES"]
         else: #else if you want to get all electrodes, set to False
             ignoreElectrodes = []
         if startUsec is None:
-            startUsec = int(float(self.jsonFile["SUBJECTS"][RID]["Events"][eventsKey][idKey][startKey])*1e6)
+            startUsec = int(float(self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey][startKey])*1e6)
         if stopUsec is None:
-            stopUsec = int(float(self.jsonFile["SUBJECTS"][RID]["Events"][eventsKey][idKey]["Stop"])*1e6)
-            
-        if not fpath == None:
-            echobase.check_path(fpath)
-            fname = os.path.join(fpath, f"sub-{RID}_{fname_iEEG}_{startUsec}_{stopUsec}.csv")
-            fnameMetadata = os.path.join(fpath, f"sub-{RID}_{fname_iEEG}_{startUsec}_{stopUsec}.json")
-            
-            if os.path.exists(fname):
-                print(f"\nFile exist. Loading {fname}")
-                df = pd.read_csv(fname, index_col=0)
-                with open(fnameMetadata) as f: metadata = json.load(f)
-                fs = metadata["fs"]
-            else:
-                print(f"\nFile does not exist. Saving to\n{fname}")
-                df, fs = downloadiEEG.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, ignoreElectrodes, channels)
-                self.saveEEG(fname, fnameMetadata, df, fs, RID, fname_iEEG, startUsec, stopUsec, ignoreElectrodes, channels )
-        else: 
-            print("\nNo file path given. Not saving data. Downloading...")
-            df, fs = downloadiEEG.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, ignoreElectrodes, channels)
-        return df, fs
-    
-    
-    def get_precitalIctalPostictal(self, RID, eventsKey, idKey, username, password, fpath = None, secondsBefore = 30, secondsAfter = 30, startKey = "EEC", IGNORE_ELECTRODES = True, channels = "all"):
-        fname_iEEG = self.jsonFile["SUBJECTS"][RID]["Events"][eventsKey][idKey]["FILE"]
-        if IGNORE_ELECTRODES == True: #if you want to ignore electrodes, then set to True
-            ignoreElectrodes =  self.jsonFile["SUBJECTS"][RID]["IGNORE_ELECTRODES"]
-        else: #else if you want to get all electrodes, set to False
-            ignoreElectrodes = []
-        #calculate exactly the start/stop times to pull
-        ictalStartUsec = int(float(self.jsonFile["SUBJECTS"][RID]["Events"][eventsKey][idKey][startKey])*1e6)
-        precitalStartUsec = int(ictalStartUsec - secondsBefore*1e6)
-        ictalStopUsec = int(float(self.jsonFile["SUBJECTS"][RID]["Events"][eventsKey][idKey]["Stop"])*1e6)
-        postictalStopUsec = int(ictalStopUsec + secondsAfter*1e6)
-        startUsec = precitalStartUsec
-        stopUsec = postictalStopUsec
+            stopUsec = int(float(self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey]["Stop"])*1e6)
+        if not BIDS == None:
+            fpath = self.getBIDSdirectoryToSaveiEEG(BIDS, dataset, sub, session )
+        else: fpath = None
         
         if not fpath == None:
             echobase.check_path(fpath)
-            fname = os.path.join(fpath, f"sub-{RID}_{fname_iEEG}_{startUsec}_{stopUsec}.csv")
-            fnameMetadata = os.path.join(fpath, f"sub-{RID}_{fname_iEEG}_{startUsec}_{stopUsec}.json")
+            fname = os.path.join(fpath, f"sub-{sub}_task-{eventsKey}_run-{startUsec}to{stopUsec}_ieeg.csv")
+            fnameMetadata = os.path.join(fpath, f"sub-{sub}_task-{eventsKey}_run-{startUsec}to{stopUsec}_ieeg.csv.json")
+            fnameEvents = os.path.join(fpath, f"sub-{sub}_task-{eventsKey}_run-{startUsec}to{stopUsec}_events.tsv")
             
             if os.path.exists(fname):
                 print(f"\nFile exist. Loading {fname}")
                 df = pd.read_csv(fname, index_col=0)
                 with open(fnameMetadata) as f: metadata = json.load(f)
-                fs = metadata["fs"]
+                fs = metadata["SamplingFrequency"]
             else:
                 print(f"\nFile does not exist. Saving to\n{fname}")
-                df, fs = downloadiEEG.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, ignoreElectrodes, channels)
-                self.saveEEG(fname, fnameMetadata, df, fs, RID, fname_iEEG, startUsec, stopUsec, ignoreElectrodes, channels )
+                df, fs = downloadiEEGorg.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, channels, ignoreElectrodes = [])
+                self.saveEEG(fname, fnameMetadata, fnameEvents, df, fs, eventsKey, fname_iEEG, startUsec, stopUsec, eventsSave = False )
+        else: 
+            print("\nNo file path given. Not saving data. Downloading...")
+            df, fs = downloadiEEGorg.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, channels, ignoreElectrodes = [])
+        df = pd.DataFrame.drop(df, ignoreElectrodes, axis=1, errors='ignore') 
+        return df, fs
+    
+    
+    def get_precitalIctalPostictal(self, sub, eventsKey, idKey, username, password, BIDS = None, dataset= None, session = None, secondsBefore = 30, secondsAfter = 30, startKey = "EEC", IGNORE_ELECTRODES = True, channels = "all"):
+        fname_iEEG = self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey]["FILE"]
+        if IGNORE_ELECTRODES: 
+            ignoreElectrodes =  self.jsonFile["SUBJECTS"][sub]["IGNORE_ELECTRODES"]
+        else:
+            ignoreElectrodes = []
+        #calculate exactly the start/stop times to pull
+        ictalStartUsec = int(float(self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey][startKey])*1e6)
+        precitalStartUsec = int(ictalStartUsec - secondsBefore*1e6)
+        ictalStopUsec = int(float(self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey]["Stop"])*1e6)
+        postictalStopUsec = int(ictalStopUsec + secondsAfter*1e6)
+        startUsec = precitalStartUsec
+        stopUsec = postictalStopUsec
+        duration = (ictalStopUsec - ictalStartUsec)/1e6
+        
+        if not BIDS == None:
+            fpath = self.getBIDSdirectoryToSaveiEEG(BIDS, dataset, sub, session )
+        else: fpath = None
+        
+        if not fpath == None:
+            echobase.check_path(fpath)
+            fname = os.path.join(fpath, f"sub-{sub}_task-{eventsKey}_run-{startUsec}to{stopUsec}_ieeg.csv")
+            fnameMetadata = os.path.join(fpath, f"sub-{sub}_task-{eventsKey}_run-{startUsec}to{stopUsec}_ieeg.json")
+            fnameEvents = os.path.join(fpath, f"sub-{sub}_task-{eventsKey}_run-{startUsec}to{stopUsec}_events.tsv")
+            
+            if os.path.exists(fname):
+                print(f"\nFile exist. Loading {fname}")
+                df = pd.read_csv(fname, index_col=0)
+                with open(fnameMetadata) as f: metadata = json.load(f)
+                fs = metadata["SamplingFrequency"]
+            else:
+                print(f"\nFile does not exist. Saving to\n{fname}")
+                df, fs = downloadiEEGorg.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec , channels, ignoreElectrodes = [])
+                self.saveEEG(fname, fnameMetadata, fnameEvents, df, fs, eventsKey, fname_iEEG, startUsec, stopUsec, secondsBefore, duration, ictalStartUsec, ictalStopUsec , eventsSave = True)
         else: 
             print("\nNo file path given. Downloading data")
-            df, fs = downloadiEEG.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, ignoreElectrodes, channels)
+            df, fs = downloadiEEGorg.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, channels, ignoreElectrodes = [])
         ictalStartIndex  = int(secondsBefore*fs)
         ictalStopIndex = int(secondsBefore*fs + (ictalStopUsec - ictalStartUsec)/1e6*fs)
+        df = pd.DataFrame.drop(df, ignoreElectrodes, axis=1, errors='ignore') 
         return df, fs, ictalStartIndex, ictalStopIndex
     
-    def saveEEG(self, fname, fnameMetadata, df, fs, RID, fname_iEEG, startUsec, stopUsec, ignoreElectrodes, channels ):
+
+    def getBIDSdirectoryToSaveiEEG(self, BIDS, dataset, sub, session ):
+        echobase.check_path(join(BIDS, dataset))
+        directory = join(BIDS, dataset,  f"sub-{sub}", f"ses-{session}", "ieeg" )
+        echobase.makePath(directory)    
+        return directory
+
+        
+    def saveEEG(self, fname, fnameMetadata, fnameEvents, df, fs, eventsKey, fname_iEEG, startUsec, stopUsec, secondsBefore = None, duration = None, ictalStartUsec = None, ictalStopUsec  = None , eventsSave = False):
         df.to_csv(fname, index=True, header=True, sep=',')
         #saving metadata
-        metadata ={"RID": RID, "fname_iEEG": fname_iEEG, 
-               "startUsec": startUsec, "stopUsec":stopUsec,
-               "fs": fs,
-               "channels": np.array(df.columns).tolist(), "ignoreElectrodes": ignoreElectrodes}   
+        metadata ={"TaskName": eventsKey, "TaskDescription": fname_iEEG, 
+               "RecordingDuration": (stopUsec-startUsec)/1e6,
+               "SamplingFrequency": fs,
+               "PowerLineFrequency": 60, "SoftwareFilters": "n/a"}   
         with open(fnameMetadata, 'w', encoding='utf-8') as f: json.dump(metadata, f, ensure_ascii=False, indent=4)
-    
+        if eventsSave:
+            ictalStartIndex  = int(secondsBefore*fs)
+            ictalStopIndex = int(secondsBefore*fs + (ictalStopUsec - ictalStartUsec)/1e6*fs)
+            events = pd.DataFrame([dict(onset = secondsBefore, duration = duration, ictalStartUsecEEC = ictalStartUsec, ictalStopUsec = ictalStopUsec, ictalStartIndexEEC = ictalStartIndex,  ictalStopIndex = ictalStopIndex )])
+            fnameEvents = events.to_csv(fnameEvents, index=False, header=True, sep='\t')
 
-    
     def downsample(self, data, fs, fsds):
         #fsds = fs_downsample: the frequency to downsample to
         downsampleFactor = int(fs/fsds) #downsample to specified frequency
         data_downsampled = signal.decimate(data, downsampleFactor, axis=0)#downsample data
         return data_downsampled
     
-    def get_annotations(self, RID, eventsKey, idKey, annotationLayerName, username, password):
-        annotations = downloadiEEG.get_iEEG_annotations(username, password, self.jsonFile["SUBJECTS"][RID]["Events"][eventsKey][idKey]["FILE"], annotationLayerName)    
+    def get_annotations(self, sub, eventsKey, idKey, annotationLayerName, username, password):
+        annotations = downloadiEEGorg.get_iEEG_annotations(username, password, self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey]["FILE"], annotationLayerName)    
         return annotations
     
     #extract the annotated segments in data 
@@ -180,15 +201,16 @@ class DataClassJson:
         return dataII_scaler, data_scaler, dataII_scalerDS, data_scalerDS, channels
        
 
-    def get_dataXY(self, RID, idKey, AssociatedInterictal, username, password, annotationLayerName, fpath = None, fsds = 128, window = 10 , skipWindow = 0.25, secondsBefore = 60, secondsAfter = 60, montage = "bipolar", prewhiten = True):
+        
+    def get_dataXY(self, sub, idKey, AssociatedInterictal, username, password, annotationLayerName, BIDS = None, dataset= None, session = None, fsds = 128, window = 10 , skipWindow = 0.25, secondsBefore = 60, secondsAfter = 60, montage = "bipolar", prewhiten = True):
         print("\nGetting ictal data")
-        df, fs, _, _ = self.get_precitalIctalPostictal(RID, "Ictal", idKey, username, password, fpath = fpath, secondsBefore = secondsBefore, secondsAfter = secondsAfter)
+        df, fs, _, _ = self.get_precitalIctalPostictal(sub, "Ictal", idKey, username, password, BIDS = BIDS, dataset= dataset, session = session, secondsBefore = secondsBefore, secondsAfter = secondsAfter)
         print("\nGetting interictal data")
-        df_interictal, _ = self.get_iEEGData(RID, "Interictal", AssociatedInterictal, username, password, fpath = fpath, startKey = "Start")
+        df_interictal, _ = self.get_iEEGData(sub, "Interictal", AssociatedInterictal, username, password, BIDS = BIDS, dataset= dataset, session = session, startKey = "Start")
         print(f"\nPreprocessing data\nMontage: {montage}\nPrewhiten: {prewhiten}")
         dataII_scaler, data_scaler, dataII_scalerDS, data_scalerDS, channels = self.preprocessNormalizeDownsample(df, df_interictal, fs, fsds, montage = montage, prewhiten = prewhiten)
         time_step, skip = int(window*fsds), int(skipWindow*fsds)
-        annotations = self.get_annotations(RID, "Ictal", idKey, annotationLayerName, username, password) 
+        annotations = self.get_annotations(sub, "Ictal", idKey, annotationLayerName, username, password) 
         print("\nAnnotations")
         #get annotated segments of preprocessed data
         #alter annotations to include time_step seconds beforehand
