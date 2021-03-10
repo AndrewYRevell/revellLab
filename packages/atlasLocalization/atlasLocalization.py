@@ -39,45 +39,54 @@ fillerString = "\n###########################\n###########################\n####
 """
 Examples:
     
-electrodePreopT1Coordinates = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/sub-RID0517/electrodeLocalization/electrodenames_coordinates_native_and_T1.csv"
-preopT1 = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/sub-RID0517/electrodeLocalization/T00_RID517_mprage.nii.gz"
-preopT1bet = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/sub-RID0517/electrodeLocalization/T00_RID517_mprage_brainBrainExtractionBrain.nii.gz"
-MNItemplate = "/media/arevell/sharedSSD/linux/tools/electrodeLocalization/tools/mniTemplate/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182.nii.gz"
-MNItemplatebet = "/media/arevell/sharedSSD/linux/tools/electrodeLocalization/tools/mniTemplate/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182_brain.nii.gz"
-atlasDirectory = "/media/arevell/sharedSSD/linux/tools/electrodeLocalization/tools/atlases"
+#electrodePreopT1Coordinates = "/media/arevell/sharedSSD/linux/data/BIDS/PIER/sub-RID0648/ses-implant01/ieeg/sub-RID0648_ses-implant01_space-preimplantT1w_electrodes.tsv"
+electrodePreopT1Coordinates = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/atlasLocalization/sub-RID0648/electrodenames_coordinates_native_and_T1.csv"
+preopT1 = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/atlasLocalization/sub-RID0648/T00_RID648_mprage.nii.gz"
+preopT1bet = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/atlasLocalization/sub-RID0648/T00_RID648_mprage_brainBrainExtractionBrain.nii.gz"
+MNItemplate = "/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182.nii.gz"
+MNItemplatebet = "/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182_brain.nii.gz"
+atlasDirectory = "/media/arevell/sharedSSD/linux/revellLab/tools/atlases"
 
-outputDirectory = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/sub-RID0517/electrodeLocalization/atlasLocalization"
-outputName = "sub-RID0517_electrodeLocalization.csv"
+outputDirectory = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/atlasLocalization/sub-RID0648"
+outputName = "sub-RID0648_atlasLocalization.csv"
 
+
+check_path(electrodePreopT1Coordinates)
+check_path(preopT1)
+check_path(preopT1bet)
+check_path(MNItemplate)
+check_path(MNItemplatebet)
+check_path(atlasDirectory)
+check_path(outputDirectory)
 
     
-conda activate electrodeLocalization
+conda activate revellLab
 
-python /media/arevell/sharedSSD/linux/tools/electrodeLocalization/electrodeLocalization.py \
-    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/sub-RID0596/electrodeLocalization/electrodenames_coordinates_native_and_T1.csv \
-    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/sub-RID0596/electrodeLocalization/T00_RID596_mprage.nii.gz \
-    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/sub-RID0596/electrodeLocalization/T00_RID596_mprage_brainBrainExtractionBrain.nii.gz \
-    /media/arevell/sharedSSD/linux/tools/electrodeLocalization/tools/mniTemplate/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182.nii.gz \
-    /media/arevell/sharedSSD/linux/tools/electrodeLocalization/tools/mniTemplate/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182_brain.nii.gz \
-    /media/arevell/sharedSSD/linux/tools/electrodeLocalization/tools/atlases \
-    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/sub-RID0596/electrodeLocalization/atlasLocalization
-    sub-RID0596_electrodeLocalization.csv
+python /media/arevell/sharedSSD/linux/revellLab/packages/atlasLocalization/atlasLocalization.py \
+    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/atlasLocalization/sub-RID0648/electrodenames_coordinates_native_and_T1.csv \
+    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/atlasLocalization/sub-RID0648/T00_RID648_mprage.nii.gz \
+    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/atlasLocalization/sub-RID0648/T00_RID648_mprage_brainBrainExtractionBrain.nii.gz \
+    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182.nii.gz \
+    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182_brain.nii.gz \
+    /media/arevell/sharedSSD/linux/revellLab/tools/atlases \
+    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/atlasLocalization/sub-RID0648
+    sub-RID0648_atlasLocalization.csv
     
     
-rid = "596"
+rid = "652"
     
     
 print(\
-    f"conda activate electrodeLocalization \n\
-python /media/arevell/sharedSSD/linux/tools/electrodeLocalization/electrodeLocalization.py \
-    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/sub-RID0{rid}/electrodeLocalization/electrodenames_coordinates_native_and_T1.csv \
-    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/sub-RID0{rid}/electrodeLocalization/T00_RID{rid}_mprage.nii.gz \
-    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/sub-RID0{rid}/electrodeLocalization/T00_RID{rid}_mprage_brainBrainExtractionBrain.nii.gz \
-    /media/arevell/sharedSSD/linux/tools/electrodeLocalization/tools/mniTemplate/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182.nii.gz \
-    /media/arevell/sharedSSD/linux/tools/electrodeLocalization/tools/mniTemplate/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182_brain.nii.gz \
-    /media/arevell/sharedSSD/linux/tools/electrodeLocalization/tools/atlases \
-    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/sub-RID0{rid}/electrodeLocalization/atlasLocalization \
-    sub-RID0{rid}_electrodeLocalization.csv\n\n" \
+    f"conda activate revellLab \n\
+python /media/arevell/sharedSSD/linux/revellLab/packages/atlasLocalization/atlasLocalization.py  \
+    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/atlasLocalization/sub-RID0{rid}/electrodenames_coordinates_native_and_T1.csv \
+    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/atlasLocalization/sub-RID0{rid}/T00_RID{rid}_mprage.nii.gz \
+    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/atlasLocalization/sub-RID0{rid}/T00_RID{rid}_mprage_brainBrainExtractionBrain.nii.gz \
+    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182.nii.gz \
+    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182_brain.nii.gz \
+    /media/arevell/sharedSSD/linux/revellLab/tools/atlases \
+    /media/arevell/sharedSSD/linux/data/BIDS/derivatives/atlasLocalization/sub-RID0{rid} \
+    sub-RID0{rid}_atlasLocalization.csv\n\n" \
     )
     
     
@@ -136,12 +145,12 @@ def applywarp_to_atlas(atlasDirectory, fname_preopT1, MNIwarp, outputDirectory):
             else: print(f"File exists: {outputAtlasName}")
             
             
-def by_region(electrodePreopT1Coordinates, atlasPath, atlasLabelsPath, ofname,  xColIndex=10, yColIndex=11, zColIndex=12, description = "unknown_atlas", Labels=True):
+def by_region(electrodePreopT1Coordinates, atlasPath, atlasLabelsPath, ofname, sep=",",  xColIndex=10, yColIndex=11, zColIndex=12, description = "unknown_atlas", Labels=True):
     # getting imaging data
     img = nib.load(atlasPath)
     img_data = img.get_fdata()  # getting actual image data array
 
-    #show_slices(img_data)
+    #show_slices(atlasPath)
     affine = img.affine
     if Labels == True:
         #getting atlas labels file
@@ -159,7 +168,7 @@ def by_region(electrodePreopT1Coordinates, atlasPath, atlasLabelsPath, ofname,  
         column_description1 = f"{description}_region_number"
         column_description2 = f"{description}_label"
     # getting electrode coordinates data
-    data = pd.read_csv(electrodePreopT1Coordinates, sep=",", header=None)
+    data = pd.read_csv(electrodePreopT1Coordinates, sep=sep, header=0)
     data = data.iloc[:, [0, xColIndex, yColIndex, zColIndex]]
     column_names = ['electrode_name', "x_coordinate", "y_coordinate", "z_coordinate", column_description1,column_description2 ]
     data = data.rename(
@@ -210,13 +219,13 @@ def by_region(electrodePreopT1Coordinates, atlasPath, atlasLabelsPath, ofname,  
     pd.DataFrame.to_csv(data, ofname, header=True, index=False)
 
 
-def distance_from_label(electrodePreopT1Coordinates, atlasPath, label, atlasLabelsPath, ofname, xColIndex=10, yColIndex=11, zColIndex=12):
+def distance_from_label(electrodePreopT1Coordinates, atlasPath, label, atlasLabelsPath, ofname, sep=",", xColIndex=10, yColIndex=11, zColIndex=12):
     # getting imaging data
     img = nib.load(atlasPath)
     img_data = img.get_fdata()  # getting actual image data array
     affine = img.affine
     # getting electrode coordinates data
-    data = pd.read_csv(electrodePreopT1Coordinates, sep=",", header=None)
+    data = pd.read_csv(electrodePreopT1Coordinates, sep=sep, header=None)
     data = data.iloc[:, [0, xColIndex, yColIndex, zColIndex]]
     
     atlas_labels = pd.read_csv(atlasLabelsPath, sep=",", header=None)
@@ -463,11 +472,10 @@ print(f"\n\n{fillerString}Part 4 of 4\nElectrode Localization\nEstimated time: 1
 if not os.path.exists(join(outputDirectory, outputName)):
     #localization by region to tissue segmentation 
     outputTissueCoordinates = join(outputDirectoryTMP, "tissueSegmentation.csv")
-    by_region(electrodePreopT1Coordinates, outputNameTissueSeg, join(atlasDirectory, "tissue_segmentation.csv"), outputTissueCoordinates,  xColIndex=10, yColIndex=11, zColIndex=12, description = "tissue_segmentation", Labels=True)
+    by_region(electrodePreopT1Coordinates, outputNameTissueSeg, join(atlasDirectory, "tissue_segmentation.csv"), outputTissueCoordinates, description = "tissue_segmentation", Labels=True)
     #rename channels to standard 4 characters (2 letters, 2 numbers)
     channel2stdCSV(outputTissueCoordinates)
-    
-    
+
     
     #localization by region to atlases
     atlases = [f for f in listdir(atlasDirectory) if isfile(join(atlasDirectory, f))]
@@ -486,7 +494,7 @@ if not os.path.exists(join(outputDirectory, outputName)):
                 check_path(atlasLabels)
                 Labels=True
             outputAtlasCoordinates = join(outputDirectoryTMP, f"{atlasName}" + "_localization.csv")
-            by_region(electrodePreopT1Coordinates, atlasInMNI, atlasLabels, outputAtlasCoordinates,  xColIndex=10, yColIndex=11, zColIndex=12, description = atlasName, Labels=Labels)
+            by_region(electrodePreopT1Coordinates, atlasInMNI, atlasLabels, outputAtlasCoordinates, description = atlasName, Labels=Labels)
             channel2stdCSV(outputAtlasCoordinates)
     
     
@@ -494,14 +502,14 @@ if not os.path.exists(join(outputDirectory, outputName)):
     print("\n\n\n\nFinding the WM electrode contacts distance to GM")
     outputTissueCoordinatesDistanceGM = join(outputDirectory, "electrodeWM_DistanceToGM.csv")
     if not os.path.exists(outputTissueCoordinatesDistanceGM):
-        distance_from_label(electrodePreopT1Coordinates, outputNameTissueSeg, 2, join(atlasDirectory, "tissue_segmentation.csv"), outputTissueCoordinatesDistanceGM, xColIndex=10, yColIndex=11, zColIndex=12)
+        distance_from_label(electrodePreopT1Coordinates, outputNameTissueSeg, 2, join(atlasDirectory, "tissue_segmentation.csv"), outputTissueCoordinatesDistanceGM)
     channel2stdCSV(outputTissueCoordinatesDistanceGM)
     
     #localization of channel distance to tissue segmentation: Gray Matter electrodes distance to White Matter
     print("\n\n\n\nFinding the GM electrode contacts distance to WM")
     outputTissueCoordinatesDistanceWM = join(outputDirectory, "electrodeGM_DistanceToWM.csv")
     if not os.path.exists(outputTissueCoordinatesDistanceWM):
-        distance_from_label(electrodePreopT1Coordinates, outputNameTissueSeg, 3, join(atlasDirectory, "tissue_segmentation.csv"), outputTissueCoordinatesDistanceWM, xColIndex=10, yColIndex=11, zColIndex=12)
+        distance_from_label(electrodePreopT1Coordinates, outputNameTissueSeg, 3, join(atlasDirectory, "tissue_segmentation.csv"), outputTissueCoordinatesDistanceWM)
     channel2stdCSV(outputTissueCoordinatesDistanceWM)
     
     
