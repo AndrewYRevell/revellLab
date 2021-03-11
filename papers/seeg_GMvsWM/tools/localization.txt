@@ -1,0 +1,74 @@
+# -*- coding: utf-8 -*-
+"""
+Spyder Editor
+
+This is a temporary script file.
+"""
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#####
+
+#linear reg of preop to T00 space
+flirt -in ../../../imaging/sub-RID0278/ses-preop3T/anat/sub-RID0278_ses-preop3T_acq-3D_T1w.nii.gz -ref ../sub-RID0278_T00_mprage -dof 12 -out preop3T_to_T00 -omat preop3T_to_T00.mat
+#non linear reg of preop to T00 space
+fnirt --in=../../../imaging/sub-RID0278/ses-preop3T/anat/sub-RID0278_ses-preop3T_acq-3D_T1w.nii.gz --ref=../sub-RID0278_T00_mprage --aff=preop3T_to_T00.mat --iout=preop3T_to_T00_nonlinear -v --cout=preop3T_to_T00_coef --fout=preop3T_to_T00_warp
+
+
+#brain extraction of preop_T00
+bet preop3T_to_T00_nonlinear.nii.gz preop3T_to_T00_nonlinear_bet.nii.gz -f 0.15
+
+#seg of preop img 
+fast -n 3 -H 0.5 -f 0.04 -l 10 -v -t 1 --nopve preop3T_to_T00_nonlinear_bet.nii.gz
+
+
+run_first_all -i preop3T_to_T00_nonlinear_bet.nii.gz -o preop3T_to_T00_nonlinear_bet_first.nii.gz -v -b
+
+
+
+
+
+
+#########
+
+#linear reg of MNI to preop_T00
+flirt -in MNI152_T1_1mm_brain.nii.gz -ref preop3T_to_T00_nonlinear_bet -dof 12 -out MNI_to_preop3T -omat MNI_to_preop3T.mat
+#non linear reg of MNI to preop
+fnirt --in=MNI152_T1_1mm.nii.gz --ref=preop3T_to_T00_nonlinear.nii.gz --aff=MNI_to_preop3T.mat --iout=MNI_to_preop3T_nonlinear -v --cout=MNI_to_preop3T_coef --fout=MNI_to_preop3T_warp
+
+
+
+#seg of MNI in preop_T00 space
+fast -n 3 -H 0.5 -f 0.04 -l 10 -v -t 1 --nopve MNI_to_preop3T.nii.gz
+
+#seg of preop img using MNI seg as prior
+fast -n 3 -H 0.5 -f 0.04 -l 10 -v -t 1 --nopve -A MNI_to_preop3T_seg.nii.gz preop3T_to_T00_nonlinear_bet.nii.gz
+
+
+#AAL atlas warp to preop_T00 space
+applywarp -i AAL3v1_1mm.nii.gz -r preop3T_to_T00_nonlinear_bet -w sub-RID0278_ses-preop3T_acq-3D_T1w_warpcoef.nii.gz -o AAL_to_preop.nii.gz --interp=nn
+
+#HO_subcort with classes atlas warp to preop_T00 space
+applywarp -i HO_sub_SEG_CLASS.nii.gz -r preop3T_to_T00_nonlinear_bet -o HO_sub_SEG_CLASS_to_preop.nii.gz --premat=MNI_to_preop3T.mat --interp=nn
+
+
+
+#seg of preop img using HO_subcort seg as prior
+fast -n 3 -H 0.5 -f 0.04 -l 10 -v -t 1 --nopve -A HO_sub_SEG_CLASS_to_preop.nii.gz preop3T_to_T00_nonlinear_bet.nii.gz
