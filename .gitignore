@@ -1,6 +1,6 @@
 #Mac OS
 .DS_Store*
-
+.spyproject
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
