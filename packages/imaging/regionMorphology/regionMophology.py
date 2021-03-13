@@ -24,24 +24,12 @@ python3.6 Script_02_electrode_localization.py
 
 #assumes current working directory is scripts directory
 #%%
-path = "/mnt"
+
 import sys
-from os.path import join as ospj
-sys.path.append(ospj(path, "paper001/code/tools"))
+from os.path import join
 import nibabel as nib
 import numpy as np
 import pandas as pd
-
-#%% Paths and File names
-"""
-atlas_path = ospj( path, "data_raw/atlases/standard_atlases/aal_res-1x1x1.nii.gz")
-
-
-img = nib.load(atlas_path)
-img_data = img.get_fdata() 
-
-"""
-
 
 #%% volume
 #(1) - count the number of voxels within a given region

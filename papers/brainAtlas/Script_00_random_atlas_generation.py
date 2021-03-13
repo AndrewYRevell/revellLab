@@ -55,6 +55,5 @@ for a in range(len(number_of_regions_list)):
             RAG.generateRandomAtlases_wholeBrain(number_of_regions, ofname_atlases_random, ifname_MNI_template)
         else:
             print("File exists: {0}".format(ofname_atlases_random))
-        #Sphericity
 
 
