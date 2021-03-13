@@ -1,0 +1,256 @@
+{   
+    "PATHS":{
+        "STANDARD": "tools/atlases/atlases",
+        "wholeBrainMNI": "tools/atlases/randomAtlasesWholeBrainMNI"
+    },
+    "STANDARD":{
+        "AAL1":{
+            "name": "AAL.nii.gz",
+            "label": "AAL.csv"
+        },
+        "AAL2":{
+            "name": "AAL2.nii.gz",
+            "label": "AAL2.csv"
+        },
+        "AAL3":{
+            "name": "AAL3v1_1mm.nii.gz",
+            "label": "AAL3v1_1mm.csv"
+        },
+        "AAL_JHU_combined":{
+            "name": "AAL_JHU_combined.nii.gz",
+            "label": "AAL_JHU_combined.csv"
+        },
+        "AICHA":{
+            "name": "AICHA.nii.gz",
+            "label": "AICHA.csv"
+        },
+        "BNA":{
+            "name": "BN_Atlas_246_1mm.nii.gz",
+            "label": "BN_Atlas_246_1mm.csv"
+        },
+        "brodmann":{
+            "name": "brodmann.nii.gz",
+            "label": "brodmann.csv"
+        },
+        "Craddock200":{
+            "name": "cc200_roi_atlas.nii.gz",
+            "label": "cc200_roi_atlas.csv"
+        },
+        "Craddock400":{
+            "name": "cc400_roi_atlas.nii.gz",
+            "label": "cc400_roi_atlas.csv"
+        },
+        "Gordon_Petersen":{
+            "name": "Gordon_Petersen_2016_MNI.nii.gz",
+            "label": "Gordon_Petersen_2016_MNI.csv"
+        },
+        "Hammersmith":{
+            "name": "Hammersmith_atlas_n30r83_SPM5.nii.gz",
+            "label": "Hammersmith_atlas_n30r83_SPM5.csv"
+        },
+        "HO_corticalSubcortical":{
+            "name": "HarvardOxford-combined.nii.gz",
+            "label": "HarvardOxford-combined.csv"
+        },
+        "HO_corticalSymmetric":{
+            "name": "HarvardOxford-cort-maxprob-thr25-1mm.nii.gz",
+            "label": "HarvardOxford-cort-maxprob-thr25-1mm.csv"
+        },
+        "HO_cortical":{
+            "name": "HarvardOxford-cort-NONSYMMETRIC-maxprob-thr25-1mm.nii.gz",
+            "label": "HarvardOxford-cort-NONSYMMETRIC-maxprob-thr25-1mm.csv"
+        },
+        "HO_subcorticalOnly":{
+            "name": "HarvardOxford-sub-ONLY_maxprob-thr25-1mm.nii.gz",
+            "label": "HarvardOxford-sub-ONLY_maxprob-thr25-1mm.csv"
+        },
+        "JHUlabels":{
+            "name": "JHU-ICBM-labels-1mm.nii.gz",
+            "label": "JHU-ICBM-labels-1mm.csv"
+        },
+        "JHUtracts-":{
+            "name": "JHU-ICBM-tracts-maxprob-thr25-1mm.nii.gz",
+            "label": "JHU-ICBM-tracts-maxprob-thr25-1mm.csv"
+        },
+        "Julich-maxprob-thr25-1mm":{
+            "name": "Julich-maxprob-thr25-1mm.nii.gz",
+            "label": "Julich-maxprob-thr25-1mm.csv"
+        },
+        "MMP":{
+            "name": "MMP_in_MNI_resliced.nii.gz",
+            "label": "MMP_in_MNI_resliced.csv"
+        },
+        "CerebrA":{
+            "name": "mni_icbm152_CerebrA_tal_nlin_sym_09c.nii.gz",
+            "label": "mni_icbm152_CerebrA_tal_nlin_sym_09c.csv"
+        },
+        "MNIstructural":{
+            "name": "MNI-maxprob-thr25-1mm.nii.gz",
+            "label": "MNI-maxprob-thr25-1mm.csv"
+        },
+        "DKT":{
+            "name": "OASIS-TRT-20_jointfusion_DKT31_CMA_labels_in_MNI152_v2.nii.gz",
+            "label": "OASIS-TRT-20_jointfusion_DKT31_CMA_labels_in_MNI152_v2.csv"
+        },
+        "Schaefer07_100":{
+            "name": "Schaefer2018_100Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_100Parcels_7Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer17_100":{
+            "name": "Schaefer2018_100Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_100Parcels_17Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer07_200":{
+            "name": "Schaefer2018_200Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_200Parcels_7Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer17_200":{
+            "name": "Schaefer2018_200Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_200Parcels_17Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer07_300":{
+            "name": "Schaefer2018_300Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_300Parcels_7Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer17_300":{
+            "name": "Schaefer2018_300Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_300Parcels_17Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer07_400":{
+            "name": "Schaefer2018_400Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_400Parcels_7Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer17_400":{
+            "name": "Schaefer2018_400Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_400Parcels_17Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer07_500":{
+            "name": "Schaefer2018_500Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_500Parcels_7Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer17_500":{
+            "name": "Schaefer2018_500Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_500Parcels_17Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer07_600":{
+            "name": "Schaefer2018_600Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_600Parcels_7Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer17_600":{
+            "name": "Schaefer2018_600Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_600Parcels_17Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer07_700":{
+            "name": "Schaefer2018_700Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_700Parcels_7Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer17_700":{
+            "name": "Schaefer2018_700Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_700Parcels_17Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer07_800":{
+            "name": "Schaefer2018_800Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_800Parcels_7Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer17_800":{
+            "name": "Schaefer2018_800Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_800Parcels_17Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer07_900":{
+            "name": "Schaefer2018_900Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_900Parcels_7Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer17_900":{
+            "name": "Schaefer2018_900Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_900Parcels_17Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer07_1000":{
+            "name": "Schaefer2018_1000Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_1000Parcels_7Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Schaefer17_1000":{
+            "name": "Schaefer2018_1000Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
+            "label": "Schaefer2018_1000Parcels_17Networks_order_FSLMNI152_1mm.csv"
+        },
+        "Talairach":{
+            "name": "Talairach-labels-1mm.nii.gz",
+            "label": "Talairach-labels-1mm.csv"
+        },
+        "Yeo07_liberal":{
+            "name": "Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_LiberalMask_resliced.nii.gz",
+            "label": "Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_LiberalMask_resliced.csv"
+        },
+        "Yeo07":{
+            "name": "Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_resliced.nii.gz",
+            "label": "Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_resliced.csv"
+        },
+        "Yeo17_liberal":{
+            "name": "Yeo2011_17Networks_MNI152_FreeSurferConformed1mm_LiberalMask_resliced.nii.gz",
+            "label": "Yeo2011_17Networks_MNI152_FreeSurferConformed1mm_LiberalMask_resliced.csv"
+        },
+        "Yeo17":{
+            "name": "Yeo2011_17Networks_MNI152_FreeSurferConformed1mm_resliced.nii.gz",
+            "label": "Yeo2011_17Networks_MNI152_FreeSurferConformed1mm_resliced.csv"
+        }
+    },
+    "RANDOM":{
+        "wholeBrainMNI":{
+            "10":{
+                "name": "RandomAtlas0000010",
+                "permutations": 5
+            },
+            "30":{
+                "name": "RandomAtlas0000030",
+                "permutations": 5
+            },
+            "50":{
+                "name": "RandomAtlas0000050",
+                "permutations": 5
+            },
+            "75":{
+                "name": "RandomAtlas0000075",
+                "permutations": 5
+            },
+            "100":{
+                "name": "RandomAtlas0000100",
+                "permutations": 5
+            },
+            "200":{
+                "name": "RandomAtlas0000200",
+                "permutations": 5
+            },
+            "300":{
+                "name": "RandomAtlas0000300",
+                "permutations": 5
+            },
+            "400":{
+                "name": "RandomAtlas0000400",
+                "permutations": 5
+            },
+            "500":{
+                "name": "RandomAtlas0000500",
+                "permutations": 5
+            },
+            "750":{
+                "name": "RandomAtlas0000750",
+                "permutations": 5
+            },
+            "1000":{
+                "name": "RandomAtlas0001000",
+                "permutations": 5
+            },
+            "2000":{
+                "name": "RandomAtlas0002000",
+                "permutations": 5
+            },
+            "5000":{
+                "name": "RandomAtlas0005000",
+                "permutations": 5
+            },
+            "10000":{
+                "name": "RandomAtlas0010000",
+                "permutations": 5
+            }
+        }
+    }
+}
