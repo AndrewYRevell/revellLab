@@ -33,7 +33,7 @@ from revellLab.packages.eeg.ieegOrg import downloadiEEGorg
 class DataClassJson:
     jsonFile: dict = "unknown"
     
-    def get_iEEGData(self, sub, eventsKey, idKey, username, password,  BIDS = None, dataset= None, session = None, startUsec = None, stopUsec= None, startKey = "EEC", IGNORE_ELECTRODES = True, channels = "all"):
+    def get_iEEGData(self, sub, eventsKey, idKey, username, password,  BIDS = None, dataset= None, session = None, startUsec = None, stopUsec= None, startKey = "EEC", IGNORE_ELECTRODES = True, channels = "all", load = True):
         fname_iEEG = self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey]["FILE"]
         if IGNORE_ELECTRODES == True: #if you want to ignore electrodes, then set to True
             ignoreElectrodes =  self.jsonFile["SUBJECTS"][sub]["IGNORE_ELECTRODES"]
@@ -54,10 +54,12 @@ class DataClassJson:
             fnameEvents = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_events.tsv")
             
             if os.path.exists(fname):
-                print(f"\nFile exist. Loading {fname}")
-                df = pd.read_csv(fname, index_col=0)
-                with open(fnameMetadata) as f: metadata = json.load(f)
-                fs = metadata["SamplingFrequency"]
+                print(f"\nFile exist {fname}")
+                if load:
+                    print("Loading")
+                    df = pd.read_csv(fname, index_col=0)
+                    with open(fnameMetadata) as f: metadata = json.load(f)
+                    fs = metadata["SamplingFrequency"]
             else:
                 print(f"\nFile does not exist. Saving to\n{fname}")
                 df, fs = downloadiEEGorg.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, channels, ignoreElectrodes = [])
@@ -65,11 +67,12 @@ class DataClassJson:
         else: 
             print("\nNo file path given. Not saving data. Downloading...")
             df, fs = downloadiEEGorg.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, channels, ignoreElectrodes = [])
-        df = pd.DataFrame.drop(df, ignoreElectrodes, axis=1, errors='ignore') 
-        return df, fs
+        if load:
+            df = pd.DataFrame.drop(df, ignoreElectrodes, axis=1, errors='ignore') 
+            return df, fs
+        
     
-    
-    def get_precitalIctalPostictal(self, sub, eventsKey, idKey, username, password, BIDS = None, dataset= None, session = None, secondsBefore = 30, secondsAfter = 30, startKey = "EEC", IGNORE_ELECTRODES = True, channels = "all"):
+    def get_precitalIctalPostictal(self, sub, eventsKey, idKey, username, password, BIDS = None, dataset= None, session = None, secondsBefore = 30, secondsAfter = 30, startKey = "EEC", IGNORE_ELECTRODES = True, channels = "all", load = True):
         fname_iEEG = self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey]["FILE"]
         if IGNORE_ELECTRODES: 
             ignoreElectrodes =  self.jsonFile["SUBJECTS"][sub]["IGNORE_ELECTRODES"]
@@ -95,10 +98,12 @@ class DataClassJson:
             fnameEvents = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_events.tsv")
             
             if os.path.exists(fname):
-                print(f"\nFile exist. Loading {fname}")
-                df = pd.read_csv(fname, index_col=0)
-                with open(fnameMetadata) as f: metadata = json.load(f)
-                fs = metadata["SamplingFrequency"]
+                print(f"\nFile exist {fname}")
+                if load:
+                    print("Loading")
+                    df = pd.read_csv(fname, index_col=0)
+                    with open(fnameMetadata) as f: metadata = json.load(f)
+                    fs = metadata["SamplingFrequency"]
             else:
                 print(f"\nFile does not exist. Saving to\n{fname}")
                 df, fs = downloadiEEGorg.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec , channels, ignoreElectrodes = [])
@@ -106,11 +111,12 @@ class DataClassJson:
         else: 
             print("\nNo file path given. Downloading data")
             df, fs = downloadiEEGorg.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, channels, ignoreElectrodes = [])
-        ictalStartIndex  = int(secondsBefore*fs)
-        ictalStopIndex = int(secondsBefore*fs + (ictalStopUsec - ictalStartUsec)/1e6*fs)
-        df = pd.DataFrame.drop(df, ignoreElectrodes, axis=1, errors='ignore') 
-        return df, fs, ictalStartIndex, ictalStopIndex
-    
+        if load:
+            ictalStartIndex  = int(secondsBefore*fs)
+            ictalStopIndex = int(secondsBefore*fs + (ictalStopUsec - ictalStartUsec)/1e6*fs)
+            df = pd.DataFrame.drop(df, ignoreElectrodes, axis=1, errors='ignore') 
+            return df, fs, ictalStartIndex, ictalStopIndex
+        
 
     def getBIDSdirectoryToSaveiEEG(self, BIDS, dataset, sub, session ):
         echobase.check_path(join(BIDS, dataset))

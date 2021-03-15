@@ -216,12 +216,12 @@ iEEGTimes = cohort.getiEEGdataKeys()
 
 for i in range(len(iEEGTimes)):
     metadata.get_precitalIctalPostictal(iEEGTimes["sub"][i] , "Ictal", iEEGTimes["iEEGdataKey"][i], username, password, 
-                                        BIDS = BIDS, dataset= "derivatives/iEEGorgDownload", session = "implant01", secondsBefore = 180, secondsAfter = 180)
+                                        BIDS = BIDS, dataset= "derivatives/iEEGorgDownload", session = "implant01", secondsBefore = 180, secondsAfter = 180, load=False)
     
     #get intertical
     associatedInterictal = metadata.get_associatedInterictal(iEEGTimes["sub"][i],  iEEGTimes["iEEGdataKey"][i])
     metadata.get_iEEGData(iEEGTimes["sub"][i] , "Interictal", associatedInterictal, username, password, 
-                                        BIDS = BIDS, dataset= "derivatives/iEEGorgDownload", session = "implant01", startKey = "Start")
+                                        BIDS = BIDS, dataset= "derivatives/iEEGorgDownload", session = "implant01", startKey = "Start", load=False)
     
 
 

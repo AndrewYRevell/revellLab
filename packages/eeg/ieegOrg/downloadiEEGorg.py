@@ -83,14 +83,18 @@ def get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, channels 
         #data = ds.get_data(startUsec, duration, channels_ind)
     if duration >= server_limit_minutes*60*1e6:
         break_times = np.ceil(np.linspace(startUsec, stopUsec, num=int(np.ceil(duration/(server_limit_minutes*60*1e6))+1), endpoint=True))
-        break_data = np.zeros(shape = (int(np.ceil(duration/1e6*fs)), len(channels_ind)))#initialize
+        #old deprecated: break_data = np.zeros(shape = (int(np.ceil(duration/1e6*fs)), len(channels_ind)))#initialize
         print("breaking up data request from server because length is too long")
         for i in range(len(break_times)-1):
-            print("{0}/{1}".format(i+1, len(break_times)-1))
-            break_data[range(int( np.ceil((break_times[i]-break_times[0])/1e6*fs) ), int(  np.ceil((break_times[i+1]- break_times[0])/1e6*fs) )  ),:] = ds.get_data(break_times[i], break_times[i+1]-break_times[i], channels_ind)
+            print(f"{i+1}/{len(break_times)-1}")
+            if i ==0: #initialize
+                break_data = ds.get_data(break_times[i], break_times[i+1]-break_times[i], channels_ind)
+            else:
+                tmp2 = ds.get_data(break_times[i], break_times[i+1]-break_times[i], channels_ind)
+                break_data = np.concatenate([break_data, tmp2], axis=0)
+                
+            #old deprecated: break_data[range(int( np.ceil((break_times[i]-break_times[0])/1e6*fs) ), int(  np.ceil((break_times[i+1]- break_times[0])/1e6*fs) )  ),:]
         data = break_data
-        
-        
     index = np.round(np.linspace(startUsec, stopUsec, num = len(data))).astype(int)
     df = pd.DataFrame(data, columns=channel_labels, index = index)
     df = pd.DataFrame.drop(df, ignoreElectrodes, axis=1, errors='ignore') #errors = ignore means only drop electrodes if actually contained within

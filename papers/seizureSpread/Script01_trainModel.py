@@ -44,7 +44,7 @@ fnameiEEGusernamePassword = join("/media","arevell","sharedSSD","linux", "ieegor
 fnameJSON = join("/media","arevell","sharedSSD","linux", "data", "metadata", "iEEGdataRevell.json")
 BIDS = join("/media","arevell","sharedSSD","linux", "data", "BIDS")
 deepLearningModelsPath = "/media/arevell/sharedSSD/linux/data/deepLearningModels/seizureSpread"
-dataset = "PIER"
+datasetiEEG = "derivatives/iEEGorgDownload"
 session = "implant01"
 
 #opening files
@@ -112,13 +112,13 @@ for i in range(len(train)):
     if i ==0: #intialize
         X_train, y_train, data, dataII, dataAnnotations = DataJson.get_dataXY(sub, idKey, 
                                                                               AssociatedInterictal, username, password, 
-                                                                              annotationLayerName, BIDS = BIDS, dataset= dataset, session = session, 
+                                                                              annotationLayerName, BIDS = BIDS, dataset= datasetiEEG, session = session, 
                                                                               secondsBefore = secondsBefore, 
                                                                               secondsAfter = secondsAfter, montage = montage, prewhiten = prewhiten)
     else:
         X, y, data, dataII, dataAnnotations = DataJson.get_dataXY(sub, idKey, 
                                                                   AssociatedInterictal, username, password, 
-                                                                  annotationLayerName, BIDS = BIDS, dataset= dataset, session = session, 
+                                                                  annotationLayerName, BIDS = BIDS, dataset= datasetiEEG, session = session, 
                                                                   secondsBefore = secondsBefore, 
                                                                   secondsAfter = secondsAfter, montage = montage, prewhiten = prewhiten)
         X_train = np.concatenate([X_train, X], axis = 0)
@@ -132,13 +132,13 @@ for i in range(len(test)):
     if i ==0: #intialize
         X_test, y_test, data, dataII, dataAnnotations = DataJson.get_dataXY(sub, idKey, 
                                                                             AssociatedInterictal, username, password, 
-                                                                            annotationLayerName, BIDS = BIDS, dataset= dataset, session = session, 
+                                                                            annotationLayerName, BIDS = BIDS, dataset= datasetiEEG, session = session, 
                                                                             secondsBefore = secondsBefore, 
                                                                             secondsAfter = secondsAfter, montage = montage, prewhiten = prewhiten)
     else:
         X, y, data, dataII, dataAnnotations = DataJson.get_dataXY(sub, idKey, 
                                                                   AssociatedInterictal, username, password, 
-                                                                  annotationLayerName, BIDS = BIDS, dataset= dataset, session = session, secondsBefore = secondsBefore, 
+                                                                  annotationLayerName, BIDS = BIDS, dataset= datasetiEEG, session = session, secondsBefore = secondsBefore, 
                                                                   secondsAfter = secondsAfter, montage = montage, prewhiten = prewhiten)
         X_train = np.concatenate([X_test, X], axis = 0)
         y_train = np.concatenate([y_test, y], axis = 0)
