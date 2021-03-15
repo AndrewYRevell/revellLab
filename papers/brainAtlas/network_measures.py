@@ -24,13 +24,10 @@ Example:
 """
 
 #%%
-path = "/mnt" #/mnt is the directory in the Docker or Singularity Continer where this study is mounted
 import sys
-from os.path import join as ospj
-sys.path.append(ospj(path, "paper001/code/tools"))
 import pandas as pd
 import numpy as np
-from scipy.io import loadmat #fromn scipy to read mat files (structural connectivity)
+#from scipy.io import loadmat #fromn scipy to read mat files (structural connectivity)
 import bct
 
 #%% Paths and File names
@@ -43,9 +40,16 @@ import bct
 #%%
 
 
-def get_network_measures(ifname_connectivity):
+def get_network_measures(fname_connectivity):
     
-    C = np.array(pd.DataFrame(loadmat(ifname_connectivity)['connectivity']))
+    C = pd.read_table(fname_connectivity, header=None, dtype=object)
+    #cleaning up structural data 
+    C = C.drop([0,1], axis=1)
+    C = C.drop([0], axis=0)
+    C = C.iloc[:, :-1]
+    #C_electrode_names = np.array([e[-4:] for e in  np.array(C.iloc[0])])
+    C = np.array(C.iloc[1:, :]).astype('float64')  #finally turn into numpy array
+
     #binarize connectivity matrix
     C_binarize = bct.weight_conversion(C, "binarize")
 

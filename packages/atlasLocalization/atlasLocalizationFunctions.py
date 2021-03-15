@@ -12,40 +12,78 @@ import pandas as pd
 import copy
 from os import listdir
 from  os.path import join, isfile
-from os.path import splitext 
+from os.path import splitext, basename
 import numpy as np
 import nibabel as nib
 import matplotlib.pyplot as plt
 #import seaborn as sns
-
+from revellLab.packages.utilities import utils
+from scipy import ndimage 
 
 #%% Input
 
 
 #%% functions
 def check_path(path):
-    '''
+    """
     Check if path exists
-
-    Parameters
-    ----------
-        path: str
-            Check if valid path
-    '''
+    """
     if not os.path.exists(path):
         raise IOError(f"\n\n\n\nPath or file does not exist:\n{path}\n\n\n\n" )
+def checkPathAndMake(path1, path2, make = True):
+    """
+    Check if path1 exists. If so, then option to make a second directory path2 (may be same)
+    """
+    if not os.path.exists(path1):
+        raise IOError(f"\n\n\n\nPath or Path does not exist:\n{path1}\n\n\n\n" )
+    if make:
+        os.makedirs(path2)
 
-
-def register_MNI_to_preopT1(fname_preopT1, fname_preopT1bet, MNItemplate, MNItemplatebet, outputMNIname, outputDirectory):
+def register_MNI_to_preopT1(preop3T, preop3Tbrain, MNItemplatePath, MNItemplateBrainPath, outputMNIname, outputDirectory, preop3Tmask = None, ):
     mniBase =  join(outputDirectory, outputMNIname)
+    
+    STDpreop3T = join(outputDirectory, utils.baseSplitextNiiGz(preop3T)[2] + "_std.nii.gz")
+    STDpreop3Tbrain = join(outputDirectory, utils.baseSplitextNiiGz(preop3Tbrain)[2] + "_std.nii.gz")
+    #convert to std space
+    cmd = f"fslreorient2std {preop3T} {STDpreop3T}"; print(cmd);os.system(cmd)
+    cmd = f"fslreorient2std {preop3Tbrain} {STDpreop3Tbrain}"; print(cmd);os.system(cmd)
+    
     #linear reg of MNI to preopT1 space
-    cmd = f"flirt -in {MNItemplatebet} -ref {fname_preopT1bet} -dof 12 -out {mniBase}_flirt -omat {mniBase}_flirt.mat -v"; print(cmd);os.system(cmd)
+    cmd = f"flirt -in {MNItemplateBrainPath} -ref {STDpreop3Tbrain} -dof 12 -out {mniBase}_flirt -omat {mniBase}_flirt.mat -v"; print(cmd);os.system(cmd)
     #non linear reg of MNI to preopT1 space
     print("\n\nLinear registration of MNI template to image is done\n\nStarting Non-linear registration:\n\n\n")
-    cmd = f"fnirt --in={MNItemplate} --ref={fname_preopT1} --aff={mniBase}_flirt.mat --iout={mniBase}_fnirt -v --cout={mniBase}_coef --fout={mniBase}_warp"
-    print(cmd)
-    os.system(cmd)
+    if preop3Tmask == None:
+        cmd = f"fnirt --in={MNItemplatePath} --ref={STDpreop3T} --aff={mniBase}_flirt.mat --iout={mniBase}_fnirt -v --cout={mniBase}_coef --fout={mniBase}_warp"; print(cmd); os.system(cmd)
+        #cmd = f"applywarp -i {MNItemplatePath} -r {STDpreop3T} -w {mniBase}_warp --premat={mniBase}_flirt.mat --interp=nn -o {mniBase}_fnirtapplywarp"; print(cmd); os.system(cmd)
+    else:
+        STDpreop3Tmask = join(outputDirectory, utils.baseSplitextNiiGz(preop3Tmask)[2] + "_std.nii.gz")
+        cmd = f"fslreorient2std {preop3Tmask} {STDpreop3Tmask}"; print(cmd);os.system(cmd)
+        cmd = f"fnirt --in={MNItemplatePath} --ref={STDpreop3T} --refmask={preop3Tmask} --aff={mniBase}_flirt.mat --iout={mniBase}_fnirt -v --cout={mniBase}_coef --fout={mniBase}_warp"; print(cmd); os.system(cmd)
+        
+        
+        
+def getBrainFromMask(preop3T, preop3TMask, outputName):
+    img = nib.load(preop3T)
+    imgData = img.get_fdata()  # getting actual image data array
+    
+    mask = nib.load(preop3TMask)
+    mask_data = mask.get_fdata()  
+    mask_data[np.where(mask_data == 1)] = imgData[np.where(mask_data == 1)]
 
+    brain = nib.Nifti1Image(mask_data, img.affine)
+    print(f"Saving to {outputName}")
+    nib.save(brain, outputName)
+
+def getExpandedBrainMask(preop3Tmask, output, expansion = 10):
+    img = nib.load(preop3Tmask)
+    imgData = img.get_fdata()
+    imgDataExpand = copy.deepcopy(imgData)
+    for i in range(expansion):
+        imgDataExpand = ndimage.binary_dilation(imgDataExpand).astype(imgDataExpand.dtype)
+    imgExpand = nib.Nifti1Image(imgDataExpand, img.affine)
+    nib.save(imgExpand, output)
+    
+    
 def combine_first_and_fast(FIRST, FAST, outputName):
     img_first = nib.load(FIRST)
     data_first = img_first.get_fdata() 
@@ -58,27 +96,31 @@ def combine_first_and_fast(FIRST, FAST, outputName):
     #plot
     img_first_fast = nib.Nifti1Image(data_fast, img_fast.affine)
     nib.save(img_first_fast, outputName)
-    
-def applywarp_to_atlas(atlasDirectory, fname_preopT1, MNIwarp, outputDirectory):
-    atlases = [f for f in listdir(atlasDirectory) if isfile(join(atlasDirectory, f))]
+
+def applywarp_to_atlas(atlasPaths, preop3T, MNIwarp, outputDirectory, isDir = True):
+    if isDir:
+        check_path(atlasPaths)
+        atlasesList = [f for f in listdir(atlasPaths) if isfile(join(atlasPaths, f))]
+    else:
+        atlasesList = atlasPaths
     check_path(MNIwarp)
-    check_path(atlasDirectory)
-    check_path(fname_preopT1)
+    check_path(preop3T)
     check_path(outputDirectory)
-    for i in range(len(atlases)):
-        atlasName = splitext(splitext(atlases[i])[0])[0]
-        atlas = join(atlasDirectory, atlases[i])
+    for i in range(len(atlasesList)):
+        atlasName = basename(splitext(splitext(atlasesList[i])[0])[0])
+        if isDir: atlas = join(atlasPaths, atlasesList[i])
+        else: atlas = atlasesList[i]
         if (".nii" in atlas):
             outputAtlasName = join(outputDirectory, atlasName + ".nii.gz")
-            if not os.path.exists(outputAtlasName):
-                cmd = f"applywarp -i {atlas} -r {fname_preopT1} -w {MNIwarp} --interp=nn -o {outputAtlasName}"; print(cmd); os.system(cmd)
-            else: print(f"File exists: {outputAtlasName}")
+            #if not os.path.exists(outputAtlasName):
+            cmd = f"applywarp -i {atlas} -r {preop3T} -w {MNIwarp} --interp=nn -o {outputAtlasName} --verbose"; print(cmd); os.system(cmd)
+            #else: print(f"File exists: {outputAtlasName}")
             
             
 def by_region(electrodePreopT1Coordinates, atlasPath, atlasLabelsPath, ofname, sep=",",  xColIndex=10, yColIndex=11, zColIndex=12, description = "unknown_atlas", Labels=True):
     # getting imaging data
     img = nib.load(atlasPath)
-    img_data = img.get_fdata()  # getting actual image data array
+    imgData = img.get_fdata()  # getting actual image data array
 
     #show_slices(atlasPath)
     affine = img.affine
@@ -91,8 +133,8 @@ def by_region(electrodePreopT1Coordinates, atlasPath, atlasLabelsPath, ofname, s
         atlas_regions_numbers = np.array(atlas_labels.iloc[:,0]).astype("float64")
         atlas_labels_descriptors = np.array(atlas_labels.iloc[:,1])
     if Labels == False:
-        atlas_regions_numbers = np.arange(0,   np.max(img_data)+1 )
-        atlas_labels_descriptors = np.arange(0,   np.max(img_data)+1 ).astype("int").astype("object")
+        atlas_regions_numbers = np.arange(0,   np.max(imgData)+1 )
+        atlas_labels_descriptors = np.arange(0,   np.max(imgData)+1 ).astype("int").astype("object")
         atlas_name = os.path.splitext(os.path.basename(atlasPath))[0]
         atlas_name = os.path.splitext(atlas_name)[0]
         column_description1 = f"{description}_region_number"
@@ -112,21 +154,21 @@ def by_region(electrodePreopT1Coordinates, atlasPath, atlasLabelsPath, ofname, s
     coordinates_voxels = coordinates_voxels.astype(int)  
      
     try:
-        img_ROI = img_data[coordinates_voxels[:,0]-1, coordinates_voxels[:,1]-1, coordinates_voxels[:,2]-1]
+        img_ROI = imgData[coordinates_voxels[:,0]-1, coordinates_voxels[:,1]-1, coordinates_voxels[:,2]-1]
     except: #checking to make sure coordinates are in the atlas. This happens usually for electrodes on the edge of the SEEG. For example, RID0420 electrodes LE11 and LE12 are outside the brain/skull, and thus are outside even the normal MNI space of 181x218x181 voxel dimensions
         img_ROI = np.zeros((coordinates_voxels.shape[0],))
         for i in range(0,coordinates_voxels.shape[0]):
-            if((coordinates_voxels[i,0]>img_data.shape[0]) or (coordinates_voxels[i,0]<1)):
+            if((coordinates_voxels[i,0]>imgData.shape[0]) or (coordinates_voxels[i,0]<1)):
                 img_ROI[i] = 0
                 print('Coordinate outside of atlas image space: setting to zero')
-            elif((coordinates_voxels[i,1]>img_data.shape[1]) or (coordinates_voxels[i,1]<1)):
+            elif((coordinates_voxels[i,1]>imgData.shape[1]) or (coordinates_voxels[i,1]<1)):
                 img_ROI[i] = 0  
                 print('Coordinate outside of atlas image space: setting to zero')
-            elif((coordinates_voxels[i,2]>img_data.shape[2]) or (coordinates_voxels[i,2]<1)):
+            elif((coordinates_voxels[i,2]>imgData.shape[2]) or (coordinates_voxels[i,2]<1)):
                 img_ROI[i] = 0   
                 print('Coordinate outside of atlas image space: setting to zero')
             else:
-                img_ROI[i] = img_data[coordinates_voxels[i,0]-1, coordinates_voxels[i,1]-1, coordinates_voxels[i,2]-1]
+                img_ROI[i] = imgData[coordinates_voxels[i,0]-1, coordinates_voxels[i,1]-1, coordinates_voxels[i,2]-1]
 
     #getting corresponding labels
     img_labels = np.zeros(shape =img_ROI.shape ).astype("object")
@@ -152,7 +194,7 @@ def by_region(electrodePreopT1Coordinates, atlasPath, atlasLabelsPath, ofname, s
 def distance_from_label(electrodePreopT1Coordinates, atlasPath, label, atlasLabelsPath, ofname, sep=",", xColIndex=10, yColIndex=11, zColIndex=12):
     # getting imaging data
     img = nib.load(atlasPath)
-    img_data = img.get_fdata()  # getting actual image data array
+    imgData = img.get_fdata()  # getting actual image data array
     affine = img.affine
     # getting electrode coordinates data
     data = pd.read_csv(electrodePreopT1Coordinates, sep=sep, header=None)
@@ -172,21 +214,21 @@ def distance_from_label(electrodePreopT1Coordinates, atlasPath, label, atlasLabe
     coordinates_voxels = coordinates_voxels.astype(int)  
     
     try:
-        img_ROI = img_data[coordinates_voxels[:,0]-1, coordinates_voxels[:,1]-1, coordinates_voxels[:,2]-1]
+        img_ROI = imgData[coordinates_voxels[:,0]-1, coordinates_voxels[:,1]-1, coordinates_voxels[:,2]-1]
     except:
         img_ROI = np.zeros((coordinates_voxels.shape[0],))
         for i in range(0,coordinates_voxels.shape[0]):
-            if((coordinates_voxels[i,0]>img_data.shape[0]) or (coordinates_voxels[i,0]<1)):
+            if((coordinates_voxels[i,0]>imgData.shape[0]) or (coordinates_voxels[i,0]<1)):
                 img_ROI[i] = -1
                 print('Coordinate outside of MNI space: setting to zero')
-            elif((coordinates_voxels[i,1]>img_data.shape[1]) or (coordinates_voxels[i,1]<1)):
+            elif((coordinates_voxels[i,1]>imgData.shape[1]) or (coordinates_voxels[i,1]<1)):
                 img_ROI[i] = -1 
                 print('Coordinate outside of MNI space: setting to zero')
-            elif((coordinates_voxels[i,2]>img_data.shape[2]) or (coordinates_voxels[i,2]<1)):
+            elif((coordinates_voxels[i,2]>imgData.shape[2]) or (coordinates_voxels[i,2]<1)):
                 img_ROI[i] = -1   
                 print('Coordinate outside of MNI space: setting to zero')
             else:
-                img_ROI[i] = img_data[coordinates_voxels[i,0]-1, coordinates_voxels[i,1]-1, coordinates_voxels[i,2]-1]
+                img_ROI[i] = imgData[coordinates_voxels[i,0]-1, coordinates_voxels[i,1]-1, coordinates_voxels[i,2]-1]
                 
     img_ROI = np.reshape(img_ROI, [img_ROI.shape[0], 1])
     distances = copy.deepcopy(img_ROI)
@@ -194,7 +236,7 @@ def distance_from_label(electrodePreopT1Coordinates, atlasPath, label, atlasLabe
     distances[(distances == label)] = 0 #if coordinate equals to the label, then it is zero distance
     
     # list of all points with label
-    labelInds = np.where((img_data == label) )
+    labelInds = np.where((imgData == label) )
 
     for i in range(0, distances.shape[0]):
         if ( int(img_ROI[i][0]) != int(label) ):
@@ -253,10 +295,13 @@ def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, l
     if iteration == total:
         print()
 
-def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, saveFilename = None):
+def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, saveFilename = None, isPath = True):
     
-    img = nib.load(fname)
-    imgdata = img.get_fdata()  
+    if isPath:
+        img = nib.load(fname)
+        imgdata = img.get_fdata()  
+    else:
+        imgdata = fname
     """ Function to display row of image slices """
     slices1 = [   imgdata[:, :, int((imgdata.shape[2]*low)) ] , imgdata[:, :, int(imgdata.shape[2]*middle)] , imgdata[:, :, int(imgdata.shape[2]*high)]   ]
     slices2 = [   imgdata[:, int((imgdata.shape[1]*low)), : ] , imgdata[:, int(imgdata.shape[1]*middle), :] , imgdata[:, int(imgdata.shape[1]*high), :]   ]

@@ -16,6 +16,10 @@
             "name": "AAL3v1_1mm.nii.gz",
             "label": "AAL3v1_1mm.csv"
         },
+        "AAL600":{
+            "name": "AAL600.nii.gz",
+            "label": "AAL600.csv"
+        },
         "AAL_JHU_combined":{
             "name": "AAL_JHU_combined.nii.gz",
             "label": "AAL_JHU_combined.csv"

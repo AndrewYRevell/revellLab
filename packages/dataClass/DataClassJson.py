@@ -163,6 +163,9 @@ class DataClassJson:
                     dataAnnotationChannels.append( annElec  )
         return dataAnnotation, dataAnnotationChannels
 
+    def get_associatedInterictal(self, sub, idKey):
+        AssociatedInterictal = self.jsonFile["SUBJECTS"][sub]["Events"]["Ictal"][idKey]["AssociatedInterictal"]
+        return AssociatedInterictal
     #%Extracting which patients actually have annotations
     def get_patientsWithSeizureChannelAnnotations(self):
         patientsWithAnnotations = pd.DataFrame(columns = ["subject", "idKey", "AssociatedInterictal"])
