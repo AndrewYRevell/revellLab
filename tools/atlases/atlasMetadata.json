@@ -1,7 +1,7 @@
 {   
     "PATHS":{
         "STANDARD": "tools/atlases/atlases",
-        "wholeBrainMNI": "tools/atlases/randomAtlasesWholeBrainMNI"
+        "wholeBrainMNI": "tools/atlases/atlases/randomAtlasesWholeBrainMNI"
     },
     "STANDARD":{
         "AAL1":{

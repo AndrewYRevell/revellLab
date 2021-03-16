@@ -35,11 +35,13 @@ def checkPathAndMake(pathToCheck, pathToMake, make = True):
     Check if pathToCheck exists. If so, then option to make a second directory pathToMake (may be same as pathToCheck)
     """
     if not os.path.exists(pathToCheck):
-        raise IOError(f"\n\n\n\nPath or Path does not exist:\n{pathToCheck}\n\n\n\n" )
+        print(f"\nFile or Path does not exist:\n{pathToCheck}" )
     if make:
         if os.path.exists(pathToMake):
             print(f"Path already exists\n{pathToMake}")
-        else: os.makedirs(pathToMake)
+        else: 
+            os.makedirs(pathToMake)
+            print("Making Path")
 
 def checkIfFileExists(path, returnOpposite = False):
     if (os.path.exists(path)): 
@@ -53,7 +55,10 @@ def checkIfFileExists(path, returnOpposite = False):
         print(f"\nFile does not exists:\n    {path}\n\n")
         if returnOpposite: return True
         return False
-    
+
+def executeCommand(cmd):
+    print(f"\n\nExecuting Command Line: \n{cmd}\n\n"); os.system(cmd)
+
 def channel2stdCSV(outputTissueCoordinates):
     df = pd.read_csv(outputTissueCoordinates, sep=",", header=0)
     for e in range(len( df  )):

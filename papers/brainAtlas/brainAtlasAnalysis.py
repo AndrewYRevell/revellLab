@@ -19,7 +19,7 @@ Example:
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 """
 
-#%%
+#%% 01 Imports
 import sys
 import os
 import json
@@ -40,7 +40,8 @@ from revellLab.packages.imaging.tractography import tractography
 from revellLab.packages.dataClass import DataClassAtlases, DataClassCohortsBrainAtlas, DataClassJson
 from revellLab.packages.utilities import utils
 from revellLab.packages.eeg.ieegOrg import downloadiEEGorg
-#%% Paths and File names
+from revellLab.packages.atlasLocalization import atlasLocalizationFunctions as atl
+#%% 02 Paths and File names
 
 #BIDS directory
 BIDS = "/media/arevell/sharedSSD/linux/data/BIDS"
@@ -57,10 +58,12 @@ fnameiEEGusernamePassword  = join("/media/arevell/sharedSSD/linux/", "ieegorg.js
 #tools
 revellLabPath = pkg_resources.resource_filename("revellLab", "/")
 tools = pkg_resources.resource_filename("revellLab", "tools")
+atlasPath = join(tools, "atlases", "atlases" )
+atlasLabelsPath = join(tools, "atlases", "atlasLabels" )
 atlasfilesPath = join(tools, "atlases", "atlasMetadata.json")
 MNItemplatePath = join( tools, "mniTemplate", "mni_icbm152_t1_tal_nlin_asym_09c_182x218x182.nii.gz")
 MNItemplateBrainPath = join( tools, "mniTemplate", "mni_icbm152_t1_tal_nlin_asym_09c_182x218x182_brain.nii.gz")
-randomAtlasesPath = join(tools, "atlases", "randomAtlasesWholeBrainMNI")
+randomAtlasesPath = join(atlasPath, "randomAtlasesWholeBrainMNI")
 
 
 #BrainAtlas Project data analysis path
@@ -69,14 +72,11 @@ pathRegionMorphology = join(path, "regionMorphology")
 pathQSIPREP = join(BIDS, "derivatives", "qsiprep")
 pathTractography = join(BIDS, "derivatives", "tractography")
 
-#%% Paramters
+#%% 03 Paramters and read metadata
 
 #Number of regions contained within the random atlas. 
 randomAtlasRegions, permutations = [10, 30, 50, 75, 100, 200, 300, 400, 500, 750, 1000, 2000, 5000, 10000], 5
 
-
-
-#%% Read data
 
 #Atlas metadata
 with open(atlasfilesPath) as f: atlasfiles = json.load(f)
@@ -87,6 +87,9 @@ with open(cohortsPath) as f: cohortJson = json.load(f)
 cohort = DataClassCohortsBrainAtlas.brainAtlasCohort(cohortJson)
 #Get patietns with DTI data 
 patientsDTI = cohort.getWithDTI()
+#get patients with iEEG times:
+iEEGTimes = cohort.getiEEGdataKeys()
+
 
 #JSON metadata data
 with open(jsonFilePath) as f: jsonFile = json.load(f)
@@ -99,7 +102,7 @@ username = usernameAndpassword["username"]
 password = usernameAndpassword["password"]
 
 
-#%% 01 Atlases
+#%% 04 Atlases
 
 #generate random atlases
 RAG.batchGenerateRandomAtlases(randomAtlasRegions, permutations, MNItemplateBrainPath, randomAtlasesPath)
@@ -107,7 +110,7 @@ RAG.batchGenerateRandomAtlases(randomAtlasRegions, permutations, MNItemplateBrai
 atlases.getAtlasMorphology(pathRegionMorphology)
 
 
-#%% 02 DTI correction and tractography
+#%% 05 DTI correction and tractography
 
 
 #01 DTI correction
@@ -135,7 +138,7 @@ for i in range(len(patientsDTI)):
         utils.calculateTimeToComplete(t0, time.time(), len(patientsDTI), i)
         
 
-#%% 03 Structural Connectivity for all atlases
+#%% 06 Structural Connectivity for all atlases
 
 #01 Atlas Registration
 def atlasRegistrationBatch(patientsDTI, i):
@@ -199,18 +202,60 @@ atlasList = atlases.getAllAtlasPaths()
 
 
 p = multiprocessing.Pool(8)
-p.starmap(batchStructuralConnectivity, zip(repeat(patientsDTI), range(1, len(patientsDTI)), repeat(0), repeat(98), repeat(pathTractography), repeat(pathQSIPREP), repeat(atlasList)    )   )
+#p.starmap(batchStructuralConnectivity, zip(repeat(patientsDTI), range(1, len(patientsDTI)), repeat(0), repeat(98), repeat(pathTractography), repeat(pathQSIPREP), repeat(atlasList)    )   )
 
 
 
-batchStructuralConnectivity(patientsDTI, 0, 98, pathTractography, pathQSIPREP, atlases.getAllAtlasPaths())
+#batchStructuralConnectivity(patientsDTI, 0, 98, pathTractography, pathQSIPREP, atlases.getAllAtlasPaths())
 
 
-#%% 04 Electrode and atlas localization
+#%% 07 Electrode and atlas localization
 
 
-#get EEG times:
-iEEGTimes = cohort.getiEEGdataKeys()
+
+iEEGpatientList = list(iEEGTimes["sub"])
+atlasLocaliztionDir = join(BIDS, "derivatives", "atlasLocalization")
+atlasLocalizationFunctionDirectory = join(revellLabPath, "packages", "atlasLocalization")
+
+#atlas Localization All subjects
+atl.atlasLocalizationBIDSwrapper(iEEGpatientList, atlasLocalizationFunctionDirectory, atlasLocaliztionDir, atlasPath, atlasLabelsPath, MNItemplatePath, MNItemplateBrainPath, atlasLocaliztionDir, multiprocess = True)
+
+#atlas Localization Input for single subject
+atl.atlasLocalizationBIDSwrapper(["RID0502"], atlasLocalizationFunctionDirectory, atlasLocaliztionDir, atlasPath, atlasLabelsPath, MNItemplatePath, MNItemplateBrainPath, atlasLocaliztionDir)
+
+#RID 420 has bad clinical imagingfor gray matter and white matter localization, so using high resolution research scan
+###Getting file names
+sub = "RID0508"
+ses = "preop3T"
+acq = "3D"
+electrodePreopT1Coordinates = join(atlasLocaliztionDir, f"sub-{sub}", "electrodenames_coordinates_native_and_T1.csv")   
+atl.atlasLocalizationFromBIDS(BIDS, "PIER", sub, ses, acq, electrodePreopT1Coordinates, 
+                              atlasLocalizationFunctionDirectory, MNItemplatePath , MNItemplateBrainPath, atlasPath, atlasLabelsPath, atlasLocaliztionDir )
+
+
+RID0420_T1 = join(BIDS, BIDSpenn, f"sub-{sub}", f"ses-{ses}", "anat", f"sub-{sub}_ses-{ses}_acq-{acq}_T1w.nii.gz" )
+RID0420_outputDir = join(BIDS, "derivatives", "atlasLocalization", f"sub-{sub}")
+RID0420_preimplantT1 = join(RID0420_outputDir, f"T00_{sub}_mprage.nii.gz" )
+RID0420_preimplantT1_brain = join(RID0420_outputDir, f"T00_{sub}_mprage_brainBrainExtractionBrain.nii.gz" )
+RID0420_T1_to_preimplantT1 = join(RID0420_outputDir, f"T1_to_T00_{sub}_mprage.nii.gz" )
+RID0420_T1_to_preimplantT1_brain = join(RID0420_outputDir, f"T1_to_T00_{sub}_mprage_brain.nii.gz" )
+RID0420_biascorrected = join(RID0420_outputDir, f"sub-{sub}_biascorrected")
+RID0420_biascorrectedDirectory = join(RID0420_outputDir, f"sub-{sub}_biascorrected.anat")
+RID0420_biascorrectedT1 = join(RID0420_biascorrectedDirectory, "T1_biascorr.nii.gz")
+RID0420_biascorrectedT1_brain = join(RID0420_biascorrectedDirectory, "T1_biascorr_brain.nii.gz")
+outputDirectoryRID0420 = join(atlasLocaliztionDir, f"sub-{sub}")
+outputName =  f"sub-{sub}_atlasLocalization.csv"
+###Bias correction
+utils.executeCommand(cmd = f"fsl_anat -i {RID0420_T1} --noreorient --noreg --nononlinreg --noseg  --nosubcortseg --nocrop --clobber -o {RID0420_biascorrected}")
+###Convert 3T preop to T00 space
+utils.executeCommand(cmd = f"flirt -in {RID0420_biascorrectedT1} -ref {RID0420_preimplantT1} -dof 6 -out {RID0420_T1_to_preimplantT1} -omat {RID0420_T1_to_preimplantT1}_flirt.mat -v")
+###Getting brain extraction
+atl.getBrainFromMask(RID0420_T1_to_preimplantT1, RID0420_preimplantT1_brain, RID0420_T1_to_preimplantT1_brain)
+atl.executeAtlasLocalizationSingleSubject(atlasLocalizationFunctionDirectory, electrodePreopT1Coordinates, RID0420_T1_to_preimplantT1, RID0420_T1_to_preimplantT1_brain, MNItemplatePath, MNItemplateBrainPath, atlasPath, atlasLabelsPath, outputDirectoryRID0420, outputName)
+
+
+
+
 
 # Download iEEG data
 
