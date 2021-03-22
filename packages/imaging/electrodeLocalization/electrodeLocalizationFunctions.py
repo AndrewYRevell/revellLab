@@ -30,13 +30,13 @@ from nibabel.affines import apply_affine
 
 
 
-def freesurferReconAll(T1path, outputpath):
+def freesurferReconAll(T1path, outputpath, overwrite = False):
     
     utils.checkPathError(outputpath)
     utils.checkPathError(T1path)
     
-    if utils.checkIfFileDoesNotExist(f"{outputpath}/freesurfer/surf/lh.pial"):
-        if utils.checkIfFileDoesNotExist(f"{outputpath}/freesurfer/surf/rh.pial"):
+    if utils.checkIfFileDoesNotExist(f"{outputpath}/freesurfer/surf/lh.pial", returnOpposite=overwrite):
+        if utils.checkIfFileDoesNotExist(f"{outputpath}/freesurfer/surf/rh.pial", returnOpposite=overwrite):
             utils.executeCommand(f"mkdir -p {outputpath}/freesurfer/mri/orig")
             utils.executeCommand(f"mri_convert {T1path} {outputpath}/freesurfer/mri/orig/001.mgz")
         

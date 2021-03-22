@@ -28,6 +28,9 @@ import json
 import numpy.linalg as npl
 from nibabel.affines import apply_affine
 
+import pkg_resources
+revellLabPath = pkg_resources.resource_filename("revellLab", "/")
+tools = pkg_resources.resource_filename("revellLab", "tools")
 
 
 
@@ -39,7 +42,7 @@ BIDS = "/media/arevell/sharedSSD/linux/data/BIDS"
 dataset= "PIER"
 outputDir = join(BIDS, "derivatives", "implantRenders")
 
-sub = "RID0278"
+sub = "RID0365"
 ses = "preop3T"
 acq = "3D"
 derivativesOutput = "implantRenders"
@@ -48,8 +51,12 @@ T1path = join(BIDS, dataset, f"sub-{sub}", f"ses-{ses}", "anat" , f"sub-{sub}_se
 outputpath = join(BIDS, "derivatives", f"{derivativesOutput}", f"sub-{sub}", f"ses-{ses}")
 T1path ,outputpath = elLoc.getBIDSinputAndOutput(BIDS, dataset, sub, ses, acq, derivativesOutput)
 
-elLoc.freesurferReconAll(T1path, outputpath)
+elLoc.freesurferReconAll(T1path, outputpath,  overwrite = False)
 
+if utils.checkIfFileExists(f"{outputpath}/logfile"):
+    utils.executeCommand(   f"rm {outputpath}/logfile"    )
+if utils.checkIfFileExists(f"{outputpath}/fsaverage"):
+    utils.executeCommand(   f"mv {outputpath}/fsaverage {outputpath}/freesurfer"    )
 
 T00 = join(BIDS, dataset, f"sub-{sub}", "ses-implant01Reconstruction", "anat", f"sub-{sub}_ses-implant01Reconstruction_acq-T00_T1w.nii.gz" )
 T00electrodes = join(BIDS, dataset, f"sub-{sub}", "ses-implant01Reconstruction", "ieeg", f"sub-{sub}_ses-implant01Reconstruction_space-T00_electrodes.tsv" )
@@ -57,11 +64,34 @@ T00electrodes = join(BIDS, dataset, f"sub-{sub}", "ses-implant01Reconstruction",
 utils.checkIfFileExists(T00)
 utils.checkIfFileExists(T00electrodes)
 
+# combined surfs
+utils.executeCommand(   f"cp {outputpath}/freesurfer/surf/lh.pial {outputpath}/freesurfer/"    )
+utils.executeCommand(   f"cp {outputpath}/freesurfer/surf/rh.pial {outputpath}/freesurfer/"    )
+
+
+
+utils.executeCommand(   f"mris_convert --to-scanner {outputpath}/freesurfer/lh.pial {outputpath}/freesurfer/lh.pial"    )
+utils.executeCommand(   f"mris_convert --to-scanner {outputpath}/freesurfer/rh.pial {outputpath}/freesurfer/rh.pial"    )
+
+utils.executeCommand(   f"mris_convert --combinesurfs {outputpath}/freesurfer/rh.pial {outputpath}/freesurfer/lh.pial {outputpath}/freesurfer/combined.stl"    )
 
 #%%
 #register T00 to T1
 
-utils.executeCommand(   f"flirt -in {T1path} -ref  {T00} -omat {outputpath}/freesurfer/xform.mat -dof 6 -out {outputpath}/freesurfer/registeredImplant.nii.gz"    )
+#brain extraction
+
+utils.executeCommand(   f"bet {T1path} {outputpath}/freesurfer/T1_bet.nii.gz"    )
+utils.executeCommand(   f"bet {T00} {outputpath}/freesurfer/T00_bet.nii.gz"    )
+utils.show_slices(f"{outputpath}/freesurfer/T1_bet.nii.gz", save=True, saveFilename=f"{outputpath}/freesurfer/pic_T1_bet.png")
+utils.show_slices(f"{outputpath}/freesurfer/T00_bet.nii.gz", save=True, saveFilename=f"{outputpath}/freesurfer/pic_T00_bet.png")
+
+utils.executeCommand(   f"flirt -in {outputpath}/freesurfer/T1_bet.nii.gz -ref {outputpath}/freesurfer/T00_bet.nii.gz -omat {outputpath}/freesurfer/xform.mat -dof 6 -out {outputpath}/freesurfer/registeredImplant_bet.nii.gz"    )
+utils.executeCommand(   f"flirt -in {T1path} -ref {T00} -applyxfm -init {outputpath}/freesurfer/xform.mat -out {outputpath}/freesurfer/registeredImplant.nii.gz"    )
+
+
+utils.show_slices(f"{outputpath}/freesurfer/registeredImplant.nii.gz", save=True, saveFilename=f"{outputpath}/freesurfer/pic_registeredImplant.png")
+utils.show_slices(f"{T00}", save=True, saveFilename=f"{outputpath}/freesurfer/pic_T00.png")
+
 utils.executeCommand(   f"convert_xfm -omat {outputpath}/freesurfer/xformInverse.mat -inverse {outputpath}/freesurfer/xform.mat"    )
 
 coordinates = pd.read_csv(T00electrodes, sep = "\t")
@@ -83,33 +113,28 @@ coordinatesOther.drop(coordinatesOther.columns[[1,3]],axis=1,inplace=True)
 
 coordinatesToSave = pd.concat([coordinatesNames, coordinatesOther ], axis=1, ignore_index=True)
 
-
+utils.checkPathAndMake(f"{outputpath}", f"{outputpath}/html")
 coordinatesToSave.to_csv(  f"{outputpath}/html/electrodes.txt",  sep=" ", index=False, header=False)
 
 
-#%% combined surfs
-utils.executeCommand(   f"cp {outputpath}/freesurfer/surf/lh.pial {outputpath}/freesurfer/"    )
-utils.executeCommand(   f"cp {outputpath}/freesurfer/surf/rh.pial {outputpath}/freesurfer/"    )
+
+
+#binary_stl_path = f"{outputpath}/freesurfer/combined.stl"
+#out_path = f"{outputpath}/html/brain.glb"
+
+#elLoc.stl_to_gltf(f"{outputpath}/freesurfer/combined.stl", f"{outputpath}/html/brain.glb", True)
 
 
 
-utils.executeCommand(   f"mris_convert --to-scanner {outputpath}/freesurfer/lh.pial {outputpath}/freesurfer/lh.pial"    )
-utils.executeCommand(   f"mris_convert --to-scanner {outputpath}/freesurfer/rh.pial {outputpath}/freesurfer/rh.pial"    )
-
-utils.executeCommand(   f"mris_convert --combinesurfs {outputpath}/freesurfer/rh.pial {outputpath}/freesurfer/lh.pial {outputpath}/freesurfer/combined.stl"    )
 
 
-binary_stl_path = f"{outputpath}/freesurfer/combined.stl"
-out_path = f"{outputpath}/freesurfer/brain.glb"
 
-elLoc.stl_to_gltf(f"{outputpath}/freesurfer/combined.stl", f"{outputpath}/html/brain.glb", True)
+cmd = f"blender --background --factory-startup --addons io_scene_gltf2 --python {revellLabPath}/packages/imaging/electrodeLocalization/blender_compress_mesh.py -- -i {outputpath}/freesurfer/combined.stl -o {outputpath}/html/brain.glb"
 
-import pkg_resources
-revellLabPath = pkg_resources.resource_filename("revellLab", "/")
-tools = pkg_resources.resource_filename("revellLab", "tools")
+utils.executeCommand(cmd)
 utils.executeCommand(   f"cp -r {tools}/threejs {outputpath}/html"    )
-utils.executeCommand(   f"mv -r {outputpath}/html/threejs/index.html {outputpath}/html"    )
-
+utils.executeCommand(   f"mv {outputpath}/html/threejs/index.html {outputpath}/html"    )
+#python -m http.server
 
 
 #%%

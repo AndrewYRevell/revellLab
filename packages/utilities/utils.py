@@ -157,6 +157,69 @@ def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, save
             raise Exception("No file name was given to save figures")
         plt.savefig(saveFilename, transparent=True)
 
+
+
+
+
+#%%
+"""
+# Download data programmatically from box.com (Python >= 3.5)
+
+# Note: You will have to create a box App first, using the following steps:
+# Go to developer.box.com, log into your box account (or create one) and create a new App
+# Find the Client ID, Client Secret, and access token (or developer token if you keep your app in developer mode) under your app's "Development" tab
+# In your online box.com account, navigate to the folder to download. The folder ID can be found at the end of the URL (the numbers after the last slash).
+
+# Last Updated: 3/19/2021
+# bscheid@seas.upenn.edu
+
+from boxsdk import Client, OAuth2
+import os
+
+# Define client ID, client secret, and developer token.
+# Note, Access token  (aka developer token) expires after 1 hour, go to developer.box.com and get new key
+CLIENT_ID = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'          # OAuth2.0 client ID for box app (in configuration tab)
+CLIENT_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'      # OAuth2.0 client secret (in configuration tab)
+ACCESS_TOKEN = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'       # box app access token (or developer token, in configuration tab)
+
+# Define Box folder ID (can find from URL), and path to deposit folder
+folderID = 'xxxxxxxx' # ID of box folder to download on box
+path = 'local/path/to/download/folder'
+
+auth = OAuth2(
+    client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET,
+    access_token=ACCESS_TOKEN,
+)
+
+client = Client(auth)
+
+# recursively download all files in folder
+def download(folderID, path):
+    folder = client.folder(folder_id=folderID).get()
+    items = client.folder(folder_id=folderID).get_items()
+
+    if ~os.path.exists(os.path.join(path, folder.name)):
+        os.makedirs(os.path.join(path, folder.name))
+
+    # mkdir folder name
+    for item in items:
+        # If item is a folder
+        if item.type == 'folder':
+            print(item.name)
+            download(item.id, os.path.join(path, folder.name))
+        # output_file = open('file.pdf', 'wb')
+        elif item.type == 'file':
+            if item.name[0] == '.':
+                continue
+            print('Downloading' + os.path.join(path, folder.name, item.name))
+            output_file = open(os.path.join(path, folder.name, item.name), 'wb')
+            client.file(file_id=item.id).download_to(output_file)
+
+
+download(folderID, path)
+
+"""
 #%% structural connectivity
 
 
