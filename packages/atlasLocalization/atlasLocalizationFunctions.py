@@ -21,10 +21,11 @@ from scipy import ndimage
 import multiprocessing
 from itertools import repeat
 from revellLab.packages.utilities import utils
+import json
 
 #%% functions
 
-def atlasLocalizationBatchProccess(subList, i,  atlasLocalizationFunctionDirectory, inputDirectory, atlasDirectory, atlasLabelsPath, MNItemplatePath, MNItemplateBrainPath, outputDirectory):
+def atlasLocalizationBatchProccess(subList, i,  atlasLocalizationFunctionDirectory, inputDirectory, atlasDirectory, atlasLabelsPath, MNItemplatePath, MNItemplateBrainPath, outputDirectory, rerun = False):
 #for i in range(len(subList)):
     sub = subList[i]
     electrodePreopT1Coordinates = join(inputDirectory, f"sub-{sub}", "electrodenames_coordinates_native_and_T1.csv")   
@@ -33,22 +34,22 @@ def atlasLocalizationBatchProccess(subList, i,  atlasLocalizationFunctionDirecto
     outputDirectory = join(outputDirectory, f"sub-{sub}")
     outputName =  f"sub-{sub}_atlasLocalization.csv"
     cmd =  f"python {atlasLocalizationFunctionDirectory + '/atlasLocalization.py'} {electrodePreopT1Coordinates} {preopT1} {preopT1bet} \
-        {MNItemplatePath} {MNItemplateBrainPath} {atlasDirectory} {atlasLabelsPath} {outputDirectory} {outputName}"
+        {MNItemplatePath} {MNItemplateBrainPath} {atlasDirectory} {atlasLabelsPath} {outputDirectory} {outputName} {rerun}"
     print(cmd); os.system(cmd)
     
-def atlasLocalizationBIDSwrapper(subList, atlasLocalizationFunctionDirectory, inputDirectory, atlasDirectory, atlasLabelsPath, MNItemplatePath, MNItemplateBrainPath, outputDirectory, multiprocess = False, cores = 8):
+def atlasLocalizationBIDSwrapper(subList, atlasLocalizationFunctionDirectory, inputDirectory, atlasDirectory, atlasLabelsPath, MNItemplatePath, MNItemplateBrainPath, outputDirectory, multiprocess = False, cores = 8, rerun = False):
     if not multiprocess:
         for i in range(len(subList)):
             sub = subList[i]
             electrodePreopT1Coordinates = join(inputDirectory, f"sub-{sub}", "electrodenames_coordinates_native_and_T1.csv")   
             preopT1 = join(inputDirectory, f"sub-{sub}", f"T00_{sub}_mprage.nii.gz")
             preopT1bet = join(inputDirectory, f"sub-{sub}", f"T00_{sub}_mprage_brainBrainExtractionBrain.nii.gz")
-            outputDirectory = join(outputDirectory, f"sub-{sub}")
+            outputDirectorySub = join(outputDirectory, f"sub-{sub}")
             outputName =  f"sub-{sub}_atlasLocalization.csv"
             cmd =  f"python {atlasLocalizationFunctionDirectory + '/atlasLocalization.py'} {electrodePreopT1Coordinates} {preopT1} {preopT1bet} \
-                {MNItemplatePath} {MNItemplateBrainPath} {atlasDirectory} {atlasLabelsPath} {outputDirectory} {outputName}"
+                {MNItemplatePath} {MNItemplateBrainPath} {atlasDirectory} {atlasLabelsPath} {outputDirectorySub} {outputName} {rerun}"
             print(cmd); os.system(cmd)
-    atlasLocalizationBatchProccess(subList, i,  atlasLocalizationFunctionDirectory, inputDirectory, atlasDirectory, atlasLabelsPath, MNItemplatePath, MNItemplateBrainPath, outputDirectory)
+    #atlasLocalizationBatchProccess(subList, i,  atlasLocalizationFunctionDirectory, inputDirectory, atlasDirectory, atlasLabelsPath, MNItemplatePath, MNItemplateBrainPath, outputDirectory)
     if multiprocess:
         p = multiprocessing.Pool(cores)
         p.starmap(atlasLocalizationBatchProccess, zip(repeat(subList), range(len(subList)), 
@@ -61,13 +62,13 @@ def atlasLocalizationBIDSwrapper(subList, atlasLocalizationFunctionDirectory, in
                                      repeat(outputDirectory)  )   )
         
         
-def executeAtlasLocalizationSingleSubject(atlasLocalizationFunctionDirectory, electrodePreopT1Coordinates, preopT1, preopT1bet, MNItemplatePath, MNItemplateBrainPath, atlasDirectory, atlasLabelsPath, outputDirectory, outputName): 
+def executeAtlasLocalizationSingleSubject(atlasLocalizationFunctionDirectory, electrodePreopT1Coordinates, preopT1, preopT1bet, MNItemplatePath, MNItemplateBrainPath, atlasDirectory, atlasLabelsPath, outputDirectory, outputName, rerun = False): 
     cmd =  f"python {atlasLocalizationFunctionDirectory + '/atlasLocalization.py'} {electrodePreopT1Coordinates} {preopT1} {preopT1bet} \
-        {MNItemplatePath} {MNItemplateBrainPath} {atlasDirectory} {atlasLabelsPath} {outputDirectory} {outputName}"
+        {MNItemplatePath} {MNItemplateBrainPath} {atlasDirectory} {atlasLabelsPath} {outputDirectory} {outputName} {rerun}"
     utils.executeCommand(cmd)
     
     
-def atlasLocalizationFromBIDS(BIDS, dataset, sub, ses, acq, electrodeCoordinatesPath,atlasLocalizationFunctionDirectory, MNItemplatePath , MNItemplateBrainPath, atlasDirectory, atlasLabelsPath, outputDirectory ):
+def atlasLocalizationFromBIDS(BIDS, dataset, sub, ses, acq, electrodeCoordinatesPath,atlasLocalizationFunctionDirectory, MNItemplatePath , MNItemplateBrainPath, atlasDirectory, atlasLabelsPath, outputDirectory, rerun = False ):
     subject_T1 = join(BIDS, dataset, f"sub-{sub}", f"ses-{ses}", "anat", f"sub-{sub}_ses-{ses}_acq-{acq}_T1w.nii.gz" )
     subject_outputDir = join(BIDS, "derivatives", "atlasLocalization", f"sub-{sub}")
     subject_preimplantT1 = join(subject_outputDir, f"T00_{sub}_mprage.nii.gz" )
@@ -86,7 +87,7 @@ def atlasLocalizationFromBIDS(BIDS, dataset, sub, ses, acq, electrodeCoordinates
     utils.executeCommand(cmd = f"flirt -in {subject_biascorrectedT1} -ref {subject_preimplantT1} -dof 6 -out {subject_T1_to_preimplantT1} -omat {subject_T1_to_preimplantT1}_flirt.mat -v")
     ###Getting brain extraction
     getBrainFromMask(subject_T1_to_preimplantT1, subject_preimplantT1_brain, subject_T1_to_preimplantT1_brain)
-    executeAtlasLocalizationSingleSubject(atlasLocalizationFunctionDirectory, electrodePreopT1Coordinates, subject_T1_to_preimplantT1, subject_T1_to_preimplantT1_brain, MNItemplatePath, MNItemplateBrainPath, atlasDirectory, atlasLabelsPath, outputDirectorysubject, outputName)
+    executeAtlasLocalizationSingleSubject(atlasLocalizationFunctionDirectory, electrodePreopT1Coordinates, subject_T1_to_preimplantT1, subject_T1_to_preimplantT1_brain, MNItemplatePath, MNItemplateBrainPath, atlasDirectory, atlasLabelsPath, outputDirectorysubject, outputName, rerun = rerun)
     
 
 
@@ -174,8 +175,19 @@ def applywarp_to_atlas(atlasPaths, preop3T, MNIwarp, outputDirectory, isDir = Tr
         if utils.checkIfFileExists(outputAtlasName, returnOpposite=True):
             cmd = f"applywarp -i { atlasesList[i]} -r {preop3T} -w {MNIwarp} --interp=nn -o {outputAtlasName} --verbose"; print(cmd); os.system(cmd)
         #else: print(f"File exists: {outputAtlasName}")
-        
-            
+
+def get_electrodeTissueMetadata(atlasLocalizationFile, outputName):
+    data = pd.read_csv(atlasLocalizationFile)
+    tissueSegNumber = data["tissue_segmentation_region_number"]
+    
+    elecGM = data["electrode_name"].iloc[np.where(tissueSegNumber == 2) ]
+    elecWM = data["electrode_name"].iloc[np.where(tissueSegNumber == 3) ]
+    elecCSF = data["electrode_name"].iloc[ np.where(tissueSegNumber == 1) ]
+    elecOutside = data["electrode_name"].iloc[np.where(tissueSegNumber == 0) ]
+    
+    metadataTissue = dict(grayMatter = elecGM.to_list() , whiteMatter = elecWM.to_list(), CSF = elecCSF.to_list(), outside = elecOutside.to_list()  )
+    with open(outputName, 'w', encoding='utf-8') as f: json.dump(metadataTissue, f, ensure_ascii=False, indent=4)
+    
 def by_region(electrodePreopT1Coordinates, atlasPath, atlasLabelsPath, ofname, sep=",",  xColIndex=10, yColIndex=11, zColIndex=12, description = "unknown_atlas", Labels=True):
     # getting imaging data
     img = nib.load(atlasPath)

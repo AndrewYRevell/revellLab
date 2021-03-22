@@ -53,8 +53,24 @@ def checkIfFileExists(path, returnOpposite = False):
             return True
     else: 
         print(f"\nFile does not exists:\n    {path}\n\n")
-        if returnOpposite: return True
-        return False
+        if returnOpposite: 
+            return True
+        else: 
+            return False
+    
+def checkIfFileDoesNotExist(path, returnOpposite = False):
+    if not (os.path.exists(path)): 
+        print(f"\nFile does not exist:\n    {path}\n\n")
+        if returnOpposite: 
+            return False
+        else:
+            return True
+    else: 
+        print(f"\nFile exists:\n    {path}\n\n")
+        if returnOpposite: 
+            return True
+        else: 
+            return False
 
 def executeCommand(cmd):
     print(f"\n\nExecuting Command Line: \n{cmd}\n\n"); os.system(cmd)
