@@ -30,7 +30,7 @@ from nibabel.affines import apply_affine
 
 
 
-def freesurferReconAll(T1path, outputpath, overwrite = False):
+def freesurferReconAll(T1path, outputpath, overwrite = False, threads = 12):
     
     utils.checkPathError(outputpath)
     utils.checkPathError(T1path)
@@ -40,7 +40,7 @@ def freesurferReconAll(T1path, outputpath, overwrite = False):
             utils.executeCommand(f"mkdir -p {outputpath}/freesurfer/mri/orig")
             utils.executeCommand(f"mri_convert {T1path} {outputpath}/freesurfer/mri/orig/001.mgz")
         
-            utils.executeCommand(f"recon-all -subjid freesurfer -all -time -log logfile -nuintensitycor-3T -sd {outputpath} -parallel -threads 12")
+            utils.executeCommand(f"recon-all -subjid freesurfer -all -time -log logfile -nuintensitycor-3T -sd {outputpath} -parallel -threads {threads}")
 
 
 
