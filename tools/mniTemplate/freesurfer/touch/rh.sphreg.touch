@@ -1,0 +1,1 @@
+mris_register -curv ../surf/rh.sphere /home/arevell/freesurfer/average/rh.folding.atlas.acfb40.noaparc.i12.2016-08-02.tif ../surf/rh.sphere.reg

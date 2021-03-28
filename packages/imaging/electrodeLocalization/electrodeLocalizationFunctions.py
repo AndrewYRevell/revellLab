@@ -32,8 +32,8 @@ from nibabel.affines import apply_affine
 
 def freesurferReconAll(T1path, outputpath, overwrite = False, threads = 12):
     
-    utils.checkPathError(outputpath)
-    utils.checkPathError(T1path)
+    utils.checkPathErrorGlob(outputpath)
+    utils.checkPathErrorGlob(T1path)
     
     if utils.checkIfFileDoesNotExist(f"{outputpath}/freesurfer/surf/lh.pial", returnOpposite=overwrite):
         if utils.checkIfFileDoesNotExist(f"{outputpath}/freesurfer/surf/rh.pial", returnOpposite=overwrite):

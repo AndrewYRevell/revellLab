@@ -1,0 +1,1 @@
+mris_curvature -seed 1234 -thresh .999 -n -a 5 -w -distances 10 10 lh.inflated

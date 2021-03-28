@@ -1,0 +1,167 @@
+/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf
+
+ mris_curvature -w -seed 1234 lh.white.preaparc 
+
+rm -f lh.white.H
+ln -s lh.white.preaparc.H lh.white.H
+rm -f lh.white.K
+ln -s lh.white.preaparc.K lh.white.K
+
+ mris_curvature -seed 1234 -thresh .999 -n -a 5 -w -distances 10 10 lh.inflated 
+
+#--------------------------------------------
+#@# Curv .H and .K rh Thu Mar 25 01:21:15 EDT 2021
+/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf
+
+ mris_curvature -w -seed 1234 rh.white.preaparc 
+
+rm -f rh.white.H
+ln -s rh.white.preaparc.H rh.white.H
+rm -f rh.white.K
+ln -s rh.white.preaparc.K rh.white.K
+
+ mris_curvature -seed 1234 -thresh .999 -n -a 5 -w -distances 10 10 rh.inflated 
+
+cd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf
+reconbatchjobs logfile mris_curvature_white_lh.cmd rm_curvature_white_lh.H.cmd ln_curvature_white_lh.H.cmd rm_curvature_white_lh.K.cmd ln_curvature_white_lh.K.cmd mris_curvature_inflated_lh.cmd mris_curvature_white_rh.cmd rm_curvature_white_rh.H.cmd ln_curvature_white_rh.H.cmd rm_curvature_white_rh.K.cmd ln_curvature_white_rh.K.cmd mris_curvature_inflated_rh.cmd
+Waiting for PID 219563 of (219563 219566 219569 219572 219575 219578 219581 219584 219587 219590 219593 219596) to complete...
+Waiting for PID 219566 of (219563 219566 219569 219572 219575 219578 219581 219584 219587 219590 219593 219596) to complete...
+Waiting for PID 219569 of (219563 219566 219569 219572 219575 219578 219581 219584 219587 219590 219593 219596) to complete...
+Waiting for PID 219572 of (219563 219566 219569 219572 219575 219578 219581 219584 219587 219590 219593 219596) to complete...
+Waiting for PID 219575 of (219563 219566 219569 219572 219575 219578 219581 219584 219587 219590 219593 219596) to complete...
+Waiting for PID 219578 of (219563 219566 219569 219572 219575 219578 219581 219584 219587 219590 219593 219596) to complete...
+Waiting for PID 219581 of (219563 219566 219569 219572 219575 219578 219581 219584 219587 219590 219593 219596) to complete...
+Waiting for PID 219584 of (219563 219566 219569 219572 219575 219578 219581 219584 219587 219590 219593 219596) to complete...
+Waiting for PID 219587 of (219563 219566 219569 219572 219575 219578 219581 219584 219587 219590 219593 219596) to complete...
+Waiting for PID 219590 of (219563 219566 219569 219572 219575 219578 219581 219584 219587 219590 219593 219596) to complete...
+Waiting for PID 219593 of (219563 219566 219569 219572 219575 219578 219581 219584 219587 219590 219593 219596) to complete...
+Waiting for PID 219596 of (219563 219566 219569 219572 219575 219578 219581 219584 219587 219590 219593 219596) to complete...
+
+ mris_curvature -w -seed 1234 lh.white.preaparc
+
+setting seed for random number generator to 1234
+total integrated curvature = 23.026*4pi (289.353) --> -22 handles
+ICI = 137.2, FI = 971.6, variation=16622.892
+writing Gaussian curvature to ./lh.white.preaparc.K...done.
+writing mean curvature to ./lh.white.preaparc.H...done.
+
+ rm -f lh.white.H
+
+
+ ln -s lh.white.preaparc.H lh.white.H
+
+
+ rm -f lh.white.K
+
+
+ ln -s lh.white.preaparc.K lh.white.K
+
+
+ mris_curvature -seed 1234 -thresh .999 -n -a 5 -w -distances 10 10 lh.inflated
+
+setting seed for random number generator to 1234
+normalizing curvature values.
+averaging curvature patterns 5 times.
+sampling 10 neighbors out to a distance of 10 mm
+239 vertices thresholded to be in k1 ~ [-0.30 1.00], k2 ~ [-0.15 0.05]
+total integrated curvature = 0.485*4pi (6.090) --> 1 handles
+ICI = 1.7, FI = 13.0, variation=211.842
+145 vertices thresholded to be in [-0.02 0.03]
+writing Gaussian curvature to ./lh.inflated.K...thresholding curvature at 99.90% level
+curvature mean = 0.000, std = 0.001
+189 vertices thresholded to be in [-0.16 0.41]
+done.
+writing mean curvature to ./lh.inflated.H...curvature mean = -0.014, std = 0.027
+done.
+
+ mris_curvature -w -seed 1234 rh.white.preaparc
+
+setting seed for random number generator to 1234
+total integrated curvature = 24.034*4pi (302.026) --> -23 handles
+ICI = 140.0, FI = 1038.8, variation=98539.357
+writing Gaussian curvature to ./rh.white.preaparc.K...done.
+writing mean curvature to ./rh.white.preaparc.H...done.
+
+ rm -f rh.white.H
+
+
+ ln -s rh.white.preaparc.H rh.white.H
+
+
+ rm -f rh.white.K
+
+
+ ln -s rh.white.preaparc.K rh.white.K
+
+
+ mris_curvature -seed 1234 -thresh .999 -n -a 5 -w -distances 10 10 rh.inflated
+
+setting seed for random number generator to 1234
+normalizing curvature values.
+averaging curvature patterns 5 times.
+sampling 10 neighbors out to a distance of 10 mm
+206 vertices thresholded to be in k1 ~ [-0.32 1.09], k2 ~ [-0.21 0.11]
+total integrated curvature = 0.451*4pi (5.667) --> 1 handles
+ICI = 1.7, FI = 13.0, variation=212.784
+160 vertices thresholded to be in [-0.03 0.04]
+writing Gaussian curvature to ./rh.inflated.K...thresholding curvature at 99.90% level
+curvature mean = 0.000, std = 0.002
+151 vertices thresholded to be in [-0.19 0.44]
+done.
+writing mean curvature to ./rh.inflated.H...curvature mean = -0.014, std = 0.028
+done.
+PIDs (219563 219566 219569 219572 219575 219578 219581 219584 219587 219590 219593 219596) completed and logs appended.
+#--------------------------------------------
+#@# Sphere lh Thu Mar 25 01:22:10 EDT 2021
+/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf
+
+ mris_curvature_stats -m --writeCurvatureFiles -G -o ../stats/lh.curv.stats -F smoothwm freesurfer lh curv sulc 
+
+             Toggling save flag on curvature files                       [ ok ]
+                 Outputting results using filestem   [ ../stats/lh.curv.stats ]
+             Toggling save flag on curvature files                       [ ok ]
+                                   Setting surface   [ freesurfer/lh.smoothwm ]
+                                Reading surface...                       [ ok ]
+                                   Setting texture                     [ curv ]
+                                Reading texture...                       [ ok ]
+                                   Setting texture                     [ sulc ]
+                                Reading texture...Gb_filter = 0
+                       [ ok ]
+      Calculating Discrete Principal Curvatures...
+      Determining geometric order for vno faces... [####################] [ ok ]
+                      Determining KH curvatures... [####################] [ ok ]
+                    Determining k1k2 curvatures... [####################] [ ok ]
+                                   deltaViolations                      [ 359 ]
+Gb_filter = 0
+@#@FSTIME  2021:03:25:02:10:56 mris_curvature_stats N 11 e 4.36 S 0.13 U 4.88 P 114% M 216376 F 0 R 58890 W 0 c 767 w 3286 I 0 O 0 L 15.72 15.14 16.51
+@#@FSLOADPOST 2021:03:25:02:11:00 mris_curvature_stats N 11 15.75 15.16 16.51
+
+#-----------------------------------------
+#@# Curvature Stats rh Thu Mar 25 02:11:00 EDT 2021
+/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf
+
+ mris_curvature_stats -m --writeCurvatureFiles -G -o ../stats/rh.curv.stats -F smoothwm freesurfer rh curv sulc 
+
+             Toggling save flag on curvature files                       [ ok ]
+                 Outputting results using filestem   [ ../stats/rh.curv.stats ]
+             Toggling save flag on curvature files                       [ ok ]
+                                   Setting surface   [ freesurfer/rh.smoothwm ]
+                                Reading surface...                       [ ok ]
+                                   Setting texture                     [ curv ]
+                                Reading texture...                       [ ok ]
+                                   Setting texture                     [ sulc ]
+                                Reading texture...Gb_filter = 0
+                       [ ok ]
+      Calculating Discrete Principal Curvatures...
+      Determining geometric order for vno faces... [####################] [ ok ]
+                      Determining KH curvatures... [####################] [ ok ]
+                    Determining k1k2 curvatures... [####################] [ ok ]
+                                   deltaViolations                      [ 424 ]
+Gb_filter = 0
+
+WARN:    S lookup   min:                          -0.002235
+WARN:    S explicit min:                          0.000000	vertex = 321
+@#@FSTIME  2021:03:25:02:11:01 mris_curvature_stats N 11 e 2.98 S 0.14 U 3.54 P 123% M 215808 F 0 R 58669 W 0 c 705 w 3434 I 0 O 0 L 15.75 15.16 16.51
+@#@FSLOADPOST 2021:03:25:02:11:04 mris_curvature_stats N 11 15.75 15.16 16.51
+#--------------------------------------------
+#@# Cortical ribbon mask Thu Mar 25 02:11:04 EDT 2021

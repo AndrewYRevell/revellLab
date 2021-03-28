@@ -1,0 +1,837 @@
+
+Wed Mar 24 16:39:33 EDT 2021
+cd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer
+setenv SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+/home/arevell/freesurfer/bin/recon-all -subjid freesurfer -all -time -log logfile -nuintensitycor-3T -sd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate -parallel -threads 12
+
+subjid freesurfer
+setenv SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Actual FREESURFER_HOME /home/arevell/freesurfer
+build-stamp.txt: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551
+Linux neuralNet 5.4.0-58-generic #64-Ubuntu SMP Wed Dec 9 08:16:25 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+cputime      unlimited
+filesize     unlimited
+datasize     unlimited
+stacksize    8192 kbytes
+coredumpsize 0 kbytes
+memoryuse    unlimited
+vmemoryuse   unlimited
+descriptors  1024 
+memorylocked 65536 kbytes
+maxproc      256849 
+maxlocks     unlimited
+maxsignal    256849 
+maxmessage   819200 
+maxnice      0 
+maxrtprio    0 
+maxrttime    unlimited
+
+              total        used        free      shared  buff/cache   available
+Mem:           62Gi        13Gi        10Gi       411Mi        39Gi        48Gi
+Swap:         2.0Gi       2.0Mi       2.0Gi
+
+########################################
+program versions used
+7.1.1 (freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551)
+7.1.1
+
+ProgramName: lta_convert  ProgramArguments: lta_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_and  ProgramArguments: mri_and -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_annotation2label  ProgramArguments: mri_annotation2label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_aparc2aseg  ProgramArguments: mri_aparc2aseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2volseg  ProgramArguments: mri_surf2volseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_binarize  ProgramArguments: mri_binarize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_label  ProgramArguments: mri_ca_label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_normalize  ProgramArguments: mri_ca_normalize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_register  ProgramArguments: mri_ca_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_cc  ProgramArguments: mri_cc -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_compute_overlap  ProgramArguments: mri_compute_overlap -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_compute_seg_overlap  ProgramArguments: mri_compute_seg_overlap -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_concat  ProgramArguments: mri_concat -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_concatenate_lta  ProgramArguments: mri_concatenate_lta -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+mri_convert -all-info 
+ProgramName: mri_convert  ProgramArguments: mri_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_diff  ProgramArguments: mri_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_edit_wm_with_aseg  ProgramArguments: mri_edit_wm_with_aseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_em_register  ProgramArguments: mri_em_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fill  ProgramArguments: mri_fill -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fuse_segmentations  ProgramArguments: mri_fuse_segmentations -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fwhm  ProgramArguments: mri_fwhm -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_gcut  ProgramArguments: mri_gcut -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_info  ProgramArguments: mri_info -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_label2label  ProgramArguments: mri_label2label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_label2vol  ProgramArguments: mri_label2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_log_likelihood  ProgramArguments: mri_log_likelihood -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_mask  ProgramArguments: mri_mask -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_matrix_multiply  ProgramArguments: mri_matrix_multiply -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_normalize  ProgramArguments: mri_normalize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_normalize_tp2  ProgramArguments: mri_normalize_tp2 -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_or  ProgramArguments: mri_or -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_relabel_hypointensities  ProgramArguments: mri_relabel_hypointensities -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_relabel_nonwm_hypos  ProgramArguments: mri_relabel_nonwm_hypos -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_remove_neck  ProgramArguments: mri_remove_neck -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+7.1.1
+
+ProgramName: mri_robust_register  ProgramArguments: mri_robust_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+7.1.1
+
+ProgramName: mri_robust_template  ProgramArguments: mri_robust_template -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_anatomical_stats  ProgramArguments: mris_anatomical_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_ca_label  ProgramArguments: mris_ca_label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_calc  ProgramArguments: mris_calc -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_convert  ProgramArguments: mris_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_curvature  ProgramArguments: mris_curvature -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_curvature_stats  ProgramArguments: mris_curvature_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_diff  ProgramArguments: mris_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_divide_parcellation  ProgramArguments: mris_divide_parcellation -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_segment  ProgramArguments: mri_segment -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_segstats  ProgramArguments: mri_segstats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_euler_number  ProgramArguments: mris_euler_number -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_fix_topology  ProgramArguments: mris_fix_topology -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_topo_fixer  ProgramArguments: mris_topo_fixer -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_jacobian  ProgramArguments: mris_jacobian -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_label2annot  ProgramArguments: mris_label2annot -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_left_right_register  ProgramArguments: mris_left_right_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_place_surface  ProgramArguments: mris_place_surface -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mrisp_paint  ProgramArguments: mrisp_paint -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_register  ProgramArguments: mris_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_smooth  ProgramArguments: mris_smooth -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_sphere  ProgramArguments: mris_sphere -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_surface_stats  ProgramArguments: mris_surface_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_stats2seg  ProgramArguments: mri_stats2seg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_thickness  ProgramArguments: mris_thickness -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_thickness_diff  ProgramArguments: mris_thickness_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_topo_fixer  ProgramArguments: mris_topo_fixer -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2surf  ProgramArguments: mri_surf2surf -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2vol  ProgramArguments: mri_surf2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surfcluster  ProgramArguments: mri_surfcluster -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_volmask  ProgramArguments: mris_volmask -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_tessellate  ProgramArguments: mri_tessellate -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_vol2surf  ProgramArguments: mri_vol2surf -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_vol2vol  ProgramArguments: mri_vol2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_voldiff  ProgramArguments: mri_voldiff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_watershed  ProgramArguments: mri_watershed -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: tkregister2  ProgramArguments: tkregister2_cmdl -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+mri_motion_correct.fsl 7.1.1
+mri_convert -all-info 
+ProgramName: mri_convert  ProgramArguments: mri_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/24-20:39:34-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+Program nu_correct, built from:
+Package MNI N3, version 1.12.0, compiled by nicks@terrier (x86_64-unknown-linux-gnu) on 2015-06-19 at 01:25:34
+#######################################
+GCADIR /home/arevell/freesurfer/average
+GCA RB_all_2020-01-02.gca
+GCASkull RB_all_withskull_2020_01_02.gca
+AvgCurvTif folding.atlas.acfb40.noaparc.i12.2016-08-02.tif
+GCSDIR /home/arevell/freesurfer/average
+GCS DKaparc.atlas.acfb40.noaparc.i12.2016-08-02.gcs
+#######################################
+#--------------------------------------------
+#@# MotionCor Wed Mar 24 16:39:34 EDT 2021
+Found 1 runs
+/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig/001.mgz
+Checking for (invalid) multi-frame inputs...
+Only one run found so motion
+correction will not be performed. I'll
+copy the run to rawavg and continue.
+
+ cp /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig/001.mgz /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/rawavg.mgz 
+
+/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer
+
+ mri_convert /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/rawavg.mgz /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz --conform 
+
+mri_convert /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/rawavg.mgz /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz --conform 
+reading from /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/rawavg.mgz...
+TR=0.00, TE=0.00, TI=0.00, flip angle=0.00
+i_ras = (-1, 0, 0)
+j_ras = (0, 1, 0)
+k_ras = (0, 0, 1)
+changing data type from float to uchar (noscale = 0)...
+MRIchangeType: Building histogram 0.00572748 98.8286 1000, flo=0, fhi=0.999, dest_type=0
+Reslicing using trilinear interpolation 
+writing to /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz...
+@#@FSTIME  2021:03:24:16:39:38 mri_convert N 3 e 4.71 S 0.04 U 4.96 P 106% M 42520 F 0 R 17545 W 0 c 1183 w 1827 I 0 O 0 L 14.11 16.22 16.77
+@#@FSLOADPOST 2021:03:24:16:39:42 mri_convert N 3 14.34 16.24 16.77
+
+ mri_add_xform_to_header -c /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/transforms/talairach.xfm /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz 
+
+INFO: extension is mgz
+@#@FSTIME  2021:03:24:16:39:42 mri_add_xform_to_header N 4 e 0.58 S 0.02 U 1.38 P 241% M 23260 F 0 R 4598 W 0 c 377 w 2246 I 0 O 0 L 14.34 16.24 16.77
+@#@FSLOADPOST 2021:03:24:16:39:43 mri_add_xform_to_header N 4 14.34 16.24 16.77
+#--------------------------------------------
+#@# Talairach Wed Mar 24 16:39:43 EDT 2021
+
+
+
+#New# invocation of recon-all 
+
+
+
+
+Wed Mar 24 20:01:23 EDT 2021
+cd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer
+setenv SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+/home/arevell/freesurfer/bin/recon-all -subjid freesurfer -all -time -log logfile -nuintensitycor-3T -sd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate -parallel -threads 4
+
+subjid freesurfer
+setenv SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Actual FREESURFER_HOME /home/arevell/freesurfer
+build-stamp.txt: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551
+Linux neuralNet 5.4.0-58-generic #64-Ubuntu SMP Wed Dec 9 08:16:25 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+cputime      unlimited
+filesize     unlimited
+datasize     unlimited
+stacksize    8192 kbytes
+coredumpsize 0 kbytes
+memoryuse    unlimited
+vmemoryuse   unlimited
+descriptors  1024 
+memorylocked 65536 kbytes
+maxproc      256849 
+maxlocks     unlimited
+maxsignal    256849 
+maxmessage   819200 
+maxnice      0 
+maxrtprio    0 
+maxrttime    unlimited
+
+              total        used        free      shared  buff/cache   available
+Mem:           62Gi        11Gi       8.9Gi       380Mi        42Gi        50Gi
+Swap:         2.0Gi       2.0Mi       2.0Gi
+
+########################################
+program versions used
+7.1.1 (freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551)
+7.1.1
+
+ProgramName: lta_convert  ProgramArguments: lta_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_and  ProgramArguments: mri_and -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_annotation2label  ProgramArguments: mri_annotation2label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_aparc2aseg  ProgramArguments: mri_aparc2aseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2volseg  ProgramArguments: mri_surf2volseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_binarize  ProgramArguments: mri_binarize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_label  ProgramArguments: mri_ca_label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_normalize  ProgramArguments: mri_ca_normalize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_register  ProgramArguments: mri_ca_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_cc  ProgramArguments: mri_cc -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_compute_overlap  ProgramArguments: mri_compute_overlap -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_compute_seg_overlap  ProgramArguments: mri_compute_seg_overlap -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_concat  ProgramArguments: mri_concat -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_concatenate_lta  ProgramArguments: mri_concatenate_lta -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+mri_convert -all-info 
+ProgramName: mri_convert  ProgramArguments: mri_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_diff  ProgramArguments: mri_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_edit_wm_with_aseg  ProgramArguments: mri_edit_wm_with_aseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_em_register  ProgramArguments: mri_em_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fill  ProgramArguments: mri_fill -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fuse_segmentations  ProgramArguments: mri_fuse_segmentations -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fwhm  ProgramArguments: mri_fwhm -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_gcut  ProgramArguments: mri_gcut -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_info  ProgramArguments: mri_info -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_label2label  ProgramArguments: mri_label2label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_label2vol  ProgramArguments: mri_label2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_log_likelihood  ProgramArguments: mri_log_likelihood -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_mask  ProgramArguments: mri_mask -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_matrix_multiply  ProgramArguments: mri_matrix_multiply -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_normalize  ProgramArguments: mri_normalize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_normalize_tp2  ProgramArguments: mri_normalize_tp2 -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_or  ProgramArguments: mri_or -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_relabel_hypointensities  ProgramArguments: mri_relabel_hypointensities -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_relabel_nonwm_hypos  ProgramArguments: mri_relabel_nonwm_hypos -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_remove_neck  ProgramArguments: mri_remove_neck -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+7.1.1
+
+ProgramName: mri_robust_register  ProgramArguments: mri_robust_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+7.1.1
+
+ProgramName: mri_robust_template  ProgramArguments: mri_robust_template -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_anatomical_stats  ProgramArguments: mris_anatomical_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_ca_label  ProgramArguments: mris_ca_label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_calc  ProgramArguments: mris_calc -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_convert  ProgramArguments: mris_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_curvature  ProgramArguments: mris_curvature -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_curvature_stats  ProgramArguments: mris_curvature_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_diff  ProgramArguments: mris_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_divide_parcellation  ProgramArguments: mris_divide_parcellation -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_segment  ProgramArguments: mri_segment -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_segstats  ProgramArguments: mri_segstats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_euler_number  ProgramArguments: mris_euler_number -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_fix_topology  ProgramArguments: mris_fix_topology -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_topo_fixer  ProgramArguments: mris_topo_fixer -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_jacobian  ProgramArguments: mris_jacobian -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_label2annot  ProgramArguments: mris_label2annot -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_left_right_register  ProgramArguments: mris_left_right_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_place_surface  ProgramArguments: mris_place_surface -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mrisp_paint  ProgramArguments: mrisp_paint -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_register  ProgramArguments: mris_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_smooth  ProgramArguments: mris_smooth -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_sphere  ProgramArguments: mris_sphere -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_surface_stats  ProgramArguments: mris_surface_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_stats2seg  ProgramArguments: mri_stats2seg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_thickness  ProgramArguments: mris_thickness -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_thickness_diff  ProgramArguments: mris_thickness_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_topo_fixer  ProgramArguments: mris_topo_fixer -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2surf  ProgramArguments: mri_surf2surf -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2vol  ProgramArguments: mri_surf2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surfcluster  ProgramArguments: mri_surfcluster -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_volmask  ProgramArguments: mris_volmask -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_tessellate  ProgramArguments: mri_tessellate -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_vol2surf  ProgramArguments: mri_vol2surf -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_vol2vol  ProgramArguments: mri_vol2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_voldiff  ProgramArguments: mri_voldiff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_watershed  ProgramArguments: mri_watershed -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: tkregister2  ProgramArguments: tkregister2_cmdl -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+mri_motion_correct.fsl 7.1.1
+mri_convert -all-info 
+ProgramName: mri_convert  ProgramArguments: mri_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:23-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+Program nu_correct, built from:
+Package MNI N3, version 1.12.0, compiled by nicks@terrier (x86_64-unknown-linux-gnu) on 2015-06-19 at 01:25:34
+#######################################
+GCADIR /home/arevell/freesurfer/average
+GCA RB_all_2020-01-02.gca
+GCASkull RB_all_withskull_2020_01_02.gca
+AvgCurvTif folding.atlas.acfb40.noaparc.i12.2016-08-02.tif
+GCSDIR /home/arevell/freesurfer/average
+GCS DKaparc.atlas.acfb40.noaparc.i12.2016-08-02.gcs
+#######################################
+
+
+
+#New# invocation of recon-all 
+
+
+
+
+Wed Mar 24 20:01:33 EDT 2021
+cd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer
+setenv SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+/home/arevell/freesurfer/bin/recon-all -subjid freesurfer -all -time -log logfile -nuintensitycor-3T -sd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate -parallel -threads 4
+
+subjid freesurfer
+setenv SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Actual FREESURFER_HOME /home/arevell/freesurfer
+build-stamp.txt: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551
+Linux neuralNet 5.4.0-58-generic #64-Ubuntu SMP Wed Dec 9 08:16:25 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+cputime      unlimited
+filesize     unlimited
+datasize     unlimited
+stacksize    8192 kbytes
+coredumpsize 0 kbytes
+memoryuse    unlimited
+vmemoryuse   unlimited
+descriptors  1024 
+memorylocked 65536 kbytes
+maxproc      256849 
+maxlocks     unlimited
+maxsignal    256849 
+maxmessage   819200 
+maxnice      0 
+maxrtprio    0 
+maxrttime    unlimited
+
+              total        used        free      shared  buff/cache   available
+Mem:           62Gi        11Gi       8.8Gi       380Mi        42Gi        50Gi
+Swap:         2.0Gi       2.0Mi       2.0Gi
+
+########################################
+program versions used
+7.1.1 (freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551)
+7.1.1
+
+ProgramName: lta_convert  ProgramArguments: lta_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_and  ProgramArguments: mri_and -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_annotation2label  ProgramArguments: mri_annotation2label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_aparc2aseg  ProgramArguments: mri_aparc2aseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2volseg  ProgramArguments: mri_surf2volseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_binarize  ProgramArguments: mri_binarize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_label  ProgramArguments: mri_ca_label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_normalize  ProgramArguments: mri_ca_normalize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_register  ProgramArguments: mri_ca_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_cc  ProgramArguments: mri_cc -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_compute_overlap  ProgramArguments: mri_compute_overlap -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_compute_seg_overlap  ProgramArguments: mri_compute_seg_overlap -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_concat  ProgramArguments: mri_concat -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_concatenate_lta  ProgramArguments: mri_concatenate_lta -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+mri_convert -all-info 
+ProgramName: mri_convert  ProgramArguments: mri_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_diff  ProgramArguments: mri_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_edit_wm_with_aseg  ProgramArguments: mri_edit_wm_with_aseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_em_register  ProgramArguments: mri_em_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fill  ProgramArguments: mri_fill -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fuse_segmentations  ProgramArguments: mri_fuse_segmentations -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fwhm  ProgramArguments: mri_fwhm -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_gcut  ProgramArguments: mri_gcut -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_info  ProgramArguments: mri_info -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_label2label  ProgramArguments: mri_label2label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_label2vol  ProgramArguments: mri_label2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_log_likelihood  ProgramArguments: mri_log_likelihood -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_mask  ProgramArguments: mri_mask -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_matrix_multiply  ProgramArguments: mri_matrix_multiply -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_normalize  ProgramArguments: mri_normalize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_normalize_tp2  ProgramArguments: mri_normalize_tp2 -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_or  ProgramArguments: mri_or -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_relabel_hypointensities  ProgramArguments: mri_relabel_hypointensities -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_relabel_nonwm_hypos  ProgramArguments: mri_relabel_nonwm_hypos -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_remove_neck  ProgramArguments: mri_remove_neck -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+7.1.1
+
+ProgramName: mri_robust_register  ProgramArguments: mri_robust_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+7.1.1
+
+ProgramName: mri_robust_template  ProgramArguments: mri_robust_template -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_anatomical_stats  ProgramArguments: mris_anatomical_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_ca_label  ProgramArguments: mris_ca_label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_calc  ProgramArguments: mris_calc -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_convert  ProgramArguments: mris_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_curvature  ProgramArguments: mris_curvature -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_curvature_stats  ProgramArguments: mris_curvature_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_diff  ProgramArguments: mris_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_divide_parcellation  ProgramArguments: mris_divide_parcellation -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_segment  ProgramArguments: mri_segment -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_segstats  ProgramArguments: mri_segstats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_euler_number  ProgramArguments: mris_euler_number -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_fix_topology  ProgramArguments: mris_fix_topology -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_topo_fixer  ProgramArguments: mris_topo_fixer -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_jacobian  ProgramArguments: mris_jacobian -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_label2annot  ProgramArguments: mris_label2annot -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_left_right_register  ProgramArguments: mris_left_right_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_place_surface  ProgramArguments: mris_place_surface -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mrisp_paint  ProgramArguments: mrisp_paint -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_register  ProgramArguments: mris_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_smooth  ProgramArguments: mris_smooth -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_sphere  ProgramArguments: mris_sphere -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_surface_stats  ProgramArguments: mris_surface_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_stats2seg  ProgramArguments: mri_stats2seg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_thickness  ProgramArguments: mris_thickness -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_thickness_diff  ProgramArguments: mris_thickness_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_topo_fixer  ProgramArguments: mris_topo_fixer -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2surf  ProgramArguments: mri_surf2surf -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2vol  ProgramArguments: mri_surf2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surfcluster  ProgramArguments: mri_surfcluster -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_volmask  ProgramArguments: mris_volmask -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_tessellate  ProgramArguments: mri_tessellate -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_vol2surf  ProgramArguments: mri_vol2surf -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_vol2vol  ProgramArguments: mri_vol2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_voldiff  ProgramArguments: mri_voldiff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_watershed  ProgramArguments: mri_watershed -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: tkregister2  ProgramArguments: tkregister2_cmdl -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+mri_motion_correct.fsl 7.1.1
+mri_convert -all-info 
+ProgramName: mri_convert  ProgramArguments: mri_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-00:01:33-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+Program nu_correct, built from:
+Package MNI N3, version 1.12.0, compiled by nicks@terrier (x86_64-unknown-linux-gnu) on 2015-06-19 at 01:25:34
+#######################################
+GCADIR /home/arevell/freesurfer/average
+GCA RB_all_2020-01-02.gca
+GCASkull RB_all_withskull_2020_01_02.gca
+AvgCurvTif folding.atlas.acfb40.noaparc.i12.2016-08-02.tif
+GCSDIR /home/arevell/freesurfer/average
+GCS DKaparc.atlas.acfb40.noaparc.i12.2016-08-02.gcs
+#######################################
+#--------------------------------------------
+#@# MotionCor Wed Mar 24 20:01:33 EDT 2021
+Found 1 runs
+/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig/001.mgz
+Checking for (invalid) multi-frame inputs...
+Only one run found so motion
+correction will not be performed. I'll
+copy the run to rawavg and continue.
+
+ cp /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig/001.mgz /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/rawavg.mgz 
+
+/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer
+
+ mri_convert /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/rawavg.mgz /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz --conform 
+
+mri_convert /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/rawavg.mgz /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz --conform 
+reading from /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/rawavg.mgz...
+TR=0.00, TE=0.00, TI=0.00, flip angle=0.00
+i_ras = (-1, 0, 0)
+j_ras = (0, 1, 0)
+k_ras = (0, 0, 1)
+changing data type from float to uchar (noscale = 0)...
+MRIchangeType: Building histogram 0.00572748 98.8286 1000, flo=0, fhi=0.999, dest_type=0
+Reslicing using trilinear interpolation 
+writing to /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz...
+@#@FSTIME  2021:03:24:20:01:37 mri_convert N 3 e 2.29 S 0.01 U 2.30 P 101% M 42624 F 0 R 17524 W 0 c 217 w 2287 I 0 O 0 L 6.33 23.05 38.04
+@#@FSLOADPOST 2021:03:24:20:01:39 mri_convert N 3 6.33 23.05 38.04
+
+ mri_add_xform_to_header -c /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/transforms/talairach.xfm /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz 
+
+INFO: extension is mgz
+@#@FSTIME  2021:03:24:20:01:39 mri_add_xform_to_header N 4 e 0.48 S 0.01 U 0.72 P 152% M 23260 F 0 R 4576 W 0 c 57 w 2259 I 0 O 0 L 6.33 23.05 38.04
+@#@FSLOADPOST 2021:03:24:20:01:39 mri_add_xform_to_header N 4 6.33 23.05 38.04
+#--------------------------------------------
+#@# Talairach Wed Mar 24 20:01:39 EDT 2021
+
+
+
+#New# invocation of recon-all 
+
+
+
+
+Wed Mar 24 23:01:37 EDT 2021
+cd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer
+setenv SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+/home/arevell/freesurfer/bin/recon-all -subjid freesurfer -all -time -log logfile -nuintensitycor-3T -sd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate -parallel -threads 4
+
+subjid freesurfer
+setenv SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Actual FREESURFER_HOME /home/arevell/freesurfer
+build-stamp.txt: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551
+Linux neuralNet 5.4.0-58-generic #64-Ubuntu SMP Wed Dec 9 08:16:25 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+cputime      unlimited
+filesize     unlimited
+datasize     unlimited
+stacksize    8192 kbytes
+coredumpsize 0 kbytes
+memoryuse    unlimited
+vmemoryuse   unlimited
+descriptors  1024 
+memorylocked 65536 kbytes
+maxproc      256849 
+maxlocks     unlimited
+maxsignal    256849 
+maxmessage   819200 
+maxnice      0 
+maxrtprio    0 
+maxrttime    unlimited
+
+              total        used        free      shared  buff/cache   available
+Mem:           62Gi        14Gi       2.2Gi       169Mi        46Gi        47Gi
+Swap:         2.0Gi        10Mi       2.0Gi
+
+########################################
+program versions used
+7.1.1 (freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551)
+7.1.1
+
+ProgramName: lta_convert  ProgramArguments: lta_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_and  ProgramArguments: mri_and -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_annotation2label  ProgramArguments: mri_annotation2label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_aparc2aseg  ProgramArguments: mri_aparc2aseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2volseg  ProgramArguments: mri_surf2volseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_binarize  ProgramArguments: mri_binarize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_label  ProgramArguments: mri_ca_label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_normalize  ProgramArguments: mri_ca_normalize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_register  ProgramArguments: mri_ca_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_cc  ProgramArguments: mri_cc -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_compute_overlap  ProgramArguments: mri_compute_overlap -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_compute_seg_overlap  ProgramArguments: mri_compute_seg_overlap -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_concat  ProgramArguments: mri_concat -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_concatenate_lta  ProgramArguments: mri_concatenate_lta -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+mri_convert -all-info 
+ProgramName: mri_convert  ProgramArguments: mri_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_diff  ProgramArguments: mri_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_edit_wm_with_aseg  ProgramArguments: mri_edit_wm_with_aseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_em_register  ProgramArguments: mri_em_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fill  ProgramArguments: mri_fill -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fuse_segmentations  ProgramArguments: mri_fuse_segmentations -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fwhm  ProgramArguments: mri_fwhm -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_gcut  ProgramArguments: mri_gcut -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_info  ProgramArguments: mri_info -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_label2label  ProgramArguments: mri_label2label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_label2vol  ProgramArguments: mri_label2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_log_likelihood  ProgramArguments: mri_log_likelihood -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_mask  ProgramArguments: mri_mask -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_matrix_multiply  ProgramArguments: mri_matrix_multiply -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_normalize  ProgramArguments: mri_normalize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_normalize_tp2  ProgramArguments: mri_normalize_tp2 -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_or  ProgramArguments: mri_or -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_relabel_hypointensities  ProgramArguments: mri_relabel_hypointensities -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_relabel_nonwm_hypos  ProgramArguments: mri_relabel_nonwm_hypos -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_remove_neck  ProgramArguments: mri_remove_neck -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+7.1.1
+
+ProgramName: mri_robust_register  ProgramArguments: mri_robust_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+7.1.1
+
+ProgramName: mri_robust_template  ProgramArguments: mri_robust_template -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_anatomical_stats  ProgramArguments: mris_anatomical_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_ca_label  ProgramArguments: mris_ca_label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_calc  ProgramArguments: mris_calc -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_convert  ProgramArguments: mris_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_curvature  ProgramArguments: mris_curvature -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_curvature_stats  ProgramArguments: mris_curvature_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_diff  ProgramArguments: mris_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_divide_parcellation  ProgramArguments: mris_divide_parcellation -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_segment  ProgramArguments: mri_segment -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_segstats  ProgramArguments: mri_segstats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_euler_number  ProgramArguments: mris_euler_number -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_fix_topology  ProgramArguments: mris_fix_topology -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_topo_fixer  ProgramArguments: mris_topo_fixer -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_jacobian  ProgramArguments: mris_jacobian -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_label2annot  ProgramArguments: mris_label2annot -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_left_right_register  ProgramArguments: mris_left_right_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_place_surface  ProgramArguments: mris_place_surface -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mrisp_paint  ProgramArguments: mrisp_paint -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_register  ProgramArguments: mris_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_smooth  ProgramArguments: mris_smooth -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_sphere  ProgramArguments: mris_sphere -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_surface_stats  ProgramArguments: mris_surface_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_stats2seg  ProgramArguments: mri_stats2seg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_thickness  ProgramArguments: mris_thickness -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_thickness_diff  ProgramArguments: mris_thickness_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_topo_fixer  ProgramArguments: mris_topo_fixer -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2surf  ProgramArguments: mri_surf2surf -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2vol  ProgramArguments: mri_surf2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surfcluster  ProgramArguments: mri_surfcluster -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_volmask  ProgramArguments: mris_volmask -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_tessellate  ProgramArguments: mri_tessellate -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_vol2surf  ProgramArguments: mri_vol2surf -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_vol2vol  ProgramArguments: mri_vol2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_voldiff  ProgramArguments: mri_voldiff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_watershed  ProgramArguments: mri_watershed -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: tkregister2  ProgramArguments: tkregister2_cmdl -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+mri_motion_correct.fsl 7.1.1
+mri_convert -all-info 
+ProgramName: mri_convert  ProgramArguments: mri_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:37-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+Program nu_correct, built from:
+Package MNI N3, version 1.12.0, compiled by nicks@terrier (x86_64-unknown-linux-gnu) on 2015-06-19 at 01:25:34
+#######################################
+GCADIR /home/arevell/freesurfer/average
+GCA RB_all_2020-01-02.gca
+GCASkull RB_all_withskull_2020_01_02.gca
+AvgCurvTif folding.atlas.acfb40.noaparc.i12.2016-08-02.tif
+GCSDIR /home/arevell/freesurfer/average
+GCS DKaparc.atlas.acfb40.noaparc.i12.2016-08-02.gcs
+#######################################
+
+
+
+#New# invocation of recon-all 
+
+
+
+
+Wed Mar 24 23:01:45 EDT 2021
+cd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer
+setenv SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+/home/arevell/freesurfer/bin/recon-all -subjid freesurfer -all -time -log logfile -nuintensitycor-3T -sd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate -parallel -threads 4
+
+subjid freesurfer
+setenv SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Actual FREESURFER_HOME /home/arevell/freesurfer
+build-stamp.txt: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551
+Linux neuralNet 5.4.0-58-generic #64-Ubuntu SMP Wed Dec 9 08:16:25 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+cputime      unlimited
+filesize     unlimited
+datasize     unlimited
+stacksize    8192 kbytes
+coredumpsize 0 kbytes
+memoryuse    unlimited
+vmemoryuse   unlimited
+descriptors  1024 
+memorylocked 65536 kbytes
+maxproc      256849 
+maxlocks     unlimited
+maxsignal    256849 
+maxmessage   819200 
+maxnice      0 
+maxrtprio    0 
+maxrttime    unlimited
+
+              total        used        free      shared  buff/cache   available
+Mem:           62Gi        14Gi       2.2Gi       169Mi        46Gi        47Gi
+Swap:         2.0Gi        10Mi       2.0Gi
+
+########################################
+program versions used
+7.1.1 (freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551)
+7.1.1
+
+ProgramName: lta_convert  ProgramArguments: lta_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_and  ProgramArguments: mri_and -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_annotation2label  ProgramArguments: mri_annotation2label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_aparc2aseg  ProgramArguments: mri_aparc2aseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2volseg  ProgramArguments: mri_surf2volseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_binarize  ProgramArguments: mri_binarize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_label  ProgramArguments: mri_ca_label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_normalize  ProgramArguments: mri_ca_normalize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_ca_register  ProgramArguments: mri_ca_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_cc  ProgramArguments: mri_cc -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_compute_overlap  ProgramArguments: mri_compute_overlap -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_compute_seg_overlap  ProgramArguments: mri_compute_seg_overlap -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_concat  ProgramArguments: mri_concat -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_concatenate_lta  ProgramArguments: mri_concatenate_lta -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+mri_convert -all-info 
+ProgramName: mri_convert  ProgramArguments: mri_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_diff  ProgramArguments: mri_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_edit_wm_with_aseg  ProgramArguments: mri_edit_wm_with_aseg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_em_register  ProgramArguments: mri_em_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fill  ProgramArguments: mri_fill -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fuse_segmentations  ProgramArguments: mri_fuse_segmentations -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_fwhm  ProgramArguments: mri_fwhm -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_gcut  ProgramArguments: mri_gcut -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_info  ProgramArguments: mri_info -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_label2label  ProgramArguments: mri_label2label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_label2vol  ProgramArguments: mri_label2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_log_likelihood  ProgramArguments: mri_log_likelihood -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_mask  ProgramArguments: mri_mask -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_matrix_multiply  ProgramArguments: mri_matrix_multiply -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_normalize  ProgramArguments: mri_normalize -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_normalize_tp2  ProgramArguments: mri_normalize_tp2 -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_or  ProgramArguments: mri_or -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_relabel_hypointensities  ProgramArguments: mri_relabel_hypointensities -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_relabel_nonwm_hypos  ProgramArguments: mri_relabel_nonwm_hypos -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_remove_neck  ProgramArguments: mri_remove_neck -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+7.1.1
+
+ProgramName: mri_robust_register  ProgramArguments: mri_robust_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+7.1.1
+
+ProgramName: mri_robust_template  ProgramArguments: mri_robust_template -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_anatomical_stats  ProgramArguments: mris_anatomical_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_ca_label  ProgramArguments: mris_ca_label -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_calc  ProgramArguments: mris_calc -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_convert  ProgramArguments: mris_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_curvature  ProgramArguments: mris_curvature -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_curvature_stats  ProgramArguments: mris_curvature_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_diff  ProgramArguments: mris_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_divide_parcellation  ProgramArguments: mris_divide_parcellation -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_segment  ProgramArguments: mri_segment -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_segstats  ProgramArguments: mri_segstats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_euler_number  ProgramArguments: mris_euler_number -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_fix_topology  ProgramArguments: mris_fix_topology -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_topo_fixer  ProgramArguments: mris_topo_fixer -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_jacobian  ProgramArguments: mris_jacobian -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_label2annot  ProgramArguments: mris_label2annot -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_left_right_register  ProgramArguments: mris_left_right_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_place_surface  ProgramArguments: mris_place_surface -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mrisp_paint  ProgramArguments: mrisp_paint -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_register  ProgramArguments: mris_register -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_smooth  ProgramArguments: mris_smooth -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_sphere  ProgramArguments: mris_sphere -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_surface_stats  ProgramArguments: mris_surface_stats -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_stats2seg  ProgramArguments: mri_stats2seg -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_thickness  ProgramArguments: mris_thickness -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_thickness_diff  ProgramArguments: mris_thickness_diff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_topo_fixer  ProgramArguments: mris_topo_fixer -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2surf  ProgramArguments: mri_surf2surf -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surf2vol  ProgramArguments: mri_surf2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_surfcluster  ProgramArguments: mri_surfcluster -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mris_volmask  ProgramArguments: mris_volmask -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_tessellate  ProgramArguments: mri_tessellate -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_vol2surf  ProgramArguments: mri_vol2surf -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_vol2vol  ProgramArguments: mri_vol2vol -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_voldiff  ProgramArguments: mri_voldiff -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: mri_watershed  ProgramArguments: mri_watershed -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+ProgramName: tkregister2  ProgramArguments: tkregister2_cmdl -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+mri_motion_correct.fsl 7.1.1
+mri_convert -all-info 
+ProgramName: mri_convert  ProgramArguments: mri_convert -all-info  ProgramVersion: 7.1.1  TimeStamp: 2021/03/25-03:01:45-GMT  BuildTime: Jul 23 2020 11:55:54  BuildStamp: freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551  User: arevell  Machine: neuralNet  Platform: Linux  PlatformVersion: 5.4.0-58-generic  CompilerName: GCC  CompilerVersion: 4.8.5
+Program nu_correct, built from:
+Package MNI N3, version 1.12.0, compiled by nicks@terrier (x86_64-unknown-linux-gnu) on 2015-06-19 at 01:25:34
+#######################################
+GCADIR /home/arevell/freesurfer/average
+GCA RB_all_2020-01-02.gca
+GCASkull RB_all_withskull_2020_01_02.gca
+AvgCurvTif folding.atlas.acfb40.noaparc.i12.2016-08-02.tif
+GCSDIR /home/arevell/freesurfer/average
+GCS DKaparc.atlas.acfb40.noaparc.i12.2016-08-02.gcs
+#######################################
+#--------------------------------------------
+#@# MotionCor Wed Mar 24 23:01:45 EDT 2021
+Found 1 runs
+/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig/001.mgz
+Checking for (invalid) multi-frame inputs...
+Only one run found so motion
+correction will not be performed. I'll
+copy the run to rawavg and continue.
+
+ cp /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig/001.mgz /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/rawavg.mgz 
+
+/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer
+
+ mri_convert /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/rawavg.mgz /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz --conform 
+
+mri_convert /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/rawavg.mgz /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz --conform 
+reading from /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/rawavg.mgz...
+TR=0.00, TE=0.00, TI=0.00, flip angle=0.00
+i_ras = (-1, 0, 0)
+j_ras = (0, 1, 0)
+k_ras = (0, 0, 1)
+changing data type from float to uchar (noscale = 0)...
+MRIchangeType: Building histogram 0.00572748 98.8286 1000, flo=0, fhi=0.999, dest_type=0
+Reslicing using trilinear interpolation 
+writing to /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz...
+@#@FSTIME  2021:03:24:23:01:49 mri_convert N 3 e 2.30 S 0.02 U 2.32 P 101% M 42528 F 0 R 17526 W 0 c 215 w 2288 I 0 O 0 L 7.71 10.78 19.12
+@#@FSLOADPOST 2021:03:24:23:01:51 mri_convert N 3 7.49 10.69 19.05
+
+ mri_add_xform_to_header -c /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/transforms/talairach.xfm /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz 
+
+INFO: extension is mgz
+@#@FSTIME  2021:03:24:23:01:51 mri_add_xform_to_header N 4 e 0.51 S 0.00 U 0.79 P 155% M 23372 F 0 R 4575 W 0 c 61 w 2258 I 0 O 0 L 7.49 10.69 19.05
+@#@FSLOADPOST 2021:03:24:23:01:52 mri_add_xform_to_header N 4 7.49 10.69 19.05
+#--------------------------------------------
+#@# Talairach Wed Mar 24 23:01:52 EDT 2021
+
+ mri_segstats --seed 1234 --seg mri/wmparc.mgz --sum stats/wmparc.stats --pv mri/norm.mgz --excludeid 0 --brainmask mri/brainmask.mgz --in mri/norm.mgz --in-intensity-name norm --in-intensity-units MR --subject freesurfer --surf-wm-vol --ctab /home/arevell/freesurfer/WMParcStatsLUT.txt --etiv 
+
+setting seed for random number genererator to 1234
+
+7.1.1
+cwd 
+cmdline mri_segstats --seed 1234 --seg mri/wmparc.mgz --sum stats/wmparc.stats --pv mri/norm.mgz --excludeid 0 --brainmask mri/brainmask.mgz --in mri/norm.mgz --in-intensity-name norm --in-intensity-units MR --subject freesurfer --surf-wm-vol --ctab /home/arevell/freesurfer/WMParcStatsLUT.txt --etiv 
+sysname  Linux
+hostname neuralNet
+machine  x86_64
+user     arevell
+whitesurfname  white
+UseRobust  0
+atlas_icv (eTIV) = 2207090 mm^3    (det: 0.882658 )
+Loading mri/wmparc.mgz
+Getting Brain Volume Statistics
+Loading mri/norm.mgz
+Loading mri/norm.mgz
+Voxel Volume is 1 mm^3
+Generating list of segmentation ids
+Found 390 segmentations
+Computing statistics for each segmentation
+
+Reporting on  70 segmentations
+Using PrintSegStat
+mri_segstats done
+@#@FSTIME  2021:03:25:02:21:29 mri_segstats N 24 e 204.28 S 0.38 U 425.23 P 208% M 239916 F 0 R 1232908 W 0 c 42220 w 617 I 0 O 0 L 9.16 10.08 13.40
+@#@FSLOADPOST 2021:03:25:02:24:53 mri_segstats N 24 9.55 11.23 13.30
+#-----------------------------------------
+#@# Parcellation Stats lh Thu Mar 25 02:24:53 EDT 2021
+/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer
+
+ mri_segstats --seed 1234 --seg mri/aseg.mgz --sum stats/aseg.stats --pv mri/norm.mgz --empty --brainmask mri/brainmask.mgz --brain-vol-from-seg --excludeid 0 --excl-ctxgmwm --supratent --subcortgray --in mri/norm.mgz --in-intensity-name norm --in-intensity-units MR --etiv --surf-wm-vol --surf-ctx-vol --totalgray --euler --ctab /home/arevell/freesurfer/ASegStatsLUT.txt --subject freesurfer 
+
+setting seed for random number genererator to 1234
+
+7.1.1
+cwd 
+cmdline mri_segstats --seed 1234 --seg mri/aseg.mgz --sum stats/aseg.stats --pv mri/norm.mgz --empty --brainmask mri/brainmask.mgz --brain-vol-from-seg --excludeid 0 --excl-ctxgmwm --supratent --subcortgray --in mri/norm.mgz --in-intensity-name norm --in-intensity-units MR --etiv --surf-wm-vol --surf-ctx-vol --totalgray --euler --ctab /home/arevell/freesurfer/ASegStatsLUT.txt --subject freesurfer 
+sysname  Linux
+hostname neuralNet
+machine  x86_64
+user     arevell
+whitesurfname  white
+UseRobust  0
+atlas_icv (eTIV) = 2207090 mm^3    (det: 0.882658 )
+Computing euler number
+orig.nofix lheno =  -20, rheno = -32
+orig.nofix lhholes =   11, rhholes = 17
+Loading mri/aseg.mgz
+Getting Brain Volume Statistics
+Loading mri/norm.mgz
+Loading mri/norm.mgz
+Voxel Volume is 1 mm^3
+Generating list of segmentation ids
+Found  50 segmentations
+Computing statistics for each segmentation
+
+Reporting on  45 segmentations
+Using PrintSegStat
+mri_segstats done
+@#@FSTIME  2021:03:25:02:25:28 mri_segstats N 32 e 66.67 S 0.41 U 250.25 P 375% M 316168 F 0 R 773790 W 0 c 24078 w 788 I 0 O 0 L 9.15 10.95 13.13
+@#@FSLOADPOST 2021:03:25:02:26:35 mri_segstats N 32 9.51 10.64 12.86

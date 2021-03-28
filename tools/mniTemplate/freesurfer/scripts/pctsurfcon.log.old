@@ -1,0 +1,4 @@
+Logfile for pctsurfcon
+Thu Mar 25 02:16:18 EDT 2021
+setenv SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+cd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/scripts

@@ -6,26 +6,141 @@ Created on Tue Mar  2 11:01:56 2021
 @author: arevell
 """
 
-import sys
 import os
-import pandas as pd
+import sys
 import copy
-from os import listdir
-from  os.path import join, isfile
-from os.path import splitext, basename
+import json
+import pkg_resources
+import multiprocessing
+
 import numpy as np
+import pandas as pd
 import nibabel as nib
 import matplotlib.pyplot as plt
-#import seaborn as sns
-from scipy import ndimage 
-import multiprocessing
-from itertools import repeat
-from revellLab.packages.utilities import utils
-import json
 
+from os import listdir
+from scipy import ndimage 
+from glob import glob, iglob
+from itertools import repeat
+from os.path import join, isfile, splitext, basename
+
+from revellLab.packages.utilities import utils
+
+
+revellLabPath = pkg_resources.resource_filename("revellLab", "/")
+tools = pkg_resources.resource_filename("revellLab", "tools")
+atlasDirectory = join(tools, "atlases", "atlases" )
+atlasLabelDirectory = join(tools, "atlases", "atlasLabels" )
+
+MNItemplatePath = join( tools, "mniTemplate", "mni_icbm152_t1_tal_nlin_asym_09c_182x218x182.nii.gz")
+MNItemplateBrainPath = join( tools, "mniTemplate", "mni_icbm152_t1_tal_nlin_asym_09c_182x218x182_brain.nii.gz")
 #%% functions
 
-def atlasLocalizationBatchProccess(subList, i,  atlasLocalizationFunctionDirectory, inputDirectory, atlasDirectory, atlasLabelsPath, MNItemplatePath, MNItemplateBrainPath, outputDirectory, rerun = False):
+sub = "RID0139"
+i=0
+SesImplant = "implant01"
+acq = "3D"
+ieegSpace = "T00"
+BIDS = join("/media","arevell","sharedSSD","linux", "data", "BIDS")
+dataset = "PIER"
+derivatives = join(BIDS, "derivatives", "atlasLocalization")
+
+utils.checkPathError(join(BIDS, dataset))
+
+utils.checkPathError(f"/media/arevell/sharedSSD/linux/data/BIDS/PIER/sub-RID0139/ses-implant01/ieeg/sub-{sub}_ses-{SesImplant}_space-{ieegSpace}_electrodes.tsv")
+
+
+glob( join(BIDS, dataset, f"sub-{sub}", f"ses-research3Tv" + '[0-9][0-9]'))
+
+def atlasLocalizationBatchProccess(subList, i, BIDS, dataset, SesImplant, ieegSpace, acq, atlasDirectory, atlasLabelDirectory, MNItemplatePath, MNItemplateBrainPath, derivatives, rerun = False ):
+    sub = subList[i]
+    electrodePreopT1Coordinates = join(BIDS, dataset, f"sub-{sub}", f"ses-{SesImplant}", "ieeg", f"sub-{sub}_ses-{SesImplant}_space-{ieegSpace}_electrodes.tsv")  
+    
+
+    highresSession = glob( join(BIDS, dataset, f"sub-{sub}", f"ses-research3Tv" + '[0-9][0-9]'))[-1]
+    if len(highresSession)  < 1:  #grab implant image if there is no high resolution T1
+        T1 =  join(BIDS, dataset, f"sub-{sub}", f"ses-{SesImplant}", "anat",   f"sub-{sub}_ses-{SesImplant}_acq-{ieegSpace}_T1w.nii.gz")
+    else:
+        highresSessionBase = basename(highresSession)
+        T1 =  join(highresSession, "anat",   f"sub-{sub}_{highresSessionBase}_acq-{acq}_T1w.nii.gz")
+
+    
+    utils.checkPathError(electrodePreopT1Coordinates)
+    utils.checkPathError(T1)
+    utils.checkPathError(derivatives)
+    
+    outputDir = join(derivatives, f"sub-{sub}", f"ses-{SesImplant}")
+    utils.checkPathAndMake(join(derivatives), outputDir)
+    
+    outputName =  f"sub-{sub}_ses-{SesImplant}_desc-atlasLocalization.csv"
+    
+    
+    fillerString = "\n###########################\n###########################\n###########################\n###########################\n"
+    
+    
+        
+        
+    #names of outputs output
+    outputDirTMP = join(outputDir, "tmp")
+
+    
+    T1_basename =  os.path.basename( splitext(splitext(T1)[0])[0])
+    T1_output = f"{join(outputDirTMP, T1_basename)}"
+
+    outputNameTissueSeg = join(outputDir, f"{T1_basename}_std1x1x1_tissueSegmentation.nii.gz")
+    FIRST = join(outputDir, f"{T1_basename}_std1x1x1_FIRST.nii.gz")
+    FAST = join(outputDir, f"{T1_basename}_std1x1x1_FAST.nii.gz")
+    outputMNIname = "mni"
+    MNIwarp = join(outputDir, outputMNIname + "_warp.nii.gz")
+    
+    #Make temporary storage 
+    utils.checkPathAndMake(outputDirTMP, outputDirTMP, make = True)
+    
+        
+    
+    
+    print(f"\n\n{fillerString}Part 1 of 4\nReorientation of Images\nEstimated time: 10-30 seconds{fillerString}\nReorient all images to standard RAS\n")
+    utils.executeCommand( f"fslreorient2std {T1} {T1_output}_std.nii.gz"  )
+    print("\n\n\nReslice all standard RAS images to 1x1x1mm voxels\n")
+    utils.executeCommand( f"flirt -in {T1_output}_std.nii.gz -ref {T1_output}_std.nii.gz -applyisoxfm 1.0 -nosearch -out {T1_output}_std1x1x1.nii.gz"  )
+
+    #visualize
+    utils.show_slices(f"{T1_output}_std1x1x1.nii.gz", save = True, saveFilename = join(outputDir, f"pic_{T1_basename}.png")  )
+
+    print("\n\n\nBrain extraction\n")
+    utils.executeCommand( f"bet {T1_output}_std1x1x1.nii.gz {T1_output}_std1x1x1_BRAIN.nii.gz -R -v"  )
+    utils.show_slices(f"{T1_output}_std1x1x1_BRAIN.nii.gz", save = True, saveFilename = join(outputDir, f"pic_{T1_basename}_BRAIN.png")  )
+
+    print("\n\n\nLinear Registration to MNI\n")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+def atlasLocalizationBatchProccess2(subList, i,  atlasLocalizationFunctionDirectory, inputDirectory, atlasDirectory, atlasLabelsPath, MNItemplatePath, MNItemplateBrainPath, outputDirectory, rerun = False):
 #for i in range(len(subList)):
     sub = subList[i]
     electrodePreopT1Coordinates = join(inputDirectory, f"sub-{sub}", "electrodenames_coordinates_native_and_T1.csv")   
@@ -68,11 +183,11 @@ def executeAtlasLocalizationSingleSubject(atlasLocalizationFunctionDirectory, el
     utils.executeCommand(cmd)
     
     
-def atlasLocalizationFromBIDS(BIDS, dataset, sub, ses, acq, electrodeCoordinatesPath,atlasLocalizationFunctionDirectory, MNItemplatePath , MNItemplateBrainPath, atlasDirectory, atlasLabelsPath, outputDirectory, rerun = False ):
+def atlasLocalizationFromBIDS(BIDS, dataset, sub, ses, acq, sesImplant, acqImplant, electrodeCoordinatesPath, atlasLocalizationFunctionDirectory, MNItemplatePath , MNItemplateBrainPath, atlasDirectory, atlasLabelsPath, outputDirectory, rerun = False ):
     subject_T1 = join(BIDS, dataset, f"sub-{sub}", f"ses-{ses}", "anat", f"sub-{sub}_ses-{ses}_acq-{acq}_T1w.nii.gz" )
-    subject_outputDir = join(BIDS, "derivatives", "atlasLocalization", f"sub-{sub}")
-    subject_preimplantT1 = join(subject_outputDir, f"T00_{sub}_mprage.nii.gz" )
-    subject_preimplantT1_brain = join(subject_outputDir, f"T00_{sub}_mprage_brainBrainExtractionBrain.nii.gz" )
+    subject_outputDir = join(BIDS, "derivatives", "atlasLocalization", f"sub-{sub}" , f"ses-{sesImplant}")
+    subject_preimplantT1 = join(subject_outputDir, "anat", f"sub-{sub}_ses-{sesImplant}_acq-{acqImplant}_T1w.nii.gz"  )
+    subject_preimplantT1_brain = join(subject_outputDir, f"sub-{sub}_ses-{sesImplant}_acq-{acqImplant}brain_T1w.nii.gz" )
     subject_T1_to_preimplantT1 = join(subject_outputDir, f"T1_to_T00_{sub}_mprage.nii.gz" )
     subject_T1_to_preimplantT1_brain = join(subject_outputDir, f"T1_to_T00_{sub}_mprage_brain.nii.gz" )
     subject_biascorrected = join(subject_outputDir, f"sub-{sub}_biascorrected")

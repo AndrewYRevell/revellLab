@@ -1,0 +1,1 @@
+mri_convert /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/rawavg.mgz /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/orig.mgz --conform

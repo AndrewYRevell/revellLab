@@ -1,0 +1,3755 @@
+/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/label
+INFO: fsaverage subject does not exist in SUBJECTS_DIR
+INFO: Creating symlink to fsaverage subject...
+
+ cd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate; ln -s /home/arevell/freesurfer/subjects/fsaverage; cd - 
+
+#--------------------------------------------
+#@# BA_exvivo Labels lh Thu Mar 25 02:26:35 EDT 2021
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA1_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA1_exvivo.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA2_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA2_exvivo.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA3a_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA3a_exvivo.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA3b_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA3b_exvivo.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA4a_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA4a_exvivo.label --hemi lh --regmethod surface 
+
+Waiting for PID 226810 of (226810 226813 226816 226819 226822) to complete...
+Waiting for PID 226813 of (226810 226813 226816 226819 226822) to complete...
+Waiting for PID 226816 of (226810 226813 226816 226819 226822) to complete...
+Waiting for PID 226819 of (226810 226813 226816 226819 226822) to complete...
+Waiting for PID 226822 of (226810 226813 226816 226819 226822) to complete...
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA1_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA1_exvivo.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA1_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA1_exvivo.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 4129 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  4129 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 432
+Checking for and removing duplicates
+Writing label file ./lh.BA1_exvivo.label 4561
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA2_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA2_exvivo.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA2_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA2_exvivo.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 7909 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  7909 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 588
+Checking for and removing duplicates
+Writing label file ./lh.BA2_exvivo.label 8497
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA3a_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA3a_exvivo.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA3a_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA3a_exvivo.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 4077 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  4077 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 83
+Checking for and removing duplicates
+Writing label file ./lh.BA3a_exvivo.label 4160
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA3b_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA3b_exvivo.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA3b_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA3b_exvivo.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 5983 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  5983 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 324
+Checking for and removing duplicates
+Writing label file ./lh.BA3b_exvivo.label 6307
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA4a_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA4a_exvivo.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA4a_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA4a_exvivo.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 5784 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  5784 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 688
+Checking for and removing duplicates
+Writing label file ./lh.BA4a_exvivo.label 6472
+mri_label2label: Done
+
+PIDs (226810 226813 226816 226819 226822) completed and logs appended.
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA4p_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA4p_exvivo.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA6_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA6_exvivo.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA44_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA44_exvivo.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA45_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA45_exvivo.label --hemi lh --regmethod surface 
+
+Waiting for PID 226867 of (226867 226870 226873 226876) to complete...
+Waiting for PID 226870 of (226867 226870 226873 226876) to complete...
+Waiting for PID 226873 of (226867 226870 226873 226876) to complete...
+Waiting for PID 226876 of (226867 226870 226873 226876) to complete...
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA4p_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA4p_exvivo.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA4p_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA4p_exvivo.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 4070 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  4070 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 220
+Checking for and removing duplicates
+Writing label file ./lh.BA4p_exvivo.label 4290
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA6_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA6_exvivo.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA6_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA6_exvivo.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 13589 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  13589 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 2892
+Checking for and removing duplicates
+Writing label file ./lh.BA6_exvivo.label 16481
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA44_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA44_exvivo.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA44_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA44_exvivo.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 4181 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  4181 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 272
+Checking for and removing duplicates
+Writing label file ./lh.BA44_exvivo.label 4453
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA45_exvivo.label --trgsubject freesurfer --trglabel ./lh.BA45_exvivo.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA45_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA45_exvivo.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 3422 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  3422 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 538
+Checking for and removing duplicates
+Writing label file ./lh.BA45_exvivo.label 3960
+mri_label2label: Done
+
+PIDs (226867 226870 226873 226876) completed and logs appended.
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.V1_exvivo.label --trgsubject freesurfer --trglabel ./lh.V1_exvivo.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.V2_exvivo.label --trgsubject freesurfer --trglabel ./lh.V2_exvivo.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.MT_exvivo.label --trgsubject freesurfer --trglabel ./lh.MT_exvivo.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.entorhinal_exvivo.label --trgsubject freesurfer --trglabel ./lh.entorhinal_exvivo.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.perirhinal_exvivo.label --trgsubject freesurfer --trglabel ./lh.perirhinal_exvivo.label --hemi lh --regmethod surface 
+
+Waiting for PID 226920 of (226920 226923 226926 226929 226932) to complete...
+Waiting for PID 226923 of (226920 226923 226926 226929 226932) to complete...
+Waiting for PID 226926 of (226920 226923 226926 226929 226932) to complete...
+Waiting for PID 226929 of (226920 226923 226926 226929 226932) to complete...
+Waiting for PID 226932 of (226920 226923 226926 226929 226932) to complete...
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.V1_exvivo.label --trgsubject freesurfer --trglabel ./lh.V1_exvivo.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.V1_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.V1_exvivo.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 4641 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  4641 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 1266
+Checking for and removing duplicates
+Writing label file ./lh.V1_exvivo.label 5907
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.V2_exvivo.label --trgsubject freesurfer --trglabel ./lh.V2_exvivo.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.V2_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.V2_exvivo.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 8114 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  8114 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 2810
+Checking for and removing duplicates
+Writing label file ./lh.V2_exvivo.label 10924
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.MT_exvivo.label --trgsubject freesurfer --trglabel ./lh.MT_exvivo.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.MT_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.MT_exvivo.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 2018 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  2018 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 302
+Checking for and removing duplicates
+Writing label file ./lh.MT_exvivo.label 2320
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.entorhinal_exvivo.label --trgsubject freesurfer --trglabel ./lh.entorhinal_exvivo.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.entorhinal_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.entorhinal_exvivo.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1290 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1290 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 192
+Checking for and removing duplicates
+Writing label file ./lh.entorhinal_exvivo.label 1482
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.perirhinal_exvivo.label --trgsubject freesurfer --trglabel ./lh.perirhinal_exvivo.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.perirhinal_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.perirhinal_exvivo.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1199 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1199 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 128
+Checking for and removing duplicates
+Writing label file ./lh.perirhinal_exvivo.label 1327
+mri_label2label: Done
+
+PIDs (226920 226923 226926 226929 226932) completed and logs appended.
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.FG1.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.FG1.mpm.vpnl.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.FG2.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.FG2.mpm.vpnl.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.FG3.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.FG3.mpm.vpnl.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.FG4.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.FG4.mpm.vpnl.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.hOc1.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.hOc1.mpm.vpnl.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.hOc2.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.hOc2.mpm.vpnl.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.hOc3v.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.hOc3v.mpm.vpnl.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.hOc4v.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.hOc4v.mpm.vpnl.label --hemi lh --regmethod surface 
+
+Waiting for PID 227019 of (227019 227022 227025 227028 227031 227034 227037 227040) to complete...
+Waiting for PID 227022 of (227019 227022 227025 227028 227031 227034 227037 227040) to complete...
+Waiting for PID 227025 of (227019 227022 227025 227028 227031 227034 227037 227040) to complete...
+Waiting for PID 227028 of (227019 227022 227025 227028 227031 227034 227037 227040) to complete...
+Waiting for PID 227031 of (227019 227022 227025 227028 227031 227034 227037 227040) to complete...
+Waiting for PID 227034 of (227019 227022 227025 227028 227031 227034 227037 227040) to complete...
+Waiting for PID 227037 of (227019 227022 227025 227028 227031 227034 227037 227040) to complete...
+Waiting for PID 227040 of (227019 227022 227025 227028 227031 227034 227037 227040) to complete...
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.FG1.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.FG1.mpm.vpnl.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.FG1.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.FG1.mpm.vpnl.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 414 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  414 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 147
+Checking for and removing duplicates
+Writing label file ./lh.FG1.mpm.vpnl.label 561
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.FG2.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.FG2.mpm.vpnl.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.FG2.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.FG2.mpm.vpnl.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 703 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  703 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 220
+Checking for and removing duplicates
+Writing label file ./lh.FG2.mpm.vpnl.label 923
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.FG3.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.FG3.mpm.vpnl.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.FG3.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.FG3.mpm.vpnl.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1873 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1873 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 226
+Checking for and removing duplicates
+Writing label file ./lh.FG3.mpm.vpnl.label 2099
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.FG4.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.FG4.mpm.vpnl.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.FG4.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.FG4.mpm.vpnl.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 2101 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  2101 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 613
+Checking for and removing duplicates
+Writing label file ./lh.FG4.mpm.vpnl.label 2714
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.hOc1.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.hOc1.mpm.vpnl.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.hOc1.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.hOc1.mpm.vpnl.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 3877 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  3877 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 965
+Checking for and removing duplicates
+Writing label file ./lh.hOc1.mpm.vpnl.label 4842
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.hOc2.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.hOc2.mpm.vpnl.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.hOc2.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.hOc2.mpm.vpnl.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 2919 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  2919 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 1236
+Checking for and removing duplicates
+Writing label file ./lh.hOc2.mpm.vpnl.label 4155
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.hOc3v.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.hOc3v.mpm.vpnl.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.hOc3v.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.hOc3v.mpm.vpnl.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1286 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1286 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 571
+Checking for and removing duplicates
+Writing label file ./lh.hOc3v.mpm.vpnl.label 1857
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.hOc4v.mpm.vpnl.label --trgsubject freesurfer --trglabel ./lh.hOc4v.mpm.vpnl.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.hOc4v.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.hOc4v.mpm.vpnl.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1006 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1006 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 311
+Checking for and removing duplicates
+Writing label file ./lh.hOc4v.mpm.vpnl.label 1317
+mri_label2label: Done
+
+PIDs (227019 227022 227025 227028 227031 227034 227037 227040) completed and logs appended.
+
+ mris_label2annot --s freesurfer --ctab /home/arevell/freesurfer/average/colortable_vpnl.txt --hemi lh --a mpm.vpnl --maxstatwinner --noverbose --l lh.FG1.mpm.vpnl.label --l lh.FG2.mpm.vpnl.label --l lh.FG3.mpm.vpnl.label --l lh.FG4.mpm.vpnl.label --l lh.hOc1.mpm.vpnl.label --l lh.hOc2.mpm.vpnl.label --l lh.hOc3v.mpm.vpnl.label --l lh.hOc4v.mpm.vpnl.label 
+
+Reading ctab /home/arevell/freesurfer/average/colortable_vpnl.txt
+Number of ctab entries 9
+
+7.1.1
+cwd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/label
+cmdline mris_label2annot --s freesurfer --ctab /home/arevell/freesurfer/average/colortable_vpnl.txt --hemi lh --a mpm.vpnl --maxstatwinner --noverbose --l lh.FG1.mpm.vpnl.label --l lh.FG2.mpm.vpnl.label --l lh.FG3.mpm.vpnl.label --l lh.FG4.mpm.vpnl.label --l lh.hOc1.mpm.vpnl.label --l lh.hOc2.mpm.vpnl.label --l lh.hOc3v.mpm.vpnl.label --l lh.hOc4v.mpm.vpnl.label 
+sysname  Linux
+hostname neuralNet
+machine  x86_64
+user     arevell
+
+subject freesurfer
+hemi    lh
+SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+ColorTable /home/arevell/freesurfer/average/colortable_vpnl.txt
+AnnotName  mpm.vpnl
+nlables 8
+LabelThresh 0 0.000000
+Loading /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.orig
+ 1 1376057 FG1
+ 2 16711935 FG2
+ 3 16711680 FG3
+ 4 1705837 FG4
+ 5 25600 hOc1
+ 6 255 hOc2
+ 7 16776960 hOc3v
+ 8 65535 hOc4v
+Mapping unhit to unknown
+Found 141353 unhit vertices
+Writing annot to /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/label/lh.mpm.vpnl.annot
+@#@FSTIME  2021:03:25:02:27:06 mris_label2annot N 26 e 0.72 S 0.07 U 0.95 P 142% M 183136 F 0 R 50252 W 0 c 98 w 1725 I 0 O 0 L 10.63 10.80 12.85
+@#@FSLOADPOST 2021:03:25:02:27:07 mris_label2annot N 26 10.63 10.80 12.85
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA1_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA1_exvivo.thresh.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA2_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA2_exvivo.thresh.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA3a_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA3a_exvivo.thresh.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA3b_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA3b_exvivo.thresh.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA4a_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA4a_exvivo.thresh.label --hemi lh --regmethod surface 
+
+Waiting for PID 227132 of (227132 227135 227138 227141 227144) to complete...
+Waiting for PID 227135 of (227132 227135 227138 227141 227144) to complete...
+Waiting for PID 227138 of (227132 227135 227138 227141 227144) to complete...
+Waiting for PID 227141 of (227132 227135 227138 227141 227144) to complete...
+Waiting for PID 227144 of (227132 227135 227138 227141 227144) to complete...
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA1_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA1_exvivo.thresh.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA1_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA1_exvivo.thresh.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1014 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1014 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 133
+Checking for and removing duplicates
+Writing label file ./lh.BA1_exvivo.thresh.label 1147
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA2_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA2_exvivo.thresh.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA2_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA2_exvivo.thresh.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 2092 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  2092 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 308
+Checking for and removing duplicates
+Writing label file ./lh.BA2_exvivo.thresh.label 2400
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA3a_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA3a_exvivo.thresh.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA3a_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA3a_exvivo.thresh.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1504 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1504 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 15
+Checking for and removing duplicates
+Writing label file ./lh.BA3a_exvivo.thresh.label 1519
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA3b_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA3b_exvivo.thresh.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA3b_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA3b_exvivo.thresh.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1996 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1996 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 137
+Checking for and removing duplicates
+Writing label file ./lh.BA3b_exvivo.thresh.label 2133
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA4a_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA4a_exvivo.thresh.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA4a_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA4a_exvivo.thresh.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 2319 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  2319 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 309
+Checking for and removing duplicates
+Writing label file ./lh.BA4a_exvivo.thresh.label 2628
+mri_label2label: Done
+
+PIDs (227132 227135 227138 227141 227144) completed and logs appended.
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA4p_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA4p_exvivo.thresh.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA6_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA6_exvivo.thresh.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA44_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA44_exvivo.thresh.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA45_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA45_exvivo.thresh.label --hemi lh --regmethod surface 
+
+Waiting for PID 227188 of (227188 227191 227194 227197) to complete...
+Waiting for PID 227191 of (227188 227191 227194 227197) to complete...
+Waiting for PID 227194 of (227188 227191 227194 227197) to complete...
+Waiting for PID 227197 of (227188 227191 227194 227197) to complete...
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA4p_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA4p_exvivo.thresh.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA4p_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA4p_exvivo.thresh.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1549 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1549 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 53
+Checking for and removing duplicates
+Writing label file ./lh.BA4p_exvivo.thresh.label 1602
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA6_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA6_exvivo.thresh.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA6_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA6_exvivo.thresh.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 7035 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  7035 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 1364
+Checking for and removing duplicates
+Writing label file ./lh.BA6_exvivo.thresh.label 8399
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA44_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA44_exvivo.thresh.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA44_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA44_exvivo.thresh.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1912 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1912 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 98
+Checking for and removing duplicates
+Writing label file ./lh.BA44_exvivo.thresh.label 2010
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA45_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.BA45_exvivo.thresh.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.BA45_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.BA45_exvivo.thresh.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1151 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1151 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 261
+Checking for and removing duplicates
+Writing label file ./lh.BA45_exvivo.thresh.label 1412
+mri_label2label: Done
+
+PIDs (227188 227191 227194 227197) completed and logs appended.
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.V1_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.V1_exvivo.thresh.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.V2_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.V2_exvivo.thresh.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.MT_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.MT_exvivo.thresh.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.entorhinal_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.entorhinal_exvivo.thresh.label --hemi lh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.perirhinal_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.perirhinal_exvivo.thresh.label --hemi lh --regmethod surface 
+
+Waiting for PID 227240 of (227240 227243 227246 227249 227252) to complete...
+Waiting for PID 227243 of (227240 227243 227246 227249 227252) to complete...
+Waiting for PID 227246 of (227240 227243 227246 227249 227252) to complete...
+Waiting for PID 227249 of (227240 227243 227246 227249 227252) to complete...
+Waiting for PID 227252 of (227240 227243 227246 227249 227252) to complete...
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.V1_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.V1_exvivo.thresh.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.V1_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.V1_exvivo.thresh.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 3405 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  3405 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 833
+Checking for and removing duplicates
+Writing label file ./lh.V1_exvivo.thresh.label 4238
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.V2_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.V2_exvivo.thresh.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.V2_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.V2_exvivo.thresh.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 3334 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  3334 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 1351
+Checking for and removing duplicates
+Writing label file ./lh.V2_exvivo.thresh.label 4685
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.MT_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.MT_exvivo.thresh.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.MT_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.MT_exvivo.thresh.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 513 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  513 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 77
+Checking for and removing duplicates
+Writing label file ./lh.MT_exvivo.thresh.label 590
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.entorhinal_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.entorhinal_exvivo.thresh.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.entorhinal_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.entorhinal_exvivo.thresh.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 470 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  470 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 107
+Checking for and removing duplicates
+Writing label file ./lh.entorhinal_exvivo.thresh.label 577
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.perirhinal_exvivo.thresh.label --trgsubject freesurfer --trglabel ./lh.perirhinal_exvivo.thresh.label --hemi lh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/lh.perirhinal_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./lh.perirhinal_exvivo.thresh.label
+regmethod = surface
+
+srchemi = lh
+trghemi = lh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 450 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  450 nlabel points
+Performing mapping from target back to the source label 158638
+Number of reverse mapping hits = 58
+Checking for and removing duplicates
+Writing label file ./lh.perirhinal_exvivo.thresh.label 508
+mri_label2label: Done
+
+PIDs (227240 227243 227246 227249 227252) completed and logs appended.
+
+ mris_label2annot --s freesurfer --hemi lh --ctab /home/arevell/freesurfer/average/colortable_BA.txt --l lh.BA1_exvivo.label --l lh.BA2_exvivo.label --l lh.BA3a_exvivo.label --l lh.BA3b_exvivo.label --l lh.BA4a_exvivo.label --l lh.BA4p_exvivo.label --l lh.BA6_exvivo.label --l lh.BA44_exvivo.label --l lh.BA45_exvivo.label --l lh.V1_exvivo.label --l lh.V2_exvivo.label --l lh.MT_exvivo.label --l lh.perirhinal_exvivo.label --l lh.entorhinal_exvivo.label --a BA_exvivo --maxstatwinner --noverbose 
+
+Reading ctab /home/arevell/freesurfer/average/colortable_BA.txt
+Number of ctab entries 15
+
+7.1.1
+cwd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/label
+cmdline mris_label2annot --s freesurfer --hemi lh --ctab /home/arevell/freesurfer/average/colortable_BA.txt --l lh.BA1_exvivo.label --l lh.BA2_exvivo.label --l lh.BA3a_exvivo.label --l lh.BA3b_exvivo.label --l lh.BA4a_exvivo.label --l lh.BA4p_exvivo.label --l lh.BA6_exvivo.label --l lh.BA44_exvivo.label --l lh.BA45_exvivo.label --l lh.V1_exvivo.label --l lh.V2_exvivo.label --l lh.MT_exvivo.label --l lh.perirhinal_exvivo.label --l lh.entorhinal_exvivo.label --a BA_exvivo --maxstatwinner --noverbose 
+sysname  Linux
+hostname neuralNet
+machine  x86_64
+user     arevell
+
+subject freesurfer
+hemi    lh
+SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+ColorTable /home/arevell/freesurfer/average/colortable_BA.txt
+AnnotName  BA_exvivo
+nlables 14
+LabelThresh 0 0.000000
+Loading /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.orig
+ 1 1530880 BA1_exvivo
+ 2 16749699 BA2_exvivo
+ 3 16711680 BA3a_exvivo
+ 4 3368703 BA3b_exvivo
+ 5 1376196 BA4a_exvivo
+ 6 13382655 BA4p_exvivo
+ 7 10036737 BA6_exvivo
+ 8 2490521 BA44_exvivo
+ 9 39283 BA45_exvivo
+10 3993 V1_exvivo
+11 8508928 V2_exvivo
+12 10027163 MT_exvivo
+13 16422433 perirhinal_exvivo
+14 16392598 entorhinal_exvivo
+Mapping unhit to unknown
+Found 110160 unhit vertices
+Writing annot to /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/label/lh.BA_exvivo.annot
+@#@FSTIME  2021:03:25:02:27:27 mris_label2annot N 38 e 0.79 S 0.07 U 1.08 P 146% M 183676 F 0 R 50342 W 0 c 108 w 2173 I 0 O 0 L 10.15 10.68 12.76
+@#@FSLOADPOST 2021:03:25:02:27:28 mris_label2annot N 38 10.15 10.68 12.76
+
+ mris_label2annot --s freesurfer --hemi lh --ctab /home/arevell/freesurfer/average/colortable_BA.txt --l lh.BA1_exvivo.thresh.label --l lh.BA2_exvivo.thresh.label --l lh.BA3a_exvivo.thresh.label --l lh.BA3b_exvivo.thresh.label --l lh.BA4a_exvivo.thresh.label --l lh.BA4p_exvivo.thresh.label --l lh.BA6_exvivo.thresh.label --l lh.BA44_exvivo.thresh.label --l lh.BA45_exvivo.thresh.label --l lh.V1_exvivo.thresh.label --l lh.V2_exvivo.thresh.label --l lh.MT_exvivo.thresh.label --l lh.perirhinal_exvivo.thresh.label --l lh.entorhinal_exvivo.thresh.label --a BA_exvivo.thresh --maxstatwinner --noverbose 
+
+Reading ctab /home/arevell/freesurfer/average/colortable_BA.txt
+Number of ctab entries 15
+
+7.1.1
+cwd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/label
+cmdline mris_label2annot --s freesurfer --hemi lh --ctab /home/arevell/freesurfer/average/colortable_BA.txt --l lh.BA1_exvivo.thresh.label --l lh.BA2_exvivo.thresh.label --l lh.BA3a_exvivo.thresh.label --l lh.BA3b_exvivo.thresh.label --l lh.BA4a_exvivo.thresh.label --l lh.BA4p_exvivo.thresh.label --l lh.BA6_exvivo.thresh.label --l lh.BA44_exvivo.thresh.label --l lh.BA45_exvivo.thresh.label --l lh.V1_exvivo.thresh.label --l lh.V2_exvivo.thresh.label --l lh.MT_exvivo.thresh.label --l lh.perirhinal_exvivo.thresh.label --l lh.entorhinal_exvivo.thresh.label --a BA_exvivo.thresh --maxstatwinner --noverbose 
+sysname  Linux
+hostname neuralNet
+machine  x86_64
+user     arevell
+
+subject freesurfer
+hemi    lh
+SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+ColorTable /home/arevell/freesurfer/average/colortable_BA.txt
+AnnotName  BA_exvivo.thresh
+nlables 14
+LabelThresh 0 0.000000
+Loading /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.orig
+ 1 1530880 BA1_exvivo
+ 2 16749699 BA2_exvivo
+ 3 16711680 BA3a_exvivo
+ 4 3368703 BA3b_exvivo
+ 5 1376196 BA4a_exvivo
+ 6 13382655 BA4p_exvivo
+ 7 10036737 BA6_exvivo
+ 8 2490521 BA44_exvivo
+ 9 39283 BA45_exvivo
+10 3993 V1_exvivo
+11 8508928 V2_exvivo
+12 10027163 MT_exvivo
+13 16422433 perirhinal_exvivo
+14 16392598 entorhinal_exvivo
+Mapping unhit to unknown
+Found 129205 unhit vertices
+Writing annot to /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/label/lh.BA_exvivo.thresh.annot
+@#@FSTIME  2021:03:25:02:27:28 mris_label2annot N 38 e 0.61 S 0.07 U 0.82 P 144% M 183148 F 0 R 50345 W 0 c 86 w 2173 I 0 O 0 L 10.15 10.68 12.76
+@#@FSLOADPOST 2021:03:25:02:27:29 mris_label2annot N 38 10.15 10.68 12.76
+
+ mris_anatomical_stats -th3 -mgz -f ../stats/lh.BA_exvivo.stats -b -a ./lh.BA_exvivo.annot -c ./BA_exvivo.ctab freesurfer lh white 
+
+computing statistics for each annotation in ./lh.BA_exvivo.annot.
+reading volume /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/wm.mgz...
+reading input surface /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white...
+reading input pial surface /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.pial...
+reading input white surface /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white...
+INFO: using TH3 volume calc
+INFO: assuming MGZ format for volumes.
+Using TH3 vertex volume calc
+Total face volume 290776
+Total vertex volume 290558 (mask=0)
+reading colortable from annotation file...
+colortable with 15 entries read (originally /home/arevell/freesurfer/average/colortable_BA.txt)
+Saving annotation colortable ./BA_exvivo.ctab
+
+table columns are:
+    number of vertices
+    total surface area (mm^2)
+    total gray matter volume (mm^3)
+    average cortical thickness +- standard deviation (mm)
+    integrated rectified mean curvature
+    integrated rectified Gaussian curvature
+    folding index
+    intrinsic curvature index
+    structure name
+
+atlas_icv (eTIV) = 2207090 mm^3    (det: 0.882658 )
+ 1403    820   1593  1.726 0.597     0.086     0.015        7     0.9  BA1_exvivo
+ 4518   2868   5956  2.140 0.716     0.100     0.019       24     3.7  BA2_exvivo
+ 1203    848   1051  1.654 0.449     0.132     0.022       11     1.0  BA3a_exvivo
+ 2811   1766   3227  1.730 0.791     0.084     0.013       13     1.6  BA3b_exvivo
+ 2303   1372   2799  1.979 0.864     0.080     0.016       10     1.5  BA4a_exvivo
+ 1514    997   1925  2.027 0.860     0.073     0.010        4     0.7  BA4p_exvivo
+13307   7454  23519  2.926 0.961     0.084     0.017       59     9.6  BA6_exvivo
+ 2444   1606   6005  3.439 0.502     0.091     0.012       15     1.3  BA44_exvivo
+ 3089   2069   7665  3.200 0.571     0.103     0.019       20     2.5  BA45_exvivo
+ 3665   2538   3624  1.514 0.417     0.125     0.031       33     5.5  V1_exvivo
+ 8758   5791  11362  1.990 0.669     0.126     0.037       70    15.3  V2_exvivo
+ 1947   1333   4347  2.777 0.613     0.117     0.030       14     2.4  MT_exvivo
+  683    415   1732  3.501 0.715     0.072     0.013        3     0.3  perirhinal_exvivo
+  833    445   1297  2.305 1.585     0.068     0.021        6     0.7  entorhinal_exvivo
+@#@FSTIME  2021:03:25:02:27:29 mris_anatomical_stats N 12 e 4.54 S 0.20 U 6.61 P 150% M 550048 F 0 R 159998 W 0 c 634 w 1246 I 0 O 0 L 10.15 10.68 12.76
+@#@FSLOADPOST 2021:03:25:02:27:33 mris_anatomical_stats N 12 9.82 10.60 12.73
+
+ mris_anatomical_stats -th3 -mgz -f ../stats/lh.BA_exvivo.thresh.stats -b -a ./lh.BA_exvivo.thresh.annot -c ./BA_exvivo.thresh.ctab freesurfer lh white 
+
+computing statistics for each annotation in ./lh.BA_exvivo.thresh.annot.
+reading volume /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/wm.mgz...
+reading input surface /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white...
+reading input pial surface /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.pial...
+reading input white surface /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/lh.white...
+INFO: using TH3 volume calc
+INFO: assuming MGZ format for volumes.
+Using TH3 vertex volume calc
+Total face volume 290776
+Total vertex volume 290558 (mask=0)
+reading colortable from annotation file...
+colortable with 15 entries read (originally /home/arevell/freesurfer/average/colortable_BA.txt)
+Saving annotation colortable ./BA_exvivo.thresh.ctab
+
+table columns are:
+    number of vertices
+    total surface area (mm^2)
+    total gray matter volume (mm^3)
+    average cortical thickness +- standard deviation (mm)
+    integrated rectified mean curvature
+    integrated rectified Gaussian curvature
+    folding index
+    intrinsic curvature index
+    structure name
+
+atlas_icv (eTIV) = 2207090 mm^3    (det: 0.882658 )
+ 1022    571   1081  1.661 0.534     0.089     0.015        5     0.7  BA1_exvivo
+ 2085   1254   2414  1.922 0.558     0.084     0.016        8     1.5  BA2_exvivo
+ 1038    737    860  1.605 0.359     0.140     0.023       10     1.0  BA3a_exvivo
+ 1773   1129   1468  1.305 0.253     0.070     0.008        5     0.7  BA3b_exvivo
+ 2287   1342   2620  1.949 0.853     0.070     0.013        7     1.3  BA4a_exvivo
+ 1173    792   1560  2.134 0.805     0.079     0.012        3     0.6  BA4p_exvivo
+ 7474   4254  11228  2.533 1.004     0.086     0.018       34     5.9  BA6_exvivo
+ 1561   1012   3816  3.448 0.541     0.094     0.012       11     0.9  BA44_exvivo
+ 1339    864   3850  3.386 0.551     0.109     0.020       11     1.2  BA45_exvivo
+ 3892   2667   3902  1.528 0.427     0.121     0.029       33     5.5  V1_exvivo
+ 4456   3003   5401  1.891 0.661     0.137     0.044       41     9.7  V2_exvivo
+  507    339    992  2.626 0.555     0.124     0.030        5     0.7  MT_exvivo
+  306    183    714  3.372 0.604     0.064     0.009        1     0.1  perirhinal_exvivo
+  520    275    928  2.772 1.359     0.044     0.011        1     0.2  entorhinal_exvivo
+@#@FSTIME  2021:03:25:02:27:33 mris_anatomical_stats N 12 e 4.21 S 0.15 U 6.35 P 154% M 550100 F 0 R 155930 W 0 c 659 w 1246 I 0 O 0 L 9.82 10.60 12.73
+@#@FSLOADPOST 2021:03:25:02:27:38 mris_anatomical_stats N 12 9.67 10.56 12.70
+#--------------------------------------------
+#@# BA_exvivo Labels rh Thu Mar 25 02:27:38 EDT 2021
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA1_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA1_exvivo.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA2_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA2_exvivo.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA3a_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA3a_exvivo.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA3b_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA3b_exvivo.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA4a_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA4a_exvivo.label --hemi rh --regmethod surface 
+
+Waiting for PID 227426 of (227426 227429 227432 227435 227438) to complete...
+Waiting for PID 227429 of (227426 227429 227432 227435 227438) to complete...
+Waiting for PID 227432 of (227426 227429 227432 227435 227438) to complete...
+Waiting for PID 227435 of (227426 227429 227432 227435 227438) to complete...
+Waiting for PID 227438 of (227426 227429 227432 227435 227438) to complete...
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA1_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA1_exvivo.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA1_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA1_exvivo.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 3962 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  3962 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 424
+Checking for and removing duplicates
+Writing label file ./rh.BA1_exvivo.label 4386
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA2_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA2_exvivo.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA2_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA2_exvivo.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 6687 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  6687 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 530
+Checking for and removing duplicates
+Writing label file ./rh.BA2_exvivo.label 7217
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA3a_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA3a_exvivo.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA3a_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA3a_exvivo.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 3980 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  3980 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 111
+Checking for and removing duplicates
+Writing label file ./rh.BA3a_exvivo.label 4091
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA3b_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA3b_exvivo.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA3b_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA3b_exvivo.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 4522 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  4522 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 305
+Checking for and removing duplicates
+Writing label file ./rh.BA3b_exvivo.label 4827
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA4a_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA4a_exvivo.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA4a_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA4a_exvivo.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 5747 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  5747 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 554
+Checking for and removing duplicates
+Writing label file ./rh.BA4a_exvivo.label 6301
+mri_label2label: Done
+
+PIDs (227426 227429 227432 227435 227438) completed and logs appended.
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA4p_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA4p_exvivo.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA6_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA6_exvivo.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA44_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA44_exvivo.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA45_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA45_exvivo.label --hemi rh --regmethod surface 
+
+Waiting for PID 227483 of (227483 227486 227489 227492) to complete...
+Waiting for PID 227486 of (227483 227486 227489 227492) to complete...
+Waiting for PID 227489 of (227483 227486 227489 227492) to complete...
+Waiting for PID 227492 of (227483 227486 227489 227492) to complete...
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA4p_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA4p_exvivo.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA4p_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA4p_exvivo.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 4473 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  4473 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 182
+Checking for and removing duplicates
+Writing label file ./rh.BA4p_exvivo.label 4655
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA6_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA6_exvivo.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA6_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA6_exvivo.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 12256 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  12256 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 1953
+Checking for and removing duplicates
+Writing label file ./rh.BA6_exvivo.label 14209
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA44_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA44_exvivo.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA44_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA44_exvivo.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 6912 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  6912 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 558
+Checking for and removing duplicates
+Writing label file ./rh.BA44_exvivo.label 7470
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA45_exvivo.label --trgsubject freesurfer --trglabel ./rh.BA45_exvivo.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA45_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA45_exvivo.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 5355 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  5355 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 931
+Checking for and removing duplicates
+Writing label file ./rh.BA45_exvivo.label 6286
+mri_label2label: Done
+
+PIDs (227483 227486 227489 227492) completed and logs appended.
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.V1_exvivo.label --trgsubject freesurfer --trglabel ./rh.V1_exvivo.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.V2_exvivo.label --trgsubject freesurfer --trglabel ./rh.V2_exvivo.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.MT_exvivo.label --trgsubject freesurfer --trglabel ./rh.MT_exvivo.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.entorhinal_exvivo.label --trgsubject freesurfer --trglabel ./rh.entorhinal_exvivo.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.perirhinal_exvivo.label --trgsubject freesurfer --trglabel ./rh.perirhinal_exvivo.label --hemi rh --regmethod surface 
+
+Waiting for PID 227535 of (227535 227538 227541 227544 227547) to complete...
+Waiting for PID 227538 of (227535 227538 227541 227544 227547) to complete...
+Waiting for PID 227541 of (227535 227538 227541 227544 227547) to complete...
+Waiting for PID 227544 of (227535 227538 227541 227544 227547) to complete...
+Waiting for PID 227547 of (227535 227538 227541 227544 227547) to complete...
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.V1_exvivo.label --trgsubject freesurfer --trglabel ./rh.V1_exvivo.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.V1_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.V1_exvivo.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 4727 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  4727 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 1505
+Checking for and removing duplicates
+Writing label file ./rh.V1_exvivo.label 6232
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.V2_exvivo.label --trgsubject freesurfer --trglabel ./rh.V2_exvivo.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.V2_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.V2_exvivo.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 8016 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  8016 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 2530
+Checking for and removing duplicates
+Writing label file ./rh.V2_exvivo.label 10546
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.MT_exvivo.label --trgsubject freesurfer --trglabel ./rh.MT_exvivo.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.MT_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.MT_exvivo.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1932 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1932 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 403
+Checking for and removing duplicates
+Writing label file ./rh.MT_exvivo.label 2335
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.entorhinal_exvivo.label --trgsubject freesurfer --trglabel ./rh.entorhinal_exvivo.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.entorhinal_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.entorhinal_exvivo.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1038 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1038 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 115
+Checking for and removing duplicates
+Writing label file ./rh.entorhinal_exvivo.label 1153
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.perirhinal_exvivo.label --trgsubject freesurfer --trglabel ./rh.perirhinal_exvivo.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.perirhinal_exvivo.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.perirhinal_exvivo.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 752 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  752 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 89
+Checking for and removing duplicates
+Writing label file ./rh.perirhinal_exvivo.label 841
+mri_label2label: Done
+
+PIDs (227535 227538 227541 227544 227547) completed and logs appended.
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.FG1.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.FG1.mpm.vpnl.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.FG2.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.FG2.mpm.vpnl.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.FG3.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.FG3.mpm.vpnl.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.FG4.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.FG4.mpm.vpnl.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.hOc1.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.hOc1.mpm.vpnl.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.hOc2.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.hOc2.mpm.vpnl.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.hOc3v.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.hOc3v.mpm.vpnl.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.hOc4v.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.hOc4v.mpm.vpnl.label --hemi rh --regmethod surface 
+
+Waiting for PID 227627 of (227627 227630 227633 227636 227639 227642 227645 227648) to complete...
+Waiting for PID 227630 of (227627 227630 227633 227636 227639 227642 227645 227648) to complete...
+Waiting for PID 227633 of (227627 227630 227633 227636 227639 227642 227645 227648) to complete...
+Waiting for PID 227636 of (227627 227630 227633 227636 227639 227642 227645 227648) to complete...
+Waiting for PID 227639 of (227627 227630 227633 227636 227639 227642 227645 227648) to complete...
+Waiting for PID 227642 of (227627 227630 227633 227636 227639 227642 227645 227648) to complete...
+Waiting for PID 227645 of (227627 227630 227633 227636 227639 227642 227645 227648) to complete...
+Waiting for PID 227648 of (227627 227630 227633 227636 227639 227642 227645 227648) to complete...
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.FG1.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.FG1.mpm.vpnl.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.FG1.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.FG1.mpm.vpnl.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 541 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  541 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 186
+Checking for and removing duplicates
+Writing label file ./rh.FG1.mpm.vpnl.label 727
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.FG2.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.FG2.mpm.vpnl.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.FG2.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.FG2.mpm.vpnl.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 721 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  721 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 224
+Checking for and removing duplicates
+Writing label file ./rh.FG2.mpm.vpnl.label 945
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.FG3.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.FG3.mpm.vpnl.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.FG3.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.FG3.mpm.vpnl.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1523 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1523 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 360
+Checking for and removing duplicates
+Writing label file ./rh.FG3.mpm.vpnl.label 1883
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.FG4.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.FG4.mpm.vpnl.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.FG4.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.FG4.mpm.vpnl.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1586 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1586 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 436
+Checking for and removing duplicates
+Writing label file ./rh.FG4.mpm.vpnl.label 2022
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.hOc1.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.hOc1.mpm.vpnl.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.hOc1.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.hOc1.mpm.vpnl.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 3667 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  3667 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 1099
+Checking for and removing duplicates
+Writing label file ./rh.hOc1.mpm.vpnl.label 4766
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.hOc2.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.hOc2.mpm.vpnl.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.hOc2.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.hOc2.mpm.vpnl.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 2719 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  2719 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 929
+Checking for and removing duplicates
+Writing label file ./rh.hOc2.mpm.vpnl.label 3648
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.hOc3v.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.hOc3v.mpm.vpnl.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.hOc3v.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.hOc3v.mpm.vpnl.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1228 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1228 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 487
+Checking for and removing duplicates
+Writing label file ./rh.hOc3v.mpm.vpnl.label 1715
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.hOc4v.mpm.vpnl.label --trgsubject freesurfer --trglabel ./rh.hOc4v.mpm.vpnl.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.hOc4v.mpm.vpnl.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.hOc4v.mpm.vpnl.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1025 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1025 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 331
+Checking for and removing duplicates
+Writing label file ./rh.hOc4v.mpm.vpnl.label 1356
+mri_label2label: Done
+
+PIDs (227627 227630 227633 227636 227639 227642 227645 227648) completed and logs appended.
+
+ mris_label2annot --s freesurfer --ctab /home/arevell/freesurfer/average/colortable_vpnl.txt --hemi rh --a mpm.vpnl --maxstatwinner --noverbose --l rh.FG1.mpm.vpnl.label --l rh.FG2.mpm.vpnl.label --l rh.FG3.mpm.vpnl.label --l rh.FG4.mpm.vpnl.label --l rh.hOc1.mpm.vpnl.label --l rh.hOc2.mpm.vpnl.label --l rh.hOc3v.mpm.vpnl.label --l rh.hOc4v.mpm.vpnl.label 
+
+Reading ctab /home/arevell/freesurfer/average/colortable_vpnl.txt
+Number of ctab entries 9
+
+7.1.1
+cwd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/label
+cmdline mris_label2annot --s freesurfer --ctab /home/arevell/freesurfer/average/colortable_vpnl.txt --hemi rh --a mpm.vpnl --maxstatwinner --noverbose --l rh.FG1.mpm.vpnl.label --l rh.FG2.mpm.vpnl.label --l rh.FG3.mpm.vpnl.label --l rh.FG4.mpm.vpnl.label --l rh.hOc1.mpm.vpnl.label --l rh.hOc2.mpm.vpnl.label --l rh.hOc3v.mpm.vpnl.label --l rh.hOc4v.mpm.vpnl.label 
+sysname  Linux
+hostname neuralNet
+machine  x86_64
+user     arevell
+
+subject freesurfer
+hemi    rh
+SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+ColorTable /home/arevell/freesurfer/average/colortable_vpnl.txt
+AnnotName  mpm.vpnl
+nlables 8
+LabelThresh 0 0.000000
+Loading /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.orig
+ 1 1376057 FG1
+ 2 16711935 FG2
+ 3 16711680 FG3
+ 4 1705837 FG4
+ 5 25600 hOc1
+ 6 255 hOc2
+ 7 16776960 hOc3v
+ 8 65535 hOc4v
+Mapping unhit to unknown
+Found 141765 unhit vertices
+Writing annot to /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/label/rh.mpm.vpnl.annot
+@#@FSTIME  2021:03:25:02:28:08 mris_label2annot N 26 e 0.78 S 0.09 U 1.03 P 144% M 182256 F 0 R 50203 W 0 c 107 w 1728 I 0 O 0 L 11.14 10.80 12.71
+@#@FSLOADPOST 2021:03:25:02:28:08 mris_label2annot N 26 11.14 10.80 12.71
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA1_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA1_exvivo.thresh.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA2_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA2_exvivo.thresh.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA3a_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA3a_exvivo.thresh.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA3b_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA3b_exvivo.thresh.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA4a_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA4a_exvivo.thresh.label --hemi rh --regmethod surface 
+
+Waiting for PID 227740 of (227740 227743 227746 227749 227752) to complete...
+Waiting for PID 227743 of (227740 227743 227746 227749 227752) to complete...
+Waiting for PID 227746 of (227740 227743 227746 227749 227752) to complete...
+Waiting for PID 227749 of (227740 227743 227746 227749 227752) to complete...
+Waiting for PID 227752 of (227740 227743 227746 227749 227752) to complete...
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA1_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA1_exvivo.thresh.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA1_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA1_exvivo.thresh.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 876 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  876 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 129
+Checking for and removing duplicates
+Writing label file ./rh.BA1_exvivo.thresh.label 1005
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA2_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA2_exvivo.thresh.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA2_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA2_exvivo.thresh.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 2688 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  2688 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 189
+Checking for and removing duplicates
+Writing label file ./rh.BA2_exvivo.thresh.label 2877
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA3a_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA3a_exvivo.thresh.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA3a_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA3a_exvivo.thresh.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1698 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1698 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 27
+Checking for and removing duplicates
+Writing label file ./rh.BA3a_exvivo.thresh.label 1725
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA3b_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA3b_exvivo.thresh.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA3b_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA3b_exvivo.thresh.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 2183 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  2183 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 156
+Checking for and removing duplicates
+Writing label file ./rh.BA3b_exvivo.thresh.label 2339
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA4a_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA4a_exvivo.thresh.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA4a_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA4a_exvivo.thresh.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1388 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1388 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 183
+Checking for and removing duplicates
+Writing label file ./rh.BA4a_exvivo.thresh.label 1571
+mri_label2label: Done
+
+PIDs (227740 227743 227746 227749 227752) completed and logs appended.
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA4p_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA4p_exvivo.thresh.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA6_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA6_exvivo.thresh.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA44_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA44_exvivo.thresh.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA45_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA45_exvivo.thresh.label --hemi rh --regmethod surface 
+
+Waiting for PID 227798 of (227798 227801 227804 227807) to complete...
+Waiting for PID 227801 of (227798 227801 227804 227807) to complete...
+Waiting for PID 227804 of (227798 227801 227804 227807) to complete...
+Waiting for PID 227807 of (227798 227801 227804 227807) to complete...
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA4p_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA4p_exvivo.thresh.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA4p_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA4p_exvivo.thresh.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1489 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1489 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 78
+Checking for and removing duplicates
+Writing label file ./rh.BA4p_exvivo.thresh.label 1567
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA6_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA6_exvivo.thresh.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA6_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA6_exvivo.thresh.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 6959 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  6959 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 985
+Checking for and removing duplicates
+Writing label file ./rh.BA6_exvivo.thresh.label 7944
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA44_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA44_exvivo.thresh.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA44_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA44_exvivo.thresh.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1012 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1012 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 142
+Checking for and removing duplicates
+Writing label file ./rh.BA44_exvivo.thresh.label 1154
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA45_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.BA45_exvivo.thresh.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.BA45_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.BA45_exvivo.thresh.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 1178 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  1178 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 215
+Checking for and removing duplicates
+Writing label file ./rh.BA45_exvivo.thresh.label 1393
+mri_label2label: Done
+
+PIDs (227798 227801 227804 227807) completed and logs appended.
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.V1_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.V1_exvivo.thresh.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.V2_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.V2_exvivo.thresh.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.MT_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.MT_exvivo.thresh.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.entorhinal_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.entorhinal_exvivo.thresh.label --hemi rh --regmethod surface 
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.perirhinal_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.perirhinal_exvivo.thresh.label --hemi rh --regmethod surface 
+
+Waiting for PID 227849 of (227849 227852 227855 227858 227861) to complete...
+Waiting for PID 227852 of (227849 227852 227855 227858 227861) to complete...
+Waiting for PID 227855 of (227849 227852 227855 227858 227861) to complete...
+Waiting for PID 227858 of (227849 227852 227855 227858 227861) to complete...
+Waiting for PID 227861 of (227849 227852 227855 227858 227861) to complete...
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.V1_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.V1_exvivo.thresh.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.V1_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.V1_exvivo.thresh.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 3232 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  3232 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 938
+Checking for and removing duplicates
+Writing label file ./rh.V1_exvivo.thresh.label 4170
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.V2_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.V2_exvivo.thresh.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.V2_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.V2_exvivo.thresh.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 3437 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  3437 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 1175
+Checking for and removing duplicates
+Writing label file ./rh.V2_exvivo.thresh.label 4612
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.MT_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.MT_exvivo.thresh.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.MT_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.MT_exvivo.thresh.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 268 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  268 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 48
+Checking for and removing duplicates
+Writing label file ./rh.MT_exvivo.thresh.label 316
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.entorhinal_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.entorhinal_exvivo.thresh.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.entorhinal_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.entorhinal_exvivo.thresh.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 694 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  694 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 88
+Checking for and removing duplicates
+Writing label file ./rh.entorhinal_exvivo.thresh.label 782
+mri_label2label: Done
+
+
+ mri_label2label --srcsubject fsaverage --srclabel /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.perirhinal_exvivo.thresh.label --trgsubject freesurfer --trglabel ./rh.perirhinal_exvivo.thresh.label --hemi rh --regmethod surface
+
+
+srclabel = /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/label/rh.perirhinal_exvivo.thresh.label
+srcsubject = fsaverage
+trgsubject = freesurfer
+trglabel = ./rh.perirhinal_exvivo.thresh.label
+regmethod = surface
+
+srchemi = rh
+trghemi = rh
+trgsurface = white
+srcsurfreg = sphere.reg
+trgsurfreg = sphere.reg
+usehash = 1
+Use ProjAbs  = 0, 0
+Use ProjFrac = 0, 0
+DoPaint 0
+
+SUBJECTS_DIR    /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+FREESURFER_HOME /home/arevell/freesurfer
+Loading source label.
+Found 291 points in source label.
+Starting surface-based mapping
+Reading source registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/fsaverage/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Reading target surface 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white
+Reading target registration 
+ /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.sphere.reg
+Rescaling ...  original radius = 100
+Building target registration hash (res=16).
+Building source registration hash (res=16).
+INFO: found  291 nlabel points
+Performing mapping from target back to the source label 158033
+Number of reverse mapping hits = 42
+Checking for and removing duplicates
+Writing label file ./rh.perirhinal_exvivo.thresh.label 333
+mri_label2label: Done
+
+PIDs (227849 227852 227855 227858 227861) completed and logs appended.
+
+ mris_label2annot --s freesurfer --hemi rh --ctab /home/arevell/freesurfer/average/colortable_BA.txt --l rh.BA1_exvivo.label --l rh.BA2_exvivo.label --l rh.BA3a_exvivo.label --l rh.BA3b_exvivo.label --l rh.BA4a_exvivo.label --l rh.BA4p_exvivo.label --l rh.BA6_exvivo.label --l rh.BA44_exvivo.label --l rh.BA45_exvivo.label --l rh.V1_exvivo.label --l rh.V2_exvivo.label --l rh.MT_exvivo.label --l rh.perirhinal_exvivo.label --l rh.entorhinal_exvivo.label --a BA_exvivo --maxstatwinner --noverbose 
+
+Reading ctab /home/arevell/freesurfer/average/colortable_BA.txt
+Number of ctab entries 15
+
+7.1.1
+cwd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/label
+cmdline mris_label2annot --s freesurfer --hemi rh --ctab /home/arevell/freesurfer/average/colortable_BA.txt --l rh.BA1_exvivo.label --l rh.BA2_exvivo.label --l rh.BA3a_exvivo.label --l rh.BA3b_exvivo.label --l rh.BA4a_exvivo.label --l rh.BA4p_exvivo.label --l rh.BA6_exvivo.label --l rh.BA44_exvivo.label --l rh.BA45_exvivo.label --l rh.V1_exvivo.label --l rh.V2_exvivo.label --l rh.MT_exvivo.label --l rh.perirhinal_exvivo.label --l rh.entorhinal_exvivo.label --a BA_exvivo --maxstatwinner --noverbose 
+sysname  Linux
+hostname neuralNet
+machine  x86_64
+user     arevell
+
+subject freesurfer
+hemi    rh
+SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+ColorTable /home/arevell/freesurfer/average/colortable_BA.txt
+AnnotName  BA_exvivo
+nlables 14
+LabelThresh 0 0.000000
+Loading /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.orig
+ 1 1530880 BA1_exvivo
+ 2 16749699 BA2_exvivo
+ 3 16711680 BA3a_exvivo
+ 4 3368703 BA3b_exvivo
+ 5 1376196 BA4a_exvivo
+ 6 13382655 BA4p_exvivo
+ 7 10036737 BA6_exvivo
+ 8 2490521 BA44_exvivo
+ 9 39283 BA45_exvivo
+10 3993 V1_exvivo
+11 8508928 V2_exvivo
+12 10027163 MT_exvivo
+13 16422433 perirhinal_exvivo
+14 16392598 entorhinal_exvivo
+Mapping unhit to unknown
+Found 110422 unhit vertices
+Writing annot to /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/label/rh.BA_exvivo.annot
+@#@FSTIME  2021:03:25:02:28:28 mris_label2annot N 38 e 0.77 S 0.06 U 1.01 P 140% M 182868 F 0 R 50313 W 0 c 100 w 2176 I 0 O 0 L 10.75 10.73 12.65
+@#@FSLOADPOST 2021:03:25:02:28:29 mris_label2annot N 38 10.75 10.73 12.65
+
+ mris_label2annot --s freesurfer --hemi rh --ctab /home/arevell/freesurfer/average/colortable_BA.txt --l rh.BA1_exvivo.thresh.label --l rh.BA2_exvivo.thresh.label --l rh.BA3a_exvivo.thresh.label --l rh.BA3b_exvivo.thresh.label --l rh.BA4a_exvivo.thresh.label --l rh.BA4p_exvivo.thresh.label --l rh.BA6_exvivo.thresh.label --l rh.BA44_exvivo.thresh.label --l rh.BA45_exvivo.thresh.label --l rh.V1_exvivo.thresh.label --l rh.V2_exvivo.thresh.label --l rh.MT_exvivo.thresh.label --l rh.perirhinal_exvivo.thresh.label --l rh.entorhinal_exvivo.thresh.label --a BA_exvivo.thresh --maxstatwinner --noverbose 
+
+Reading ctab /home/arevell/freesurfer/average/colortable_BA.txt
+Number of ctab entries 15
+
+7.1.1
+cwd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/label
+cmdline mris_label2annot --s freesurfer --hemi rh --ctab /home/arevell/freesurfer/average/colortable_BA.txt --l rh.BA1_exvivo.thresh.label --l rh.BA2_exvivo.thresh.label --l rh.BA3a_exvivo.thresh.label --l rh.BA3b_exvivo.thresh.label --l rh.BA4a_exvivo.thresh.label --l rh.BA4p_exvivo.thresh.label --l rh.BA6_exvivo.thresh.label --l rh.BA44_exvivo.thresh.label --l rh.BA45_exvivo.thresh.label --l rh.V1_exvivo.thresh.label --l rh.V2_exvivo.thresh.label --l rh.MT_exvivo.thresh.label --l rh.perirhinal_exvivo.thresh.label --l rh.entorhinal_exvivo.thresh.label --a BA_exvivo.thresh --maxstatwinner --noverbose 
+sysname  Linux
+hostname neuralNet
+machine  x86_64
+user     arevell
+
+subject freesurfer
+hemi    rh
+SUBJECTS_DIR /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+ColorTable /home/arevell/freesurfer/average/colortable_BA.txt
+AnnotName  BA_exvivo.thresh
+nlables 14
+LabelThresh 0 0.000000
+Loading /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.orig
+ 1 1530880 BA1_exvivo
+ 2 16749699 BA2_exvivo
+ 3 16711680 BA3a_exvivo
+ 4 3368703 BA3b_exvivo
+ 5 1376196 BA4a_exvivo
+ 6 13382655 BA4p_exvivo
+ 7 10036737 BA6_exvivo
+ 8 2490521 BA44_exvivo
+ 9 39283 BA45_exvivo
+10 3993 V1_exvivo
+11 8508928 V2_exvivo
+12 10027163 MT_exvivo
+13 16422433 perirhinal_exvivo
+14 16392598 entorhinal_exvivo
+Mapping unhit to unknown
+Found 130732 unhit vertices
+Writing annot to /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/label/rh.BA_exvivo.thresh.annot
+@#@FSTIME  2021:03:25:02:28:29 mris_label2annot N 38 e 0.79 S 0.07 U 1.06 P 144% M 182544 F 0 R 50208 W 0 c 104 w 2192 I 0 O 0 L 10.75 10.73 12.65
+@#@FSLOADPOST 2021:03:25:02:28:30 mris_label2annot N 38 10.37 10.65 12.61
+
+ mris_anatomical_stats -th3 -mgz -f ../stats/rh.BA_exvivo.stats -b -a ./rh.BA_exvivo.annot -c ./BA_exvivo.ctab freesurfer rh white 
+
+computing statistics for each annotation in ./rh.BA_exvivo.annot.
+reading volume /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/wm.mgz...
+reading input surface /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white...
+reading input pial surface /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.pial...
+reading input white surface /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white...
+INFO: using TH3 volume calc
+INFO: assuming MGZ format for volumes.
+Using TH3 vertex volume calc
+Total face volume 290734
+Total vertex volume 290508 (mask=0)
+reading colortable from annotation file...
+colortable with 15 entries read (originally /home/arevell/freesurfer/average/colortable_BA.txt)
+Saving annotation colortable ./BA_exvivo.ctab
+
+table columns are:
+    number of vertices
+    total surface area (mm^2)
+    total gray matter volume (mm^3)
+    average cortical thickness +- standard deviation (mm)
+    integrated rectified mean curvature
+    integrated rectified Gaussian curvature
+    folding index
+    intrinsic curvature index
+    structure name
+
+atlas_icv (eTIV) = 2207090 mm^3    (det: 0.882658 )
+ 1217    683   1525  1.865 0.701     0.088     0.019        6     0.9  BA1_exvivo
+ 3954   2482   4685  1.982 0.658     0.089     0.014       19     2.4  BA2_exvivo
+ 1249    883   1125  1.618 0.481     0.124     0.022       10     1.0  BA3a_exvivo
+ 2458   1500   2523  1.555 0.587     0.075     0.010        8     1.2  BA3b_exvivo
+ 2040   1223   2402  1.924 0.862     0.072     0.012        7     1.2  BA4a_exvivo
+ 1503    967   1858  2.028 0.821     0.074     0.010        5     0.6  BA4p_exvivo
+10873   6407  18655  2.789 1.051     0.093     0.020       55     9.5  BA6_exvivo
+ 3867   2529   8111  3.071 0.645     0.098     0.016       23     2.7  BA44_exvivo
+ 4601   3035  10360  2.961 0.644     0.108     0.020       32     4.1  BA45_exvivo
+ 4133   2724   4135  1.478 0.497     0.111     0.025       35     4.8  V1_exvivo
+ 8426   5706  11134  1.985 0.626     0.124     0.034       68    12.7  V2_exvivo
+ 2161   1518   4469  2.847 0.516     0.110     0.028       14     2.5  MT_exvivo
+  455    301    902  3.142 0.552     0.121     0.020        3     0.6  perirhinal_exvivo
+  674    396   1527  3.031 0.771     0.069     0.016        2     0.3  entorhinal_exvivo
+@#@FSTIME  2021:03:25:02:28:30 mris_anatomical_stats N 12 e 4.30 S 0.19 U 6.43 P 154% M 547828 F 0 R 159424 W 0 c 611 w 1243 I 0 O 0 L 10.37 10.65 12.61
+@#@FSLOADPOST 2021:03:25:02:28:34 mris_anatomical_stats N 12 10.37 10.65 12.61
+
+ mris_anatomical_stats -th3 -mgz -f ../stats/rh.BA_exvivo.thresh.stats -b -a ./rh.BA_exvivo.thresh.annot -c ./BA_exvivo.thresh.ctab freesurfer rh white 
+
+computing statistics for each annotation in ./rh.BA_exvivo.thresh.annot.
+reading volume /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/mri/wm.mgz...
+reading input surface /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white...
+reading input pial surface /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.pial...
+reading input white surface /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate/freesurfer/surf/rh.white...
+INFO: using TH3 volume calc
+INFO: assuming MGZ format for volumes.
+Using TH3 vertex volume calc
+Total face volume 290734
+Total vertex volume 290508 (mask=0)
+reading colortable from annotation file...
+colortable with 15 entries read (originally /home/arevell/freesurfer/average/colortable_BA.txt)
+Saving annotation colortable ./BA_exvivo.thresh.ctab
+
+table columns are:
+    number of vertices
+    total surface area (mm^2)
+    total gray matter volume (mm^3)
+    average cortical thickness +- standard deviation (mm)
+    integrated rectified mean curvature
+    integrated rectified Gaussian curvature
+    folding index
+    intrinsic curvature index
+    structure name
+
+atlas_icv (eTIV) = 2207090 mm^3    (det: 0.882658 )
+  885    487   1049  1.804 0.601     0.089     0.019        4     0.7  BA1_exvivo
+ 2275   1390   2636  1.892 0.592     0.076     0.013        7     1.2  BA2_exvivo
+ 1136    817    951  1.568 0.384     0.134     0.023       11     1.0  BA3a_exvivo
+ 1925   1210   1692  1.396 0.355     0.068     0.008        5     0.7  BA3b_exvivo
+ 1322    789   1248  1.649 0.731     0.082     0.014        5     1.0  BA4a_exvivo
+ 1220    806   1486  1.939 0.817     0.071     0.009        3     0.5  BA4p_exvivo
+ 6849   4015  10579  2.519 1.012     0.092     0.019       35     5.3  BA6_exvivo
+ 1017    661   2688  3.425 0.557     0.098     0.017        7     0.7  BA44_exvivo
+ 1256    809   3076  3.051 0.632     0.116     0.024       11     1.3  BA45_exvivo
+ 3953   2620   3763  1.448 0.464     0.111     0.026       34     4.5  V1_exvivo
+ 4431   3030   5633  1.863 0.566     0.126     0.036       36     7.1  V2_exvivo
+  297    224    819  3.036 0.578     0.143     0.037        2     0.5  MT_exvivo
+   46     33     74  3.241 0.574     0.157     0.014        0     0.0  perirhinal_exvivo
+  689    413   1428  2.977 0.626     0.080     0.014        3     0.4  entorhinal_exvivo
+@#@FSTIME  2021:03:25:02:28:34 mris_anatomical_stats N 12 e 4.67 S 0.22 U 6.65 P 146% M 547936 F 0 R 159362 W 0 c 659 w 1226 I 0 O 0 L 10.37 10.65 12.61
+@#@FSLOADPOST 2021:03:25:02:28:39 mris_anatomical_stats N 12 10.02 10.58 12.58
+
+Started at Wed Mar 24 23:01:45 EDT 2021 
+Ended   at Thu Mar 25 02:28:39 EDT 2021
+#@#%# recon-all-run-time-hours 3.448
+recon-all -s freesurfer finished without error at Thu Mar 25 02:28:39 EDT 2021

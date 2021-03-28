@@ -1,0 +1,1 @@
+mri_ca_register -nobigventricles -T transforms/talairach.lta -align-after -mask brainmask.mgz norm.mgz /home/arevell/freesurfer/average/RB_all_2020-01-02.gca transforms/talairach.m3z

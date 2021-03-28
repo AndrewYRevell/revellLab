@@ -1,0 +1,13 @@
+------------------------------
+SUBJECT freesurfer
+START_TIME Wed Mar 24 23:01:45 EDT 2021
+END_TIME Thu Mar 25 02:28:39 EDT 2021
+RUNTIME_HOURS 3.448
+USER arevell
+HOST neuralNet
+PROCESSOR x86_64
+OS Linux
+UNAME Linux neuralNet 5.4.0-58-generic #64-Ubuntu SMP Wed Dec 9 08:16:25 UTC 2020 x86_64 x86_64 x86_64 GNU/Linux
+VERSION 7.1.1 (freesurfer-linux-centos7_x86_64-7.1.1-20200723-8b40551)
+CMDPATH /home/arevell/freesurfer/bin/recon-all
+CMDARGS -subjid freesurfer -all -time -log logfile -nuintensitycor-3T -sd /media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate -parallel -threads 4

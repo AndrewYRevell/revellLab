@@ -18,7 +18,7 @@ import numpy as np
 import nibabel as nib
 import matplotlib.pyplot as plt
 #import seaborn as sns
-
+import glob
 
 #%% Input
 
@@ -30,50 +30,112 @@ def checkPathError(path):
     """
     if not os.path.exists(path):
         raise IOError(f"\n\n\n\nPath or file does not exist:\n{path}\n\n\n\n" )
-def checkPathAndMake(pathToCheck, pathToMake, make = True):
+        
+
+def checkPathErrorGlob(path):
+    """
+    Check if path exists
+    """
+    files = glob.glob(path)
+    files = glob.glob(path)
+    if len(files) > 1:
+        IOError(f"More than 1 file exists: \n{files}")
+    if len(files) == 0:
+        raise IOError(f"\n\n\n\nPath or file does not exist:\n{path}\n\n\n\n" )        
+        
+        
+def checkPathAndMake(pathToCheck, pathToMake, make = True, printBOOL = True):
     """
     Check if pathToCheck exists. If so, then option to make a second directory pathToMake (may be same as pathToCheck)
     """
     if not os.path.exists(pathToCheck):
-        print(f"\nFile or Path does not exist:\n{pathToCheck}" )
+        if printBOOL: print(f"\nFile or Path does not exist:\n{pathToCheck}" )
     if make:
         if os.path.exists(pathToMake):
-            print(f"Path already exists\n{pathToMake}")
+            if printBOOL: print(f"Path already exists\n{pathToMake}")
         else: 
             os.makedirs(pathToMake)
-            print("Making Path")
+            if printBOOL: print("Making Path")
 
-def checkIfFileExists(path, returnOpposite = False):
+def checkIfFileExists(path, returnOpposite = False, printBOOL = True):
     if (os.path.exists(path)): 
-        print(f"\nFile exists:\n    {path}\n\n")
+        if printBOOL: print(f"\nFile exists:\n    {path}\n\n")
         if returnOpposite: 
             return False
-            print("\nHowever, re-writing over file\n\n")
+            if printBOOL: print("\nHowever, re-writing over file\n\n")
         else: 
             return True
     else: 
-        print(f"\nFile does not exists:\n    {path}\n\n")
+        if printBOOL: print(f"\nFile does not exists:\n    {path}\n\n")
         if returnOpposite: 
             return True
         else: 
             return False
-    
-def checkIfFileDoesNotExist(path, returnOpposite = False):
+
+
+
+
+def checkIfFileDoesNotExist(path, returnOpposite = False, printBOOL = True):
     if not (os.path.exists(path)): 
-        print(f"\nFile does not exist:\n    {path}\n\n")
+        if printBOOL: print(f"\nFile does not exist:\n    {path}\n\n")
         if returnOpposite: 
             return False
         else:
             return True
     else: 
-        print(f"\nFile exists:\n    {path}\n\n")
+        if printBOOL: print(f"\nFile exists:\n    {path}\n\n")
         if returnOpposite: 
             return True
         else: 
             return False
+        
+def checkIfFileExistsGlob(path, returnOpposite = False, printBOOL = True):
+    files = glob.glob(path)
+    if len(files) > 1:
+        print(f"More than 1 file exists: \n{files}")
+    else:
+        if len(files) == 0: file = ""
+        else:
+            file = files[0]
+        
+        if (os.path.exists(file)): 
+            if printBOOL: print(f"\nFile exists:\n    {path}\n\n")
+            if returnOpposite: 
+                return False
+                if printBOOL: print("\nHowever, re-writing over file\n\n")
+            else: 
+                return True
+        else: 
+            if printBOOL: print(f"\nFile does not exists:\n    {path}\n\n")
+            if returnOpposite: 
+                return True
+            else: 
+                return False
 
-def executeCommand(cmd):
-    print(f"\n\nExecuting Command Line: \n{cmd}\n\n"); os.system(cmd)
+def checkIfFileDoesNotExistGlob(path, returnOpposite = False, printBOOL = True):
+    files = glob.glob(path)
+    if len(files) > 1:
+        print(f"More than 1 file exists: \n{files}")
+    else:
+        if len(files) == 0: file = ""
+        else:
+            file = files[0]
+        if not (os.path.exists(file)): 
+            if printBOOL: print(f"\nFile does not exist:\n    {path}\n\n")
+            if returnOpposite: 
+                return False
+            else:
+                return True
+        else: 
+            if printBOOL: print(f"\nFile exists:\n    {file}\n\n")
+            if returnOpposite: 
+                return True
+            else: 
+                return False
+
+def executeCommand(cmd, printBOOL = True):
+    if printBOOL: print(f"\n\nExecuting Command Line: \n{cmd}\n\n") 
+    os.system(cmd)
 
 def channel2stdCSV(outputTissueCoordinates):
     df = pd.read_csv(outputTissueCoordinates, sep=",", header=0)
@@ -125,8 +187,12 @@ def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, l
 def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, saveFilename = None, isPath = True):
     
     if isPath:
-        img = nib.load(fname)
-        imgdata = img.get_fdata()  
+        if checkIfFileExistsGlob(fname):
+            fname = glob.glob(fname)[0]
+            img = nib.load(fname)
+            imgdata = img.get_fdata()  
+        else:
+            return print(f"File does not exist: \n{fname}")
     else:
         imgdata = fname
     """ Function to display row of image slices """

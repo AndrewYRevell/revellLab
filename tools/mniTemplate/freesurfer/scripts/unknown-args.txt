@@ -1,0 +1,12 @@
+-subjid
+freesurfer
+-all
+-time
+-log
+logfile
+-nuintensitycor-3T
+-sd
+/media/arevell/sharedSSD/linux/revellLab/tools/mniTemplate
+-parallel
+-threads
+4
