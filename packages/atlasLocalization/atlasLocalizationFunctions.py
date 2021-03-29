@@ -10,6 +10,7 @@ import os
 import sys
 import copy
 import json
+import subprocess
 import pkg_resources
 import multiprocessing
 
@@ -34,6 +35,11 @@ atlasLabelDirectory = join(tools, "atlases", "atlasLabels" )
 
 MNItemplatePath = join( tools, "mniTemplate", "mni_icbm152_t1_tal_nlin_asym_09c_182x218x182.nii.gz")
 MNItemplateBrainPath = join( tools, "mniTemplate", "mni_icbm152_t1_tal_nlin_asym_09c_182x218x182_brain.nii.gz")
+
+OASIStemplatePath = join( tools, "templates","OASIS" ,"T_template0.nii.gz")
+OASISprobabilityPath = join( tools, "templates", "OASIS", "T_template0_BrainCerebellumProbabilityMask.nii.gz")
+
+ANTSPATH="/home/arevell/Documents/ANTS/install/bin/"
 #%% functions
 
 sub = "RID0139"
@@ -54,64 +60,110 @@ glob( join(BIDS, dataset, f"sub-{sub}", f"ses-research3Tv" + '[0-9][0-9]'))
 
 def atlasLocalizationBatchProccess(subList, i, BIDS, dataset, SesImplant, ieegSpace, acq, atlasDirectory, atlasLabelDirectory, MNItemplatePath, MNItemplateBrainPath, derivatives, rerun = False ):
     sub = subList[i]
-    electrodePreopT1Coordinates = join(BIDS, dataset, f"sub-{sub}", f"ses-{SesImplant}", "ieeg", f"sub-{sub}_ses-{SesImplant}_space-{ieegSpace}_electrodes.tsv")  
-    
 
+
+    utils.checkPathError(atlasDirectory)
+    utils.checkPathError(atlasLabelDirectory)
+    utils.checkPathError(MNItemplatePath)
+    utils.checkPathError(MNItemplateBrainPath)
+    
+    electrodePreopT1Coordinates = join(BIDS, dataset, f"sub-{sub}", f"ses-{SesImplant}", "ieeg", f"sub-{sub}_ses-{SesImplant}_space-{ieegSpace}_electrodes.tsv")  
     highresSession = glob( join(BIDS, dataset, f"sub-{sub}", f"ses-research3Tv" + '[0-9][0-9]'))[-1]
     if len(highresSession)  < 1:  #grab implant image if there is no high resolution T1
         T1 =  join(BIDS, dataset, f"sub-{sub}", f"ses-{SesImplant}", "anat",   f"sub-{sub}_ses-{SesImplant}_acq-{ieegSpace}_T1w.nii.gz")
     else:
         highresSessionBase = basename(highresSession)
         T1 =  join(highresSession, "anat",   f"sub-{sub}_{highresSessionBase}_acq-{acq}_T1w.nii.gz")
-
     
     utils.checkPathError(electrodePreopT1Coordinates)
     utils.checkPathError(T1)
     utils.checkPathError(derivatives)
-    
     outputDir = join(derivatives, f"sub-{sub}", f"ses-{SesImplant}")
     utils.checkPathAndMake(join(derivatives), outputDir)
-    
     outputName =  f"sub-{sub}_ses-{SesImplant}_desc-atlasLocalization.csv"
     
     
     fillerString = "\n###########################\n###########################\n###########################\n###########################\n"
-    
-    
-        
-        
     #names of outputs output
     outputDirTMP = join(outputDir, "tmp")
-
-    
     T1_basename =  os.path.basename( splitext(splitext(T1)[0])[0])
     T1_output = f"{join(outputDirTMP, T1_basename)}"
-
     outputNameTissueSeg = join(outputDir, f"{T1_basename}_std1x1x1_tissueSegmentation.nii.gz")
-    FIRST = join(outputDir, f"{T1_basename}_std1x1x1_FIRST.nii.gz")
-    FAST = join(outputDir, f"{T1_basename}_std1x1x1_FAST.nii.gz")
+    FIRST = join(outputDir, f"{T1_basename}_std_FIRST.nii.gz")
+    FAST = join(outputDir, f"{T1_basename}_std_FAST.nii.gz")
     outputMNIname = "mni"
     MNIwarp = join(outputDir, outputMNIname + "_warp.nii.gz")
-    
     #Make temporary storage 
     utils.checkPathAndMake(outputDirTMP, outputDirTMP, make = True)
     
         
-    
-    
     print(f"\n\n{fillerString}Part 1 of 4\nReorientation of Images\nEstimated time: 10-30 seconds{fillerString}\nReorient all images to standard RAS\n")
     utils.executeCommand( f"fslreorient2std {T1} {T1_output}_std.nii.gz"  )
-    print("\n\n\nReslice all standard RAS images to 1x1x1mm voxels\n")
-    utils.executeCommand( f"flirt -in {T1_output}_std.nii.gz -ref {T1_output}_std.nii.gz -applyisoxfm 1.0 -nosearch -out {T1_output}_std1x1x1.nii.gz"  )
-
+    #print("\n\n\nReslice all standard RAS images to 1x1x1mm voxels\n")
+    #utils.executeCommand( f"flirt -in {T1_output}_std.nii.gz -ref {T1_output}_std.nii.gz -applyisoxfm 1.0 -nosearch -out {T1_output}_std1x1x1.nii.gz"  )
     #visualize
-    utils.show_slices(f"{T1_output}_std1x1x1.nii.gz", save = True, saveFilename = join(outputDir, f"pic_{T1_basename}.png")  )
-
+    #utils.show_slices(f"{T1_output}_std1x1x1.nii.gz", save = True, saveFilename = join(outputDir, f"pic_{T1_basename}.png")  )
     print("\n\n\nBrain extraction\n")
-    utils.executeCommand( f"bet {T1_output}_std1x1x1.nii.gz {T1_output}_std1x1x1_BRAIN.nii.gz -R -v"  )
-    utils.show_slices(f"{T1_output}_std1x1x1_BRAIN.nii.gz", save = True, saveFilename = join(outputDir, f"pic_{T1_basename}_BRAIN.png")  )
+    utils.executeCommand( f"{ANTSPATH}antsBrainExtraction.sh -d 3 -a {T1_output}_std.nii.gz -e {OASIStemplatePath} -m {OASISprobabilityPath} -o {T1_output}_std"  )
+    utils.show_slices(f"{T1_output}_stdBrainExtractionBrain.nii.gz", save = True, saveFilename = join(outputDir, f"pic_{T1_basename}_BRAIN.png")  )
+   
+    print("\n\n\nMNI Linear Registration \n")
+    utils.executeCommand(f"flirt -in {T1_output}_std1x1x1BrainExtractionBrain.nii.gz -ref {MNItemplateBrainPath} -dof 12 -out {outputDirTMP}/T1_to_mni_flirt -omat  {outputDirTMP}/T1_to_mni_flirt.mat -v")
+    utils.show_slices(f"{outputDirTMP}/T1_to_mni_flirt.nii.gz", save = True, saveFilename = join(outputDir, f"pic_{T1_basename}_MNI_Linear.png")  )
+    utils.show_slices(f"{MNItemplateBrainPath}", save = True, saveFilename = join(outputDir, f"pic_{T1_basename}_MNI.png")  )
+    
+    #FIRST: subcortical segmentation
+    print(f"\n\n{fillerString}Part 2 of 4\nTissue Segmentation\nEstimated time: 30+ min{fillerString}\nRUNNING FIRST SUBCORTICAL SEGMENTATION\n")
+    utils.executeCommand(f"run_first_all -i {T1_output}_stdBrainExtractionBrain.nii.gz -o {T1_output}_std.nii.gz -b -v -a {outputDirTMP}/T1_to_mni_flirt.mat")
 
-    print("\n\n\nLinear Registration to MNI\n")
+
+    utils.executeCommand(f"fast -n 3 -H 0.25 -t 1 -v -a {outputDirTMP}/T1_to_mni_flirt.mat {T1_output}_stdBrainExtractionBrain.nii.gz")
+
+
+
+    #clean up files
+    utils.executeCommand(f"rm -r {T1_output}_std.logs")
+    utils.executeCommand(f"rm -r {T1_output}_std*.bvars")
+    utils.executeCommand(f"rm -r {T1_output}_std*.vtk")
+    utils.executeCommand(f"rm -r {T1_output}_std*origsegs*")
+    utils.executeCommand(f"rm -r {T1_output}_std_to_std*")
+    utils.executeCommand(f"rm -r {T1_output}_std*.com*")
+    utils.executeCommand(f"mv {T1_output}_std_all_fast_firstseg.nii.gz {FIRST}")
+
+
+    utils.show_slices(f"{FIRST}", save = True, saveFilename = join(outputDir, f"pic_FIRST.png")  )
+
+    combine_first_and_fast(FIRST, FAST, outputNameTissueSeg)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+    
+def combine_first_and_fast(FIRST, FAST, outputName):
+    img_first = nib.load(FIRST)
+    data_first = img_first.get_fdata() 
+    img_fast= nib.load(FAST)
+    data_fast = img_fast.get_fdata() 
+    #make all subcortical structures = 2 (2 is the GM category)
+    data_first[np.where(data_first > 0)] = 2
+    #replace fast images with first images where not zero
+    data_fast[np.where(data_first > 0)] = data_first[np.where(data_first > 0)] 
+    #plot
+    img_first_fast = nib.Nifti1Image(data_fast, img_fast.affine)
+    nib.save(img_first_fast, outputName)
+
+
+
 
 
 
@@ -254,19 +306,6 @@ def getExpandedBrainMask(preop3Tmask, output, expansion = 10):
     imgExpand = nib.Nifti1Image(imgDataExpand, img.affine)
     nib.save(imgExpand, output)
     
-    
-def combine_first_and_fast(FIRST, FAST, outputName):
-    img_first = nib.load(FIRST)
-    data_first = img_first.get_fdata() 
-    img_fast= nib.load(FAST)
-    data_fast = img_fast.get_fdata() 
-    #make all subcortical structures = 2 (2 is the GM category)
-    data_first[np.where(data_first > 0)] = 2
-    #replace fast images with first images where not zero
-    data_fast[np.where(data_first > 0)] = data_first[np.where(data_first > 0)] 
-    #plot
-    img_first_fast = nib.Nifti1Image(data_fast, img_fast.affine)
-    nib.save(img_first_fast, outputName)
 
 def applywarp_to_atlas(atlasPaths, preop3T, MNIwarp, outputDirectory, isDir = True):
     if isDir: #crawling through directories

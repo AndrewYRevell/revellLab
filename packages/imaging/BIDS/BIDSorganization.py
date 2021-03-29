@@ -26,7 +26,7 @@ from glob import glob
 #%% Getting directories
 
 
-dataset= "PIER"
+dataset= "derivatives/implantRenders"
 
 BIDSlocal = join("/media/arevell/sharedSSD/linux/data/BIDS", dataset)
 BIDSserver = join("/home/arevell/borel/DATA/Human_Data/BIDS",dataset)
@@ -283,9 +283,33 @@ for l in range(len(subjects)):
 
 
 
-#%%
+#%%Removing _brain extraction images
 
 
+
+for s in range(len(SERVdir)):
+    
+    sub = basename(SERVdir[s])[4:]
+    
+    #print(sub)
+       
+
+    sessions = glob(join(SERVdir[s], "*"))
+    
+    if len(sessions) > 0:
+        for w in range(len(sessions)):
+            session = basename(sessions[w])[4:]
+            anat = join(sessions[w], "anat")
+            anats = np.array(glob(join(anat, "*")))
+            tmp = np.where(["T00brain_T1w.nii.gz" in b for b in anats])
+            if len(tmp[0]) > 0:
+                T1s = anats[tmp[0]][0]
+            
+                utils.executeCommand(f"rm {T1s}")
+         
+    
+    
+    
 
 
                        
