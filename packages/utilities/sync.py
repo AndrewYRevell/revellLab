@@ -26,13 +26,13 @@ import dirsync
 syncFolder = "PIER"
 
 MAC_BIDSserver = join("/Users/andyrevell/mount/DATA/Human_Data/BIDS", syncFolder)
-MAC_BIDSlocal = join("/Users/andyrevell/research/data/BIDS/PIER", syncFolder)
+MAC_BIDSlocal = join("/Users/andyrevell/research/data/BIDS", syncFolder)
 LINUX_BIDSserver =  join("/home/arevell/borel/DATA/Human_Data/BIDS", syncFolder)
 LINUX_BIDSlocal =  join("/media/arevell/sharedSSD/linux/data/BIDS", syncFolder)
 
 
-BIDSserver = LINUX_BIDSserver
-BIDSlocal = LINUX_BIDSlocal
+BIDSserver = MAC_BIDSserver
+BIDSlocal = MAC_BIDSlocal
 #%%
 
 
