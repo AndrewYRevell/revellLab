@@ -48,7 +48,7 @@ subjects = [basename(item) for item in subDir ]
 
 #%%
 
-implantName = "RNS01"
+implantName = "implant01"
 preferredSurface = "research3T*" 
 
 for s in range(len(subjects)):
