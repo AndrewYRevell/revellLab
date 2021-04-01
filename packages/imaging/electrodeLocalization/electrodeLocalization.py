@@ -48,7 +48,7 @@ subjects = [basename(item) for item in subDir ]
 
 #%%
 
-implantName = "implant01"
+implantName = "RNS01"
 preferredSurface = "research3T*" 
 
 for s in range(len(subjects)):
@@ -101,10 +101,7 @@ for s in range(len(subjects)):
                     utils.executeCommand(   f"mris_convert --combinesurfs {outputpath}/freesurfer/rh.pial {outputpath}/freesurfer/lh.pial {outputpath}/freesurfer/combined.stl"    )
                     cmd = f"blender --background --factory-startup --addons io_scene_gltf2 --python {revellLabPath}/packages/imaging/electrodeLocalization/blender_compress_mesh.py -- -i {outputpath}/freesurfer/combined.stl -o {outputpath}/html/brain.glb"
                     utils.executeCommand(cmd)
-                    
-                    
-                    
-                    
+                
                     
                     utils.executeCommand(f"mri_convert  {join(outputpath, 'freesurfer', 'mri' , 'orig_nu.mgz')}  {join(outputpath, 'freesurfer', 'T1.nii.gz')}")
                     utils.executeCommand(f"mri_convert  {join(outputpath, 'freesurfer', 'mri' , 'brain.mgz')}  {join(outputpath, 'freesurfer', 'T1_bet.nii.gz')}")

@@ -184,7 +184,7 @@ def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, l
     if iteration == total:
         print()
 
-def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, saveFilename = None, isPath = True):
+def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, saveFilename = None, isPath = True, cmap="gray"):
     
     if isPath:
         if checkIfFileExistsGlob(fname):
@@ -210,7 +210,7 @@ def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, save
     r = 0; c = 0
     for i in range(9):
         if (i%3 == 0 and i >0): r = r + 1; c = 0
-        axes[i].imshow(slices[r][c].T, cmap="gray", origin="lower")
+        axes[i].imshow(slices[r][c].T, cmap=cmap, origin="lower")
         c = c + 1
         axes[i].set_xticklabels([])
         axes[i].set_yticklabels([])
