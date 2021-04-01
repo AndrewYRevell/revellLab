@@ -40,10 +40,10 @@ MNItemplateBrainPath = join( tools, "mniTemplate", "mni_icbm152_t1_tal_nlin_asym
 OASIStemplatePath = join( tools, "templates","OASIS" ,"T_template0.nii.gz")
 OASISprobabilityPath = join( tools, "templates", "OASIS", "T_template0_BrainCerebellumProbabilityMask.nii.gz")
 
-ANTSPATH="/home/arevell/Documents/ANTS/install/bin/"
+ANTSPATH="/Users/andyrevell/ANTS/install/bin"
 
 
-BIDS = "/media/arevell/sharedSSD/linux/data/BIDS"
+BIDS = "/Users/andyrevell/research/data/BIDS"
 dataset= "PIER"
 outputDir = join(BIDS, "derivatives", "brainTemplates")
 
@@ -413,7 +413,7 @@ controls = pd.DataFrame(np.array(controls))
 patients.to_csv(  join(multimodal, "subjectsPatientsEpilepsyAll.csv"), header = False , index = False   )
 controls.to_csv(  join(multimodal, "subjectsControls.csv"), header = False , index = False   )
 
-cmd = f"{ANTSPATH}antsMultivariateTemplateConstruction2.sh -d 3 -k 3 -v 32 -c 0 -j 6 -r 1 -o {join(iteration1Controls, 'PIER_controls_')} {join(imagesControls, '*_T1w.nii.gz')},{join(imagesControls, '*_T2w.nii.gz')},{join(imagesControls, '*_FLAIR.nii.gz')}" 
+cmd = f"{ANTSPATH}/antsMultivariateTemplateConstruction2.sh -d 3 -k 3 -v 16 -c 2 -j 12 -r 1 -o {join(iteration1Controls, 'PIER_controls_')} {join(imagesControls, '*_T1w.nii.gz')},{join(imagesControls, '*_T2w.nii.gz')},{join(imagesControls, '*_FLAIR.nii.gz')}" 
 print(cmd)
 utils.executeCommand( cmd )
 
