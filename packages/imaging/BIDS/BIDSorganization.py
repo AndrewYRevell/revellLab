@@ -26,7 +26,7 @@ from glob import glob
 #%% Getting directories
 
 
-dataset= "derivatives/implantRenders"
+dataset= "PIER"
 
 BIDSlocal = join("/media/arevell/sharedSSD/linux/data/BIDS", dataset)
 BIDSserver = join("/home/arevell/borel/DATA/Human_Data/BIDS",dataset)
@@ -48,7 +48,7 @@ for (dirpath, dirnames, filenames) in os.walk(BIDSserver):
 
 
 for f in range(len(listOfFiles)):
-    print(f)
+    #print(f)
     SERVERfile =  listOfFiles[f]
     LOCALfile = join( BIDSlocal, relpath(SERVERfile, BIDSserver))
     #ignore git
@@ -217,7 +217,7 @@ subjectsP = [
 subjects = ["RID0682"]#
 subjectsP = ["3T_C017"]#
 
-for l in range(len(subjects)):
+for l in range(1,len(subjects)):
     subFolder = join(BIDSdir, "sub-"+ subjects[l])
     utils.checkPathAndMake( BIDSserver, subFolder  )
     
@@ -233,12 +233,20 @@ for l in range(len(subjects)):
     raw = join(dirname(BIDSserver), "sourcedata", "3T_Subjects", subjectsP[l])
     utils.checkIfFileExists(raw)
     folderT1 = glob(join(raw, "T1w_MPR*"))
+    folderT2 = glob(join(raw, "T2w_SPC*"))
+    folderFLAIR = glob(join(raw, "FLAIR_3D*"))
     folderdwi =  glob(join(raw, "MULTISHELL_b2000_117dir*"))
     folderTOP =  glob(join(raw, "MULTISHELL_TOPUP*"))
     folderB0map =  glob(join(raw, "B0map_v4*"))
   
     
-    cmd = f"dcm2niix -z y -f sub-{subjects[l]}_ses-{ses}_acq-3D_T1w -w 1 -o {anat} {folderT1[0]}/"
+    #cmd = f"dcm2niix -z y -f sub-{subjects[l]}_ses-{ses}_acq-3D_T1w -w 1 -o {anat} {folderT1[0]}/"
+    #utils.executeCommand(cmd)
+    
+    cmd = f"dcm2niix -z y -f sub-{subjects[l]}_ses-{ses}_acq-3D_T2w -w 1 -o {anat} {folderT2[0]}/"
+    utils.executeCommand(cmd)
+    
+    cmd = f"dcm2niix -z y -f sub-{subjects[l]}_ses-{ses}_acq-3D_FLAIR -w 1 -o {anat} {folderFLAIR[0]}/"
     utils.executeCommand(cmd)
     
     
