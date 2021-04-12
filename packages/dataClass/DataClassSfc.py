@@ -217,5 +217,54 @@ class sfc:
     def movingaverage(self, x, window_size):
         window = np.ones(int(window_size))/float(window_size)
         return np.convolve(x, window, 'valid')
+    
+     def create_feature_matrix(self):
+        # Feature matrix with each element containing an NxN array
+        feature_matrix = []
+
+        # EDGE WEIGHT (Depth 0)
+        structural_connectivity_array = self.get_structure_and_function()
+        feature_matrix.append(structural_connectivity_array)
+
+        # DEGREE (Depth 1 & 2)
+        deg = bct.degrees_und(structural_connectivity_array)
+        self.fill_array_2D(feature_matrix, deg)
+
+        # Conversion of connection weights to connection lengths
+        connection_length_matrix = bct.weight_conversion(structural_connectivity_array, 'lengths')
+
+        # SHORTEST PATH LENGTH (Depth 3 & 4)
+        shortest_path = bct.distance_wei(connection_length_matrix)
+        feature_matrix.append(shortest_path[0])  # distance (shortest weighted path) matrix
+        feature_matrix.append(shortest_path[1])  # matrix of number of edges in shortest weighted path
+
+        # BETWEENNESS CENTRALITY (Depth 5 & 6)
+        bc = bct.betweenness_wei(connection_length_matrix)
+        from python_files.create_feature_matrix import fill_array_2D
+        self.fill_array_2D(feature_matrix, bc)
+
+        # CLUSTERING COEFFICIENTS (Depth 7 & 8)
+        cl = bct.clustering_coef_wu(connection_length_matrix)
+        self.fill_array_2D(feature_matrix, cl)
+
+        return feature_matrix
+
+    # turns 2D feature into 3D
+    def fill_array_2D(feature_matrix, feature_array):
+        feature_array_level1 = []
+        for row in range(len(feature_array)):
+            one_row = []
+            for col in range(len(feature_array)):
+                one_row.append(feature_array[row])
+            feature_array_level1.append(one_row)
+        feature_matrix.append(np.array(feature_array_level1))
+
+        feature_array_level2 = []
+        for row in range(len(feature_array)):
+            one_row = []
+            for col in range(len(feature_array)):
+                one_row.append(feature_array[row])
+            feature_array_level2.append(one_row)
+        feature_matrix.append(np.array(feature_array_level2))
 
 
