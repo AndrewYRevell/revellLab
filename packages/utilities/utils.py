@@ -6,19 +6,16 @@ Created on Tue Mar  2 11:01:56 2021
 @author: arevell
 """
 
-import sys
-import os
-import time
+import sys, os, time, copy, glob, smtplib, ssl
 import pandas as pd
-import copy
-from os import listdir
-from  os.path import join, isfile
-from os.path import splitext, basename
 import numpy as np
 import nibabel as nib
 import matplotlib.pyplot as plt
+from os import listdir
+from os.path import join, isfile, splitext, basename
+from email.header import Header
+from email.mime.text import MIMEText
 #import seaborn as sns
-import glob
 
 #%% Input
 
@@ -162,6 +159,22 @@ def getSubType(name):
         return "control"
     if "RID" in name:
         return "subjects"
+
+    
+
+def sendEmail(receiver_email = "andyrevell.python@gmail.com", subject ="Process is done", text = "done", port = 465, smtp_server = "smtp.gmail.com" , sender_email = "andyrevell.python@gmail.com"):
+    
+    AppPassword_twoAuthentication = "vgkpolyhiwzzifcc"
+    email_message = MIMEText(text, 'plain', 'utf-8')
+    email_message['From'] = sender_email
+    email_message['To'] = receiver_email
+    email_message['Subject'] = Header(subject, 'utf-8')
+    context = ssl.create_default_context()
+    with smtplib.SMTP_SSL(smtp_server, port, context=context) as server:
+        server.login(sender_email, AppPassword_twoAuthentication)
+        server.sendmail(sender_email, receiver_email, email_message.as_string())
+    print(f"Email sent to {receiver_email}")
+    
     
 def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, length = 25, fill = "X", printEnd = "\r"):
     """

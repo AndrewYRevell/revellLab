@@ -47,6 +47,7 @@ for s in range(len(subDir)):
     print(sub)
     acq = ["-3D_", "-T00_"] #acquisition description for the mprage. 
     sessions = glob(join(subDir[s], "*"))
+    print(sessions)
     if len(sessions) > 0:
         for w in range(len(sessions)):
             session = basename(sessions[w])[4:]
