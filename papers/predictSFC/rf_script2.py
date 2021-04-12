@@ -26,6 +26,7 @@ import pickle
 from python_files import random_forest, DataClassSfc
 import pandas as pd
 from python_files.create_feature_matrix import create_feature_matrix
+from dataclasses import dataclass
 
 # Each structural connectivity matrix gets a label of a functional connectivity matrix,
 # which is done multiple times if there were multiple seizures
@@ -57,63 +58,26 @@ stp = int((secondsBeforeSpread +20)/skipWindow)
 SC, SC_regions = sfc_data.get_structure(atlas)
 electrodeLocalization = sfc_data.get_electrodeLocalization(atlas)
 
-# Creates features, which are structural connectivity matrices
-features = []
-for s in sub_ID_array:
-    for ra in random_atlases:
-        for p in range(len(perm_list)):
-            if p < 9:
-                file = '{0}sub-{1}/connectivity_matrices/structural/{2}/sub-{3}_ses-preop3T_dwi-eddyMotionB0Corrected' \
-                       '.nii.gz.trk.gz.{4}_Perm000{5}.count.pass.connectivity.mat'.format(file_directory, s, ra, s, ra,
-                                                                                          perm_list[p])
-            else:
-                file = '{0}sub-{1}/connectivity_matrices/structural/{2}/sub-{3}_ses-preop3T_dwi-eddyMotionB0Corrected' \
-                       '.nii.gz.trk.gz.{4}_Perm00{5}.count.pass.connectivity.mat'.format(file_directory, s, ra, s, ra,
-                                                                                         perm_list[p])
-            features.append(create_feature_matrix(file))
-    for sa in standard_atlases:
-        file = '{0}sub-{1}/connectivity_matrices/structural/{2}/sub-{3}_ses-preop3T_dwi-eddyMotionB0Corrected.nii.gz.' \
-               'trk.gz.{4}.count.pass.connectivity.mat'.format(file_directory, s, sa, s, sa)
-        features.append(create_feature_matrix(file))
-
 # Get electrode localization
-electrode_localization_by_atlas_file_paths = []
-for s in sub_ID_array:
-    for ra in random_atlases:
-        for p in range(len(perm_list)):
-            if p < 9:
-                file = '{0}sub-{1}/electrode_localization/electrode_localization_by_atlas/sub-{2}_electrode_' \
-                           'coordinates_mni_{3}_Perm000{4}.csv'.format(file_directory, s, s, ra, perm_list[p])
-            else:
-                file = '{0}sub-{1}/electrode_localization/electrode_localization_by_atlas/sub-{2}_electrode_' \
-                           'coordinates_mni_{3}_Perm00{4}.csv'.format(file_directory, s, s, ra, perm_list[p])
-            electrode_localization_by_atlas_file_paths.append(file)
-    for sa in standard_atlases:
-        file = '{0}sub-{1}/electrode_localization/electrode_localization_by_atlas/sub-{2}_electrode_coordinates_' \
-                   'mni_{3}.csv'.format(file_directory, s, s, sa)
-        electrode_localization_by_atlas_file_paths.append(file)
+sfc_data = sfc_data.get_electrodeLocalization()
 
-# Get electrode localization by atlas csv file data. From get_electrode_localization.py
-electrode_localization_by_atlas = []
-for electrode_localization_by_atlas_file in electrode_localization_by_atlas_file_paths:
-    electrode_localization_by_atlas.append(pd.read_csv(electrode_localization_by_atlas_file))
-
-
+# Creates features, which are structural connectivity matrices
+features = sfc_data.create_feature_matrix()
 
 # Accesses files for functional connectivity matrices (preictal)
 FC_preictal_file_path_array = []
-for x in range(len(standard_atlases)):
-    for s in range(len(sub_ID_array)):
+for x in range(len(sfc_data.get_atlas_names)):
+    for s in range(len(RID)):
         file = '{0}sub-{1}/connectivity_matrices/functional/eeg/sub-{2}_{3}_{4}_{5}_functionalConnectivity.pickle' \
-            .format(file_directory, sub_ID_array[s], sub_ID_array[s], HUP_ID[s], start_preictal[s], end_preictal[s])
+            .format(file_directory, RID, RID, iEEG_filename, start_time_usec, stop_time_usec)
         FC_preictal_file_path_array.append(file)
 
 # Accesses files for functional connectivity matrices (ictal)
 FC_ictal_file_path_array = []
-for x in range(len(standard_atlases)):
-    for s in range(len(sub_ID_array)):
+for x in range(len(sfc_data.get_atlas_names)):
+    for s in range(len(RID)):
         file = '{0}sub-{1}/connectivity_matrices/functional/eeg/sub-{2}_{3}_{4}_{5}_functionalConnectivity.pickle'\
-                .format(file_directory, sub_ID_array[s], sub_ID_array[s], HUP_ID[s], start_ictal[s], end_ictal[s])
+                .format(file_directory, RID, RID, iEEG_filename, start_time_usec, stop_time_usec)
         FC_ictal_file_path_array.append(file)
 
 # Get functional connectivity data in pickle file format (preictal)
@@ -132,4 +96,4 @@ for FC_file_path in FC_ictal_file_path_array:
 
 FC_list = []
 
-random_forest.FC_SC_random_forest(features, FC_preictal_list, FC_ictal_list, FC_list, electrode_localization_by_atlas)
+random_forest.FC_SC_random_forest(features, FC_preictal_list, FC_ictal_list, FC_list)
