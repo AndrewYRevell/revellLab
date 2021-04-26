@@ -23,10 +23,8 @@ Output: Random Forest predictions of FC based on SC
 """
 import os
 import pickle
-from python_files import random_forest, DataClassSfc
-import pandas as pd
-from python_files.create_feature_matrix import create_feature_matrix
-from dataclasses import dataclass
+from python_files import random_forest
+from revellLab.packages.dataClass.DataClassSfc import DataClassSfc
 
 # Each structural connectivity matrix gets a label of a functional connectivity matrix,
 # which is done multiple times if there were multiple seizures
@@ -59,14 +57,14 @@ SC, SC_regions = sfc_data.get_structure(atlas)
 electrodeLocalization = sfc_data.get_electrodeLocalization(atlas)
 
 # Get electrode localization
-sfc_data = sfc_data.get_electrodeLocalization()
+sfc_data_electrode_localized = sfc_data.get_electrodeLocalization()
 
 # Creates features, which are structural connectivity matrices
-features = sfc_data.create_feature_matrix()
+structural_features = sfc_data.create_feature_matrix()
 
 # Accesses files for functional connectivity matrices (preictal)
 FC_preictal_file_path_array = []
-for x in range(len(sfc_data.get_atlas_names)):
+for x in range(len(sfc_data_electrode_localized.get_atlas_names)):
     for s in range(len(RID)):
         file = '{0}sub-{1}/connectivity_matrices/functional/eeg/sub-{2}_{3}_{4}_{5}_functionalConnectivity.pickle' \
             .format(file_directory, RID, RID, iEEG_filename, start_time_usec, stop_time_usec)
@@ -74,7 +72,7 @@ for x in range(len(sfc_data.get_atlas_names)):
 
 # Accesses files for functional connectivity matrices (ictal)
 FC_ictal_file_path_array = []
-for x in range(len(sfc_data.get_atlas_names)):
+for x in range(len(sfc_data_electrode_localized.get_atlas_names)):
     for s in range(len(RID)):
         file = '{0}sub-{1}/connectivity_matrices/functional/eeg/sub-{2}_{3}_{4}_{5}_functionalConnectivity.pickle'\
                 .format(file_directory, RID, RID, iEEG_filename, start_time_usec, stop_time_usec)
@@ -96,4 +94,4 @@ for FC_file_path in FC_ictal_file_path_array:
 
 FC_list = []
 
-random_forest.FC_SC_random_forest(features, FC_preictal_list, FC_ictal_list, FC_list)
+random_forest.FC_SC_random_forest(structural_features, FC_preictal_list, FC_ictal_list, FC_list)
