@@ -54,21 +54,22 @@ Change Log
 2021 March 9: Formalized by Andy Revell. Documentation by Lena Armstrong
 """
 
-from __future__ import division
-import numpy as np
 import os
+import math
+import time
+import copy
 import inspect
+import numpy as np
 import pandas as pd
-from scipy import signal as signal
-#from mtspec import mt_coherence #needed if uncommented out for mtspec
+import seaborn as sns
+import matplotlib.pyplot as plt
+from scipy import signal
+from scipy import interpolate 
+from scipy.spatial import distance_matrix
 from scipy.stats import pearsonr, spearmanr
 from sklearn.feature_selection import mutual_info_regression
-import time
-import matplotlib.pyplot as plt
-import seaborn as sns
-from scipy.spatial import distance_matrix
-import math
-import copy
+#from mtspec import mt_coherence #needed if uncommented out for mtspec
+#from __future__ import division
 
 #%%
 
@@ -1236,6 +1237,48 @@ def lineLengthOfArray(data):
     for c in range(nchan):
         lineLengthNorm[:,c] = lineLength_arr[:,c]/np.max(lineLength_arr[:,c])
     return lineLength_arr, lineLengthNorm
+
+
+#%% signal analysis
+
+    
+def get_power(data, fs, avg = False):
+    nchan = data.shape[1]
+    if avg: #calculate over entire segment. else, calculate in one second windows
+        power = np.zeros(shape = (129,nchan))
+        for ch in range(nchan):
+            _, power[:,ch] = signal.welch(data[:,ch], fs, nperseg=1 * fs)
+    else:
+        index = np.arange(0, len(data), step = fs *1 )
+        power = np.zeros(shape = (129, len(index),nchan))
+        for w in range(len(index)-1):
+            st = index[w]
+            sp = index[w+1]
+            for ch in range(nchan):
+                _, power[:,w,ch] = signal.welch(data[st:sp,ch], fs, nperseg=1 * fs)
+    return power
+
+
+
+def power_interpolate(data, dataInterictal, ictalStartIndex, ictalEndIndex, length = 200):
+    nchan = data.shape[2]
+    powerInterp = np.zeros(shape = (129, length*4, nchan))
+    for ch in range(nchan):
+        ii = dataInterictal[:,:,ch]
+        pi =  data[:,0:ictalStartIndex,ch]
+        ic =  data[:,ictalStartIndex:ictalEndIndex,ch]
+        po =  data[:,ictalEndIndex:,ch]
+        interpII = interpolate.interp1d(np.linspace(1,100, ii.shape[1]),  ii, axis=1 )
+        interpPI = interpolate.interp1d(np.linspace(1,100, pi.shape[1]),  pi, axis=1 )
+        interpIC = interpolate.interp1d(np.linspace(1,100, ic.shape[1]),  ic, axis=1 )
+        interpPO = interpolate.interp1d(np.linspace(1,100, po.shape[1]),  po, axis=1 )
+        powerInterp[:,0:length,ch]= interpII(np.linspace(1,100,length))
+        powerInterp[:,length:length*2,ch]= interpPI(np.linspace(1,100,length))
+        powerInterp[:,length*2:length*3,ch]= interpIC(np.linspace(1,100,length))
+        powerInterp[:,length*3:length*4,ch]= interpPO(np.linspace(1,100,length))
+    return powerInterp
+
+
 
 #%%
 """

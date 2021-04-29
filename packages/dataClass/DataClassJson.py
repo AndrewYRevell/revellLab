@@ -68,6 +68,7 @@ class DataClassJson:
             print("\nNo file path given. Not saving data. Downloading...")
             df, fs = downloadiEEGorg.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, channels, ignoreElectrodes = [])
         if load:
+            print(f"ignored electrodes: {ignoreElectrodes}")
             df = pd.DataFrame.drop(df, ignoreElectrodes, axis=1, errors='ignore') 
             return df, fs
         
@@ -112,6 +113,7 @@ class DataClassJson:
             print("\nNo file path given. Downloading data")
             df, fs = downloadiEEGorg.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, channels, ignoreElectrodes = [])
         if load:
+            print(f"ignored electrodes: {ignoreElectrodes}")
             ictalStartIndex  = int(secondsBefore*fs)
             ictalStopIndex = int(secondsBefore*fs + (ictalStopUsec - ictalStartUsec)/1e6*fs)
             df = pd.DataFrame.drop(df, ignoreElectrodes, axis=1, errors='ignore') 
@@ -186,14 +188,18 @@ class DataClassJson:
         return patientsWithAnnotations
     
     def get_patientsWithSeizuresAndInterictal(self):
-        patientsWithseizures = pd.DataFrame(columns = ["subject", "idKey", "AssociatedInterictal"])
+        patientsWithseizures = pd.DataFrame(columns = ["subject", "idKey", "AssociatedInterictal", "EEC", "UEO", "stop"])
         subjects = list(self.jsonFile["SUBJECTS"].keys())
         for s in range(len(subjects)):
             idKeys = list(self.jsonFile["SUBJECTS"][subjects[s]]["Events"]["Ictal"].keys())
-            for i in  range(len(idKeys)):
+            for i in range(len(idKeys)):
                 if "AssociatedInterictal" in self.jsonFile["SUBJECTS"][subjects[s]]["Events"]["Ictal"][idKeys[i]]:
                     AssociatedInterictal = self.jsonFile["SUBJECTS"][subjects[s]]["Events"]["Ictal"][idKeys[i]]["AssociatedInterictal"]
-                    patientsWithseizures = patientsWithseizures.append(dict(subject =  subjects[s], idKey = idKeys[i], AssociatedInterictal = AssociatedInterictal),ignore_index=True)
+                    if not AssociatedInterictal == "missing":
+                        EEC = float(self.jsonFile["SUBJECTS"][subjects[s]]["Events"]["Ictal"][idKeys[i]]["EEC"])
+                        UEO = float(self.jsonFile["SUBJECTS"][subjects[s]]["Events"]["Ictal"][idKeys[i]]["UEO"])
+                        stop = float(self.jsonFile["SUBJECTS"][subjects[s]]["Events"]["Ictal"][idKeys[i]]["Stop"])
+                        patientsWithseizures = patientsWithseizures.append(dict(subject =  subjects[s], idKey = idKeys[i], AssociatedInterictal = AssociatedInterictal, EEC = EEC, UEO = UEO, stop = stop),  ignore_index=True)
         return patientsWithseizures
     
     def preprocessNormalizeDownsample(self, df, df_interictal, fs, fsds, montage = "bipolar", prewhiten = True):
@@ -261,7 +267,6 @@ class DataClassJson:
         X = X[shuffle,:,:]
         Y = Y[shuffle,:]
         return X, Y, data_scalerDS, dataII_scalerDS, dataAnnotationDS
-    
     
     ##Plotting functions
     def plot_eeg(self, data, fs, startSec = None, stopSec = None, nchan = None, markers = [], aspect = 20, height = 0.3, hspace = -0.3, dpi = 300, lw=1, fill = False, savefig = False, pathFig = None):
