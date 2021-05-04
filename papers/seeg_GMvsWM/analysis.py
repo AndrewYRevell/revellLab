@@ -220,9 +220,9 @@ for i in range(3, N):# [3,5, 16, 22,26, 40 , 46, 60, 80]:
     ictalStopIndexDS = int(ictalStopIndex * (fsds/fs))
     seizureLength = (ictalStopIndexDS-ictalStartIndexDS)/fsds
     _, _, _, seizureFilt, channels = echobase.preprocess(
-        seizure, fs, fs, montage="bipolar", prewhiten=False)
+        seizure, fs, fs, montage="car", prewhiten=False)
     _, _, _, interictalFilt, _ = echobase.preprocess(
-        interictal, fs, fs, montage="bipolar", prewhiten=False)
+        interictal, fs, fs, montage="car", prewhiten=False)
     seizureFiltDS = metadata.downsample(seizureFilt, fs, fsds)
     interictalFiltDS = metadata.downsample(interictalFilt, fs, fsds)
 
@@ -292,7 +292,7 @@ for i in range(3, N):# [3,5, 16, 22,26, 40 , 46, 60, 80]:
     noise = np.zeros(shape = (nchan))
     powerInterpIIAvg = np.nanmean(powerInterp[0:200, :,:], axis = 1)
     for ch in range(nchan):
-        noise[ch] = simps(powerInterpIIAvg[:,ch], dx=1)
+        noise[ch] = simps(powerInterpIIAvg[:,ch], dx=1)/2
 
     SNR = np.zeros(shape = (powerInterp.shape[1], nchan))
     for ch in range(nchan):
@@ -315,7 +315,7 @@ for i in range(3, N):# [3,5, 16, 22,26, 40 , 46, 60, 80]:
         powerDistAvg = np.nanmean(powerDistAllSame, axis=3)
         
         
-        plot_GMvsWM.plotUnivariate(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll)
+        plot_GMvsWM.plotUnivariate(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList)
 
         print(f"\n\n\n\n\n\n\n\n\n{i}\n\n\n\n\n\n\n\n\n")
         plt.show()
@@ -344,67 +344,12 @@ for i in range(3, N):# [3,5, 16, 22,26, 40 , 46, 60, 80]:
         """
 
 #%% Power analysis
-plot_GMvsWM.plotUnivariate(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll)
-
-
-nseiuzres = powerGM.shape[2]
-powerGMmean = np.nanmean(powerGM, axis=2)
-powerWMmean = np.nanmean(powerWM, axis=2)
-#padding power vs distance with NaNs
-powerDistAllSame = np.full( shape= ( powerDistAll[1].shape[0],   findMaxDim(powerDistAll), 4, len(powerDistAll)) , fill_value= np.nan)
-for d in range(len(powerDistAll)):
-    filler = powerDistAll[d]
-    powerDistAllSame[:,:filler.shape[1],:, d] = filler
-powerDistAvg = np.nanmean(powerDistAllSame, axis=3)
+plot_GMvsWM.plotUnivariate(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, powerWM)
+plt.savefig(f"{figureDir}/GMvsWM/powerspectra.png")
+plt.savefig(f"{figureDir}/GMvsWM/powerspectra.pdf")
 
 
 
-
-
-
-
-
-
-
-
-  
-fig = plt.figure(figsize=(8, 8), dpi=300)
-gs = fig.add_gridspec(4, 4)
-axes = 4 * [None]
-for t in range(2,4):
-    axes[t] = 4 * [None]
-axes[0] = fig.add_subplot(gs[0, :]); axes[1] = fig.add_subplot(gs[1, :])
-for t in range(4):
-    axes[2][t] = fig.add_subplot(gs[2, t])
-    axes[3][t] = fig.add_subplot(gs[3, t])
-sns.heatmap(np.log10(powerGMmean[0:110, :]), vmin=0, vmax=4, center=0, ax=axes[0],cbar = False); axes[0].invert_yaxis()
-sns.heatmap(np.log10(powerWMmean[0:110, :]), vmin=0, vmax=4, center=0,  ax=axes[1],cbar = False); axes[1].invert_yaxis()
-for t in range(4):
-    sns.heatmap(np.log10(powerDistAvg[1:50, :,t]),  ax=axes[2][t],cbar = False, vmin=-2, vmax=5)
-    axes[2][t].invert_yaxis()
-
-
-print(f"\n\n\n\n\n\n\n\n\n{i}\n\n\n\n\n\n\n\n\n")
-plt.show()
-
-
-
-ax = sns.heatmap(np.log10(powerGM[0:110, :, 10]), vmin=0, vmax=4, center=0)
-ax.invert_yaxis()
-
-nseiuzres = powerGM.shape[2]
-powerGMmean = np.nanmean(powerGM, axis=2)
-powerWMmean = np.nanmean(powerWM, axis=2)
-
-fig, axes = plt.subplots(2, 1, figsize=(8, 4), dpi=300)
-sns.heatmap(np.log10(powerGMmean[0:110, :]),
-            vmin=0, vmax=4, center=0, ax=axes[0])
-axes[0].invert_yaxis()
-sns.heatmap(np.log10(powerWMmean[0:110, :]),
-            vmin=0, vmax=4, center=0,  ax=axes[1])
-axes[1].invert_yaxis()
-print(f"\n\n\n\n\n\n\n\n\n{i}\n\n\n\n\n\n\n\n\n")
-plt.show()
 
 upperFreq = 60
 GMmeanII = np.nanmean(powerGM[0:upperFreq, 0:200, :], axis=1)
@@ -444,16 +389,16 @@ dfArea["patient"] = np.nan
 for i in range(len(dfArea)):
     dfArea["patient"][i] = paientList["patient"][dfArea["seizure"][i]]
 
-dfArea = dfArea.groupby(["tissue", "patient", "state"]).mean()
-dfArea.reset_index(inplace=True)
+dfAreaPlot = dfArea.groupby(["tissue", "seizure", "state"]).mean()
+dfAreaPlot.reset_index(inplace=True)
 
 colors1 = ["#c6b4a5", "#b6d4ee"]
 colors2 = ["#a08269", "#76afdf"]
 colors3 = ["#544335", "#1f5785"]
 fig, axes = plt.subplots(1, 1, figsize=(5, 4), dpi=300)
-sns.boxplot(data=dfArea, x="state", y="power", hue="tissue", palette=colors2, showfliers=False,
+sns.boxplot(data=dfAreaPlot, x="state", y="power", hue="tissue", palette=colors2, showfliers=False,
             ax=axes, color=colors3, order=["interictal", "preictal", "ictal", "postictal"])
-sns.stripplot(x="state", y="power", hue="tissue",  data=dfArea, palette=colors3,
+sns.stripplot(x="state", y="power", hue="tissue",  data=dfAreaPlot, palette=colors3,
               dodge=True, size=3, order=["interictal", "preictal", "ictal", "postictal"])
 # Set only one legend
 handles, labels = axes.get_legend_handles_labels()
@@ -462,12 +407,14 @@ l = plt.legend(handles[0:2], labels[0:2], bbox_to_anchor=(
 axes.set(xlabel='', ylabel='power (log10)', title="Tissue Power Differences")
 plt.savefig(f"{figureDir}/GMvsWM/powerDifferences_bySeziure.pdf")
 
-dfArea = dfArea.groupby(["tissue", "patient", "state"]).mean()
-dfArea.reset_index(inplace=True)
+
+
+dfAreaPlot = dfArea.groupby(["tissue", "patient", "state"]).mean()
+dfAreaPlot.reset_index(inplace=True)
 fig, axes = plt.subplots(1, 1, figsize=(5, 4), dpi=300)
-sns.boxplot(data=dfArea, x="state", y="power", hue="tissue", palette=colors2, showfliers=False,
+sns.boxplot(data=dfAreaPlot, x="state", y="power", hue="tissue", palette=colors2, showfliers=False,
             ax=axes, color=colors3, order=["interictal", "preictal", "ictal", "postictal"])
-sns.stripplot(x="state", y="power", hue="tissue",  data=dfArea, palette=colors3,
+sns.stripplot(x="state", y="power", hue="tissue",  data=dfAreaPlot, palette=colors3,
               dodge=True, size=3, order=["interictal", "preictal", "ictal", "postictal"])
 # Set only one legend
 handles, labels = axes.get_legend_handles_labels()
@@ -477,6 +424,11 @@ axes.set(xlabel='', ylabel='power (log10)', title="Tissue Power Differences")
 plt.savefig(f"{figureDir}/GMvsWM/powerDifferences_byPatient.pdf")
 
 
+
+
+
+dfArea = dfArea.groupby(["tissue", "patient", "state"]).mean()
+dfArea.reset_index(inplace=True)
 statsTable = pd.DataFrame(
     columns=["tissue_1", "state_1", "tissue_2", "state_2", "pvalue"])
 v1 = dfArea.loc[dfArea['tissue'] ==
@@ -485,6 +437,7 @@ v2 = dfArea.loc[dfArea['tissue'] ==
                 "WM"].loc[dfArea['state'] == "ictal"]["power"]
 statsTable = statsTable.append(dict(tissue_1="GM", tissue_2="WM", state_1="ictal",
                                     state_2="ictal", pvalue=stats.wilcoxon(v1, v2)[1]), ignore_index=True)
+
 v1 = dfArea.loc[dfArea['tissue'] ==
                 "GM"].loc[dfArea['state'] == "interictal"]["power"]
 v2 = dfArea.loc[dfArea['tissue'] ==
@@ -537,7 +490,7 @@ v1 = dfArea.loc[dfArea['tissue'] ==
                 "GM"].loc[dfArea['state'] == "preictal"]["power"]
 v2 = dfArea.loc[dfArea['tissue'] ==
                 "GM"].loc[dfArea['state'] == "postictal"]["power"]
-statsTable = statsTable.append(dict(tissue_1="WM", tissue_2="WM", state_1="preictal",
+statsTable = statsTable.append(dict(tissue_1="GM", tissue_2="GM", state_1="preictal",
                                     state_2="postictal", pvalue=stats.wilcoxon(v1, v2)[1]), ignore_index=True)
 v1 = dfArea.loc[dfArea['tissue'] ==
                 "WM"].loc[dfArea['state'] == "preictal"]["power"]
@@ -545,5 +498,6 @@ v2 = dfArea.loc[dfArea['tissue'] ==
                 "WM"].loc[dfArea['state'] == "postictal"]["power"]
 statsTable = statsTable.append(dict(tissue_1="WM", tissue_2="WM", state_1="preictal",
                                     state_2="postictal", pvalue=stats.wilcoxon(v1, v2)[1]), ignore_index=True)
-
+statsTable["corrected"] = statsTable["pvalue"] * len(statsTable)
+statsTable["significance"] = statsTable["corrected"] <0.05
 statsTable.to_csv(f"{figureDir}/GMvsWM/powerDifferences.csv", index=False)
