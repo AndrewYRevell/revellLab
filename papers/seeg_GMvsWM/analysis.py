@@ -49,7 +49,7 @@ from revellLab.papers.seeg_GMvsWM import plot_GMvsWM
 pathFile = "linuxAndy.json"
 revellLabPath = pkg_resources.resource_filename("revellLab", "/")
 with open(join(revellLabPath, "paths", pathFile)) as f: paths = json.load(f)
-with open(join(paths["metadata"], "iEEGdataRevell.json")) as f: jsonFile = json.load(f)
+with open(join(paths["iEEGdata"])) as f: jsonFile = json.load(f)
 # tools
 
 
