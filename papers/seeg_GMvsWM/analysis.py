@@ -46,18 +46,17 @@ from revellLab.packages.eeg.echobase import echobase
 from revellLab.papers.seeg_GMvsWM import plot_GMvsWM
 #%% 02 Paths and File names
 
-pathFile = "macAndy.json"
+pathFile = "linuxAndy.json"
 revellLabPath = pkg_resources.resource_filename("revellLab", "/")
 with open(join(revellLabPath, "paths", pathFile)) as f: paths = json.load(f)
 paths
 
 
-paths["BIDS"]
 
 
 jsonFilePath = join(paths["metadata"], "iEEGdataRevell.json")
 
-
+with open(join(paths["metadata"], "iEEGdataRevell.json")) as f: jsonFile = json.load(f)
 # tools
 tools = pkg_resources.resource_filename("revellLab", "tools")
 atlasPath = join(tools, "atlases", "atlases")
