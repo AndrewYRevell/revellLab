@@ -366,9 +366,9 @@ utils.checkPathAndMake(templatesPatients, templatesPatients)
 utils.checkPathAndMake(templatesPatients, templatesControls)
 
 
-iteration1Patients = join(templatesPatients , "interation01")
-iteration1Controls = join(templatesControls , "interation01")
-iteration2Controls = join(templatesControls , "interation02")
+iteration1Patients = join(templatesPatients , "iteration01")
+iteration1Controls = join(templatesControls , "iteration01")
+iteration2Controls = join(templatesControls , "iteration02")
 
 utils.checkPathAndMake(outputDir, iteration1Patients)
 utils.checkPathAndMake(outputDir, iteration1Controls)
@@ -415,10 +415,10 @@ controls.to_csv(  join(multimodal, "subjectsControls.csv"), header = False , ind
 
 cmd = f"{ANTSPATH}/antsMultivariateTemplateConstruction2.sh -d 3 -k 3 -v 16 -c 2 -j 12 -r 1 -o {join(iteration1Controls, 'PIER_controls_')} {join(imagesControls, '*_T1w.nii.gz')},{join(imagesControls, '*_T2w.nii.gz')},{join(imagesControls, '*_FLAIR.nii.gz')}" 
 print(cmd)
-utils.executeCommand( cmd )
+#utils.executeCommand( cmd )
 
-utils.executeCommand( f"{ANTSPATH}antsMultivariateTemplateConstruction2.sh -d 3 -v 32 -c 2 -j 12 -z {join(T1wDirTemplate, 'antsBTPtemplate0.nii.gz')} -o {join(T1wDirTemplate2, 'antsBTP')} {join(T1wImagesCONTROLSDir, '*_T1w.nii.gz')}"  )
-
+cmd = f"{ANTSPATH}/antsMultivariateTemplateConstruction2.sh -d 3 -k 3 -v 16 -c 2 -j 12  -o {join(iteration2Controls, 'PIER_controls_')} -z {join(iteration1Controls, 'PIER_controls_template0.nii.gz')} -z {join(iteration1Controls, 'PIER_controls_template1.nii.gz')} -z {join(iteration1Controls, 'PIER_controls_template2.nii.gz')} {join(imagesControls, '*_T1w.nii.gz')},{join(imagesControls, '*_T2w.nii.gz')},{join(imagesControls, '*_FLAIR.nii.gz')}"  
+print(cmd)
 
 utils.executeCommand( f"{ANTSPATH}antsMultivariateTemplateConstruction2.sh -d 3 -v 32 -c 2 -j 24 -z {join(T1wDirTemplate2, 'antsBTPtemplate0.nii.gz')} -o {join(T1wDirTemplatePatients01, 'PIER_')} {join(T1wImagesPATEINTSDir, '*_T1w.nii.gz')}"  )
 utils.executeCommand( f"{ANTSPATH}antsMultivariateTemplateConstruction2.sh -d 3 -v 32 -c 2 -j 24 -z {join(T1wDirTemplatePatients01, 'PIER_template0.nii.gz')} -o {join(T1wDirTemplatePatients02, 'PIER_')} {join(T1wImagesPATEINTSDir, '*_T1w.nii.gz')}"  )
