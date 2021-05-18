@@ -49,36 +49,8 @@ from revellLab.papers.seeg_GMvsWM import plot_GMvsWM
 pathFile = "linuxAndy.json"
 revellLabPath = pkg_resources.resource_filename("revellLab", "/")
 with open(join(revellLabPath, "paths", pathFile)) as f: paths = json.load(f)
-paths
-
-
-
-
-jsonFilePath = join(paths["metadata"], "iEEGdataRevell.json")
-
 with open(join(paths["metadata"], "iEEGdataRevell.json")) as f: jsonFile = json.load(f)
 # tools
-tools = pkg_resources.resource_filename("revellLab", "tools")
-atlasPath = join(tools, "atlases", "atlases")
-atlasLabelsPath = join(tools, "atlases", "atlasLabels")
-atlasfilesPath = join(tools, "atlases", "atlasMetadata.json")
-MNItemplatePath = join(tools, "templates", "MNI",
-                       "mni_icbm152_t1_tal_nlin_asym_09c_182x218x182.nii.gz")
-MNItemplateBrainPath = join(tools, "templates", "MNI",
-                            "mni_icbm152_t1_tal_nlin_asym_09c_182x218x182_brain.nii.gz")
-randomAtlasesPath = join(atlasPath, "randomAtlasesWholeBrainMNI")
-atlasDirectory = join(tools, "atlases", "atlases")
-atlasLabelDirectory = join(tools, "atlases", "atlasLabels")
-
-atlasLocaliztionDir = join(BIDS, "derivatives", "atlasLocalization")
-atlasLocalizationFunctionDirectory = join(
-    revellLabPath, "packages", "atlasLocalization")
-
-# BrainAtlas Project data analysis path
-derivatives = join(BIDS, "derivatives")
-
-freesurferReconAllDir = join(BIDS, "derivatives", "freesurferReconAll")
-atlasLocalizationDir = join(derivatives, "atlasLocalization")
 
 
 # % 03 Paramters and read metadata
@@ -90,18 +62,9 @@ ieegSpace = "T00"
 # %
 
 # Atlas metadata
-with open(atlasfilesPath) as f:
-    atlasfiles = json.load(f)
+with open(paths["atlasfilesPath"]) as f: atlasfiles = json.load(f)
 atlases = DataClassAtlases.atlases(atlasfiles)
 
-# Study cohort data
-with open(cohortsPath) as f:
-    cohortJson = json.load(f)
-cohort = DataClassCohortsBrainAtlas.brainAtlasCohort(cohortJson)
-# Get patietns with DTI data
-patientsDTI = cohort.getWithDTI()
-# get patients with iEEG times:
-iEEGTimes = cohort.getiEEGdataKeys()
 
 
 # JSON metadata data
