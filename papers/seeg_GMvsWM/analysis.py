@@ -44,23 +44,21 @@ from revellLab.packages.eeg.ieegOrg import downloadiEEGorg
 from revellLab.packages.atlasLocalization import atlasLocalizationFunctions as atl
 from revellLab.packages.eeg.echobase import echobase
 from revellLab.papers.seeg_GMvsWM import plot_GMvsWM
-# % 02 Paths and File names
+#%% 02 Paths and File names
 
-figureDir = "/media/arevell/sharedSSD/linux/figures"
-# BIDS directory
-BIDS = "/media/arevell/sharedSSD/linux/data/BIDS"
-dataset = "PIER"
-metadataDir = "/media/arevell/sharedSSD/linux/data/metadata"
+pathFile = "macAndy.json"
+revellLabPath = pkg_resources.resource_filename("revellLab", "/")
+with open(join(revellLabPath, "paths", pathFile)) as f: paths = json.load(f)
+paths
 
-dsiStudioSingularityPatah = "/home/arevell/singularity/dsistudio/dsistudio_latest.sif"
-freesurferLicense = "$FREESURFER_HOME/license.txt"
-cohortsPath = join(metadataDir, "cohortData_brainAtlas.json")
-jsonFilePath = join(metadataDir, "iEEGdataRevell.json")
-fnameiEEGusernamePassword = join(
-    "/media/arevell/sharedSSD/linux/", "ieegorg.json")
+
+paths["BIDS"]
+
+
+jsonFilePath = join(paths["metadata"], "iEEGdataRevell.json")
+
 
 # tools
-revellLabPath = pkg_resources.resource_filename("revellLab", "/")
 tools = pkg_resources.resource_filename("revellLab", "tools")
 atlasPath = join(tools, "atlases", "atlases")
 atlasLabelsPath = join(tools, "atlases", "atlasLabels")
