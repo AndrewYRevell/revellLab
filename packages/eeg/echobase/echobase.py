@@ -204,13 +204,16 @@ def crossCorrelation_wrapper(data, fs, param = param, avgref=True):
     check_type(fs, int)
 
     # Build pipeline
+    """
     if avgref:
         data_ref = common_avg_ref(data)
     else:
         data_ref = data.copy()
     data_ref_ar = ar_one(data_ref)
-
     data_bb, data_d, data_t, data_a, data_b, data_gl, data_gm, data_gh = elliptic_bandFilter(data_ref_ar, fs, param)
+    """
+
+    data_bb, data_d, data_t, data_a, data_b, data_gl, data_gm, data_gh = elliptic_bandFilter(data, fs, param)
     
     print("Cross Correlation Broadband")
     adj_xcorr_bb = crossCorrelation_connectivity(data_bb, fs, **param['XCorr'], absolute=False)
@@ -279,6 +282,7 @@ def pearson_wrapper(data, fs, param = param, avgref=True):
     check_type(fs, int)
 
     # Build pipeline
+    """
     if avgref:
         data_ref = common_avg_ref(data)
     else:
@@ -286,7 +290,8 @@ def pearson_wrapper(data, fs, param = param, avgref=True):
     data_ref_ar = ar_one(data_ref)
 
     data_bb, data_d, data_t, data_a, data_b, data_gl, data_gm, data_gh = elliptic_bandFilter(data_ref_ar, fs, param)
-    
+    """
+    data_bb, data_d, data_t, data_a, data_b, data_gl, data_gm, data_gh = elliptic_bandFilter(data, fs, param)
     print("Pearson Correlation Broadband")
     adj_pearson_bb, adj_pearson_bb_pval  = pearson_connectivity(data_bb, fs)
     print("Pearson Correlation Delta")
@@ -354,6 +359,7 @@ def spearman_wrapper(data, fs, param = param, avgref=True):
     check_type(fs, int)
 
     # Build pipeline
+    """
     if avgref:
         data_ref = common_avg_ref(data)
     else:
@@ -361,7 +367,8 @@ def spearman_wrapper(data, fs, param = param, avgref=True):
     data_ref_ar = ar_one(data_ref)
 
     data_bb, data_d, data_t, data_a, data_b, data_gl, data_gm, data_gh = elliptic_bandFilter(data_ref_ar, fs, param)
-    
+    """
+    data_bb, data_d, data_t, data_a, data_b, data_gl, data_gm, data_gh = elliptic_bandFilter(data, fs, param)
     print("spearman Correlation Broadband")
     adj_spearman_bb, adj_spearman_bb_pval  = spearman_connectivity(data_bb, fs)
     print("spearman Correlation Delta")
@@ -432,12 +439,15 @@ def coherence_wrapper(data, fs, param = param, avgref=True):
     check_type(fs, int)
 
     # Build pipeline
+    """
     if avgref:
         data_ref = common_avg_ref(data)
     else:
         data_ref = data.copy()
     data_ref_60 = elliptic(data_ref, fs, **param['Notch_60Hz'])
-    
+    """
+    data_ref_60 = elliptic(data, fs, **param['Notch_60Hz'])
+
     print("Coherence Broadband")
     adj_coherence_bb = coherence_connectivity(data_ref_60, fs, param["Broadband"]['wp'])
     print("Coherence Delta")
@@ -504,6 +514,7 @@ def mutualInformation_wrapper(data, fs, param = param, avgref=True):
     check_type(fs, int)
 
     # Build pipeline
+    """
     if avgref:
         data_ref = common_avg_ref(data)
     else:
@@ -511,7 +522,8 @@ def mutualInformation_wrapper(data, fs, param = param, avgref=True):
     data_ref_ar = ar_one(data_ref)
 
     data_bb, data_d, data_t, data_a, data_b, data_gl, data_gm, data_gh = elliptic_bandFilter(data_ref_ar, fs, param)
-    
+    """
+    data_bb, data_d, data_t, data_a, data_b, data_gl, data_gm, data_gh = elliptic_bandFilter(data, fs, param)
     print("Mutual Information Broadband")
     adj_mi_bb = mutualInformation_connectivity(data_bb, fs)
     print("Mutual Information Delta")

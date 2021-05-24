@@ -160,7 +160,13 @@ def getSubType(name):
     if "RID" in name:
         return "subjects"
 
+
+def getUpperTriangle(data,k=1):
+    return data[np.triu_indices_from(data, k)]
     
+def reorderAdj(adj, ind):
+    adj = adj[ind[:,None], ind[None,:]]
+    return adj
 
 def sendEmail(receiver_email = "andyrevell.python@gmail.com", subject ="Process is done", text = "done", port = 465, smtp_server = "smtp.gmail.com" , sender_email = "andyrevell.python@gmail.com"):
     

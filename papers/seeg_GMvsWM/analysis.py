@@ -50,45 +50,36 @@ pathFile = "linuxAndy.json"
 revellLabPath = pkg_resources.resource_filename("revellLab", "/")
 with open(join(revellLabPath, "paths", pathFile)) as f: paths = json.load(f)
 with open(join(paths["iEEGdata"])) as f: jsonFile = json.load(f)
-# tools
-
-
-# % 03 Paramters and read metadata
-
-SesImplant = "implant01"
-acq = "3D"
-ieegSpace = "T00"
-
-# %
-
-# Atlas metadata
 with open(paths["atlasfilesPath"]) as f: atlasfiles = json.load(f)
+with open(paths["iEEGusernamePassword"]) as f: usernameAndpassword = json.load(f)
 atlases = DataClassAtlases.atlases(atlasfiles)
-
-
-
-# JSON metadata data
-with open(jsonFilePath) as f:
-    jsonFile = json.load(f)
 metadata = DataClassJson.DataClassJson(jsonFile)
-
-
 # Get iEEG.org username and password
-with open(fnameiEEGusernamePassword) as f:
-    usernameAndpassword = json.load(f)
 username = usernameAndpassword["username"]
 password = usernameAndpassword["password"]
 
 
-# % 01
+#%% 03 Paramters 
+
+SesImplant = "implant01"
+acq = "3D"
+ieegSpace = "T00"
+montage = "bipolar"
+fsds = 256 #sampleing frequency down-sampled
+
+paths["figures"]
+
+#%% 01
 
 patientsWithseizures = metadata.get_patientsWithSeizuresAndInterictal()
 # calculate length of seizures
 patientsWithseizures = pd.concat([patientsWithseizures, pd.DataFrame(
     patientsWithseizures["stop"] - patientsWithseizures["EEC"], columns=['length'])], axis=1)
+N = len(patientsWithseizures)
 
 #% custom functions
-def findMaxDim(l, init = 0): #find the maximum second dimension of a list of arrays.
+def findMaxDim(l, init = 0): 
+    #find the maximum second dimension of a list of arrays.
     for i in range(len(l)):
         if l[i].shape[1] > init:
             init = l[i].shape[1]
@@ -101,7 +92,7 @@ sns.histplot(data=seizureCounts, x="idKey", binwidth=1, kde=True, ax=axes)
 axes.set_xlim(1, None)
 axes.set(xlabel='Number of Seizures', ylabel='Number of Patients',
          title="Distribution of Seizure Occurrences")
-plt.savefig(f"{figureDir}/common/seizureCounts.pdf")
+plt.savefig(f"{paths['figures']}/common/seizureCounts.pdf")
 
 # get time distributions
 fig, axes = plt.subplots(1, 2, figsize=(8, 4), dpi=300)
@@ -115,15 +106,16 @@ for i in range(2):
                 title="Distribution of Seizure Lengths")
     #axes[i].set_xticklabels(axes[i].get_xticks(), rotation = 45)
 
-plt.savefig(f"{figureDir}/common/seizureLengthDistribution.pdf")
+plt.savefig(f"{paths['figures']}/common/seizureLengthDistribution.pdf")
 
 # %% 07 Electrode and atlas localization
 
 iEEGpatientList = np.unique(list(patientsWithseizures["subject"]))
 iEEGpatientList = ["sub-" + s for s in iEEGpatientList]
 
-atl.atlasLocalizationBIDSwrapper(iEEGpatientList,  BIDS, dataset, SesImplant, ieegSpace, acq, freesurferReconAllDir, atlasLocalizationDir,
-                                 atlasDirectory, atlasLabelDirectory, MNItemplatePath, MNItemplateBrainPath, multiprocess=False, cores=12, rerun=False)
+atl.atlasLocalizationBIDSwrapper(iEEGpatientList,  paths['BIDS'], "PIER", SesImplant, ieegSpace, acq,  paths['freesurferReconAll'],  paths['atlasLocaliztion'],
+                                 paths['atlases'], paths['atlasLabels'], paths['MNItemplate'], paths['MNItemplateBrain'], multiprocess=False, cores=12, rerun=False)
+
 
 
 # %% 08 EEG download and preprocessing of electrodes
@@ -133,56 +125,54 @@ atl.atlasLocalizationBIDSwrapper(iEEGpatientList,  BIDS, dataset, SesImplant, ie
 
 for i in range(0, 40):
     metadata.get_precitalIctalPostictal(patientsWithseizures["subject"][i], "Ictal", patientsWithseizures["idKey"][i], username, password,
-                                        BIDS=BIDS, dataset="derivatives/iEEGorgDownload", session="implant01", secondsBefore=180, secondsAfter=180, load=False)
+                                        BIDS=paths['BIDS'], dataset="derivatives/iEEGorgDownload", session="implant01", secondsBefore=180, secondsAfter=180, load=False)
     # get intertical
     associatedInterictal = metadata.get_associatedInterictal(
         patientsWithseizures["subject"][i],  patientsWithseizures["idKey"][i])
     metadata.get_iEEGData(patientsWithseizures["subject"][i], "Interictal", associatedInterictal, username, password,
-                          BIDS=BIDS, dataset="derivatives/iEEGorgDownload", session="implant01", startKey="Start", load=False)
+                          BIDS=paths['BIDS'], dataset="derivatives/iEEGorgDownload", session="implant01", startKey="Start", load=False)
 
 
 for i in range(40, 80):
     print(i)
     metadata.get_precitalIctalPostictal(patientsWithseizures["subject"][i], "Ictal", patientsWithseizures["idKey"][i], username, password,
-                                        BIDS=BIDS, dataset="derivatives/iEEGorgDownload", session="implant01", secondsBefore=180, secondsAfter=180, load=False)
+                                        BIDS=paths['BIDS'], dataset="derivatives/iEEGorgDownload", session="implant01", secondsBefore=180, secondsAfter=180, load=False)
     # get intertical
     associatedInterictal = metadata.get_associatedInterictal(
         patientsWithseizures["subject"][i],  patientsWithseizures["idKey"][i])
     metadata.get_iEEGData(patientsWithseizures["subject"][i], "Interictal", associatedInterictal, username, password,
-                          BIDS=BIDS, dataset="derivatives/iEEGorgDownload", session="implant01", startKey="Start", load=False)
+                          BIDS=paths['BIDS'], dataset="derivatives/iEEGorgDownload", session="implant01", startKey="Start", load=False)
 
 
 for i in range(80, len(patientsWithseizures)):
     metadata.get_precitalIctalPostictal(patientsWithseizures["subject"][i], "Ictal", patientsWithseizures["idKey"][i], username, password,
-                                        BIDS=BIDS, dataset="derivatives/iEEGorgDownload", session="implant01", secondsBefore=180, secondsAfter=180, load=False)
+                                        BIDS=paths['BIDS'], dataset="derivatives/iEEGorgDownload", session="implant01", secondsBefore=180, secondsAfter=180, load=False)
     # get intertical
     associatedInterictal = metadata.get_associatedInterictal(
         patientsWithseizures["subject"][i],  patientsWithseizures["idKey"][i])
     metadata.get_iEEGData(patientsWithseizures["subject"][i], "Interictal", associatedInterictal, username, password,
-                          BIDS=BIDS, dataset="derivatives/iEEGorgDownload", session="implant01", startKey="Start", load=False)
+                          BIDS=paths['BIDS'], dataset="derivatives/iEEGorgDownload", session="implant01", startKey="Start", load=False)
 
 
-# %%
+# %% Power analysis calculation
 paientList = pd.DataFrame(columns=["patient"])
-N = len(patientsWithseizures)
-for i in range(3, N):# [3,5, 16, 22,26, 40 , 46, 60, 80]:
+for i in [3, 5, 16]: #range(3, N):
     paientList = paientList.append(
         dict(patient=patientsWithseizures["subject"][i]), ignore_index=True)
     # get data
     seizure, fs, ictalStartIndex, ictalStopIndex = metadata.get_precitalIctalPostictal(patientsWithseizures["subject"][i], "Ictal", patientsWithseizures["idKey"][i], username, password,
-                                                                                       BIDS=BIDS, dataset="derivatives/iEEGorgDownload", session="implant01", secondsBefore=180, secondsAfter=180, load=True)
+                                                                                       BIDS=paths['BIDS'], dataset="derivatives/iEEGorgDownload", session="implant01", secondsBefore=180, secondsAfter=180, load=True)
     interictal, fs = metadata.get_iEEGData(patientsWithseizures["subject"][i], "Interictal", patientsWithseizures["AssociatedInterictal"][i], username, password,
-                                           BIDS=BIDS, dataset="derivatives/iEEGorgDownload", session="implant01", startKey="Start", load=True)
+                                           BIDS=paths['BIDS'], dataset="derivatives/iEEGorgDownload", session="implant01", startKey="Start", load=True)
 
     ###filtering and downsampling
-    fsds = 256
     ictalStartIndexDS = int(ictalStartIndex * (fsds/fs))
     ictalStopIndexDS = int(ictalStopIndex * (fsds/fs))
     seizureLength = (ictalStopIndexDS-ictalStartIndexDS)/fsds
     _, _, _, seizureFilt, channels = echobase.preprocess(
-        seizure, fs, fs, montage="car", prewhiten=False)
+        seizure, fs, fs, montage="bipolar", prewhiten=False)
     _, _, _, interictalFilt, _ = echobase.preprocess(
-        interictal, fs, fs, montage="car", prewhiten=False)
+        interictal, fs, fs, montage="bipolar", prewhiten=False)
     seizureFiltDS = metadata.downsample(seizureFilt, fs, fsds)
     interictalFiltDS = metadata.downsample(interictalFilt, fs, fsds)
 
@@ -193,7 +183,7 @@ for i in range(3, N):# [3,5, 16, 22,26, 40 , 46, 60, 80]:
     # interpolate power
     powerInterp = echobase.power_interpolate( power, powerII, 180, 180 + int(np.round(seizureLength)), length=200)
     # Get atlas localization and distances
-    file = join(atlasLocalizationDir, f"sub-{patientsWithseizures['subject'][i]}", "ses-implant01",
+    file = join(paths["atlasLocaliztion"], f"sub-{patientsWithseizures['subject'][i]}", "ses-implant01",
                 f"sub-{patientsWithseizures['subject'][i]}_ses-implant01_desc-atlasLocalization.csv")
     if utils.checkIfFileExistsGlob(file):
         localization = pd.read_csv(file)
@@ -275,7 +265,7 @@ for i in range(3, N):# [3,5, 16, 22,26, 40 , 46, 60, 80]:
         powerDistAvg = np.nanmean(powerDistAllSame, axis=3)
         
         
-        plot_GMvsWM.plotUnivariate(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList)
+        plot_GMvsWM.plotUnivariate(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, powerWM)
 
         print(f"\n\n\n\n\n\n\n\n\n{i}\n\n\n\n\n\n\n\n\n")
         plt.show()
@@ -303,13 +293,10 @@ for i in range(3, N):# [3,5, 16, 22,26, 40 , 46, 60, 80]:
         
         """
 
-#%% Power analysis
+#%% Power analysis plots
 plot_GMvsWM.plotUnivariate(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, powerWM)
-plt.savefig(f"{figureDir}/GMvsWM/powerspectra.png")
-plt.savefig(f"{figureDir}/GMvsWM/powerspectra.pdf")
-
-
-
+#plt.savefig(f"{paths['figures']}/GMvsWM/powerspectra.png")
+#plt.savefig(f"{paths['figures']}/GMvsWM/powerspectra.pdf")
 
 upperFreq = 60
 GMmeanII = np.nanmean(powerGM[0:upperFreq, 0:200, :], axis=1)
@@ -365,9 +352,7 @@ handles, labels = axes.get_legend_handles_labels()
 l = plt.legend(handles[0:2], labels[0:2], bbox_to_anchor=(
     0.0, 1), loc=2, borderaxespad=0.5)
 axes.set(xlabel='', ylabel='power (log10)', title="Tissue Power Differences")
-plt.savefig(f"{figureDir}/GMvsWM/powerDifferences_bySeziure.pdf")
-
-
+#plt.savefig(f"{paths['figures']}/GMvsWM/powerDifferences_bySeziure.pdf")
 
 dfAreaPlot = dfArea.groupby(["tissue", "patient", "state"]).mean()
 dfAreaPlot.reset_index(inplace=True)
@@ -381,12 +366,9 @@ handles, labels = axes.get_legend_handles_labels()
 l = plt.legend(handles[0:2], labels[0:2], bbox_to_anchor=(
     0.0, 1), loc=2, borderaxespad=0.5)
 axes.set(xlabel='', ylabel='power (log10)', title="Tissue Power Differences")
-plt.savefig(f"{figureDir}/GMvsWM/powerDifferences_byPatient.pdf")
+#plt.savefig(f"{paths['figures']}/GMvsWM/powerDifferences_byPatient.pdf")
 
-
-
-
-
+#power analysis stats
 dfArea = dfArea.groupby(["tissue", "patient", "state"]).mean()
 dfArea.reset_index(inplace=True)
 statsTable = pd.DataFrame(
@@ -397,42 +379,36 @@ v2 = dfArea.loc[dfArea['tissue'] ==
                 "WM"].loc[dfArea['state'] == "ictal"]["power"]
 statsTable = statsTable.append(dict(tissue_1="GM", tissue_2="WM", state_1="ictal",
                                     state_2="ictal", pvalue=stats.wilcoxon(v1, v2)[1]), ignore_index=True)
-
 v1 = dfArea.loc[dfArea['tissue'] ==
                 "GM"].loc[dfArea['state'] == "interictal"]["power"]
 v2 = dfArea.loc[dfArea['tissue'] ==
                 "WM"].loc[dfArea['state'] == "interictal"]["power"]
 statsTable = statsTable.append(dict(tissue_1="GM", tissue_2="WM", state_1="interictal",
                                     state_2="interictal", pvalue=stats.wilcoxon(v1, v2)[1]), ignore_index=True)
-
 v1 = dfArea.loc[dfArea['tissue'] ==
                 "GM"].loc[dfArea['state'] == "preictal"]["power"]
 v2 = dfArea.loc[dfArea['tissue'] ==
                 "WM"].loc[dfArea['state'] == "preictal"]["power"]
 statsTable = statsTable.append(dict(tissue_1="GM", tissue_2="WM", state_1="preictal",
                                     state_2="preictal", pvalue=stats.wilcoxon(v1, v2)[1]), ignore_index=True)
-
 v1 = dfArea.loc[dfArea['tissue'] ==
                 "GM"].loc[dfArea['state'] == "postictal"]["power"]
 v2 = dfArea.loc[dfArea['tissue'] ==
                 "WM"].loc[dfArea['state'] == "postictal"]["power"]
 statsTable = statsTable.append(dict(tissue_1="GM", tissue_2="WM", state_1="postictal",
                                     state_2="postictal", pvalue=stats.wilcoxon(v1, v2)[1]), ignore_index=True)
-
 v1 = dfArea.loc[dfArea['tissue'] ==
                 "GM"].loc[dfArea['state'] == "preictal"]["power"]
 v2 = dfArea.loc[dfArea['tissue'] ==
                 "GM"].loc[dfArea['state'] == "ictal"]["power"]
 statsTable = statsTable.append(dict(tissue_1="GM", tissue_2="GM", state_1="preictal",
                                     state_2="ictal", pvalue=stats.wilcoxon(v1, v2)[1]), ignore_index=True)
-
 v1 = dfArea.loc[dfArea['tissue'] ==
                 "WM"].loc[dfArea['state'] == "preictal"]["power"]
 v2 = dfArea.loc[dfArea['tissue'] ==
                 "WM"].loc[dfArea['state'] == "ictal"]["power"]
 statsTable = statsTable.append(dict(tissue_1="WM", tissue_2="WM", state_1="preictal",
                                     state_2="ictal", pvalue=stats.wilcoxon(v1, v2)[1]), ignore_index=True)
-
 v1 = dfArea.loc[dfArea['tissue'] ==
                 "GM"].loc[dfArea['state'] == "preictal"]["power"]
 v2 = dfArea.loc[dfArea['tissue'] ==
@@ -445,7 +421,6 @@ v2 = dfArea.loc[dfArea['tissue'] ==
                 "WM"].loc[dfArea['state'] == "interictal"]["power"]
 statsTable = statsTable.append(dict(tissue_1="WM", tissue_2="WM", state_1="preictal",
                                     state_2="interictal", pvalue=stats.wilcoxon(v1, v2)[1]), ignore_index=True)
-
 v1 = dfArea.loc[dfArea['tissue'] ==
                 "GM"].loc[dfArea['state'] == "preictal"]["power"]
 v2 = dfArea.loc[dfArea['tissue'] ==
@@ -460,4 +435,159 @@ statsTable = statsTable.append(dict(tissue_1="WM", tissue_2="WM", state_1="preic
                                     state_2="postictal", pvalue=stats.wilcoxon(v1, v2)[1]), ignore_index=True)
 statsTable["corrected"] = statsTable["pvalue"] * len(statsTable)
 statsTable["significance"] = statsTable["corrected"] <0.05
-statsTable.to_csv(f"{figureDir}/GMvsWM/powerDifferences.csv", index=False)
+#statsTable.to_csv(f"{paths['figures']}/GMvsWM/powerDifferences.csv", index=False)
+
+
+
+#%% Calculate functional connectivity
+
+
+
+paientList = pd.DataFrame(columns=["patient"])
+for i in [3, 5, 22]: #range(3, N):
+    paientList = paientList.append(dict(patient=patientsWithseizures["subject"][i]), ignore_index=True)
+    # get data
+    seizure, fs, ictalStartIndex, ictalStopIndex = metadata.get_precitalIctalPostictal(patientsWithseizures["subject"][i], "Ictal", patientsWithseizures["idKey"][i], username, password,
+                                                                                       BIDS=paths['BIDS'], dataset="derivatives/iEEGorgDownload", session="implant01", secondsBefore=180, secondsAfter=180, load=True)
+    interictal, fs = metadata.get_iEEGData(patientsWithseizures["subject"][i], "Interictal", patientsWithseizures["AssociatedInterictal"][i], username, password,
+                                           BIDS=paths['BIDS'], dataset="derivatives/iEEGorgDownload", session="implant01", startKey="Start", load=True)
+
+    ###filtering and downsampling
+    ictalStartIndexDS = int(ictalStartIndex * (fsds/fs))
+    ictalStopIndexDS = int(ictalStopIndex * (fsds/fs))
+    seizureLength = (ictalStopIndexDS-ictalStartIndexDS)/fsds
+
+    #Get Not prewhitened data (coherence measurement should not be used with pre-whitened data)
+    _, _, _, seizureFilt, channels = echobase.preprocess(seizure, fs, fs, montage=montage, prewhiten=False)
+    _, _, _, interictalFilt, _ = echobase.preprocess(interictal, fs, fs, montage=montage, prewhiten=False)
+    #Get prewhitened data
+    _, _, _, seizureFiltWhite, _ = echobase.preprocess(seizure, fs, fs, montage=montage, prewhiten=True)
+    _, _, _, interictalFiltWhite, _ = echobase.preprocess(interictal, fs, fs, montage=montage, prewhiten=True)
+    #downsample
+    seizureFiltDS = metadata.downsample(seizureFilt, fs, fsds)
+    interictalFiltDS = metadata.downsample(interictalFilt, fs, fsds)
+    seizureFiltDSWhite = metadata.downsample(seizureFiltWhite, fs, fsds)
+    interictalFiltDSWhite = metadata.downsample(interictalFiltWhite, fs, fsds)
+
+    nchan = seizureFiltDS.shape[1]
+
+    # Get atlas localization and distances
+    file = join(paths["atlasLocaliztion"], f"sub-{patientsWithseizures['subject'][i]}", "ses-implant01", f"sub-{patientsWithseizures['subject'][i]}_ses-implant01_desc-atlasLocalization.csv")
+    if utils.checkIfFileExistsGlob(file):
+        localization = pd.read_csv(file)
+        localizationChannels = localization["channel"]
+        localizationChannels = echobase.channel2std(
+            np.array(localizationChannels))
+    # getting distances
+    dist = pd.DataFrame(channels, columns=["channels"])
+    dist["distance"] = np.nan
+    for ch in range(len(channels)):
+        channelName = channels[ch]
+        if any(channelName == localizationChannels):
+            dist.iloc[ch, 1] = localization["distance_to_GM_millimeters"][np.where(
+                channelName == localizationChannels)[0][0]]
+        else:
+            # if channel has no localization, then just assume GM.
+            dist.iloc[ch, 1] = 0
+    WMdefinition = 1 # definition of WM by distance
+    GMindex = np.where(dist["distance"] <= WMdefinition)[0]
+    WMindex = np.where(dist["distance"] > WMdefinition)[0]
+    distOrderInd = np.array(np.argsort(dist["distance"]))
+    distOrder = dist.iloc[distOrderInd].reset_index()
+
+
+
+
+
+    data = [interictalFiltDS, seizureFiltDS[:ictalStartIndexDS,:], seizureFiltDS[ictalStartIndexDS:ictalStopIndexDS+1,:]  , seizureFiltDS[ictalStopIndexDS+1:,:]   ]
+    dataWhite = [interictalFiltDSWhite, seizureFiltDSWhite[:ictalStartIndexDS,:], seizureFiltDSWhite[ictalStartIndexDS:ictalStopIndexDS+1,:]  , seizureFiltDSWhite[ictalStopIndexDS+1:,:]   ]
+    
+    xcorr = []
+    for x in range(4):
+        print(f"\n\n\n\n {x}/3")
+        xcorr.append( list(echobase.crossCorrelation_wrapper(dataWhite[x], fsds))     )
+    coherence = []
+    for x in range(4):
+        print(f"\n\n\n\n {x}/3")
+        coherence.append( list(echobase.coherence_wrapper(data[x], fsds))     )
+
+    
+    pearson = []
+    for x in range(4):
+        print(f"\n\n\n\n {x}/3")
+        pearson.append( list(echobase.pearson_wrapper(dataWhite[x], fsds)[0]   )     ) #ind at [0] because don't need the p-values
+
+    FC = [xcorr, coherence, pearson]    
+
+
+
+
+
+
+
+    state = 2
+    freq = 7
+    Func=2
+   
+    #get FC values for just the GM-GM connections and WM-WM connections
+    FCtissue = [None] *2
+    for F in range(len(FCtissue)):
+        FCtissue[F] = []
+    for F in range(len(FC)):
+        #Reorder/get just the tissue index, and then just get the upper half of triangle (exluding diagonal)
+        FCtissue[0].append(   utils.getUpperTriangle(     utils.reorderAdj(FC[F][state][freq], GMindex)       )   )
+        FCtissue[1].append(   utils.getUpperTriangle(     utils.reorderAdj(FC[F][state][freq], WMindex)       )   )
+    
+   
+    #echobase.plot_adj_allbands(FC[Func][state], vmin = -0.2)
+    #echobase.plot_adj(FC[Func][state][freq][distOrderInd[:,None],distOrderInd[None,:]], vmin = -0.2, vmax= 1)
+    
+    print(np.nanmean(FCtissue[0][Func]))
+    print(np.nanmean(FCtissue[1][Func]))
+    
+    
+    fig,axes = plt.subplots(1,2,figsize=(8,4), dpi = 300)
+    sns.ecdfplot(data=FCtissue[0][Func], ax = axes[0])
+    sns.ecdfplot(data=FCtissue[1][Func], ax = axes[0])
+    
+
+    sns.kdeplot(data=FCtissue[0][Func], ax = axes[1])
+    sns.kdeplot(data=FCtissue[1][Func], ax = axes[1])
+
+    stats.kruskal(FCtissue[0][Func],FCtissue[1][Func])
+    
+    
+    
+    
+    stats.median_test(FCtissue[0][Func],FCtissue[1][Func])
+    stats.mannwhitneyu(FCtissue[0][Func],FCtissue[1][Func])
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
