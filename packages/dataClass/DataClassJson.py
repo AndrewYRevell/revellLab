@@ -16,7 +16,7 @@ import seaborn as sns
 import scipy.signal as signal
 import matplotlib.pyplot as plt
 from dataclasses import dataclass
-from os.path import join
+from os.path import join, basename
 from sklearn.preprocessing import OneHotEncoder
 
 #import custom
@@ -24,7 +24,7 @@ path = join("/media","arevell","sharedSSD","linux","papers","paper002") #Parent 
 from revellLab.packages.eeg.echobase import echobase
 from revellLab.packages.seizureSpread import echomodel
 from revellLab.packages.eeg.ieegOrg import downloadiEEGorg
-
+from revellLab.packages.utilities import utils
 
 #%%
 
@@ -141,6 +141,80 @@ class DataClassJson:
             ictalStopIndex = int(secondsBefore*fs + (ictalStopUsec - ictalStartUsec)/1e6*fs)
             events = pd.DataFrame([dict(onset = secondsBefore, duration = duration, ictalStartUsecEEC = ictalStartUsec, ictalStopUsec = ictalStopUsec, ictalStartIndexEEC = ictalStartIndex,  ictalStopIndex = ictalStopIndex )])
             fnameEvents = events.to_csv(fnameEvents, index=False, header=True, sep='\t')
+    
+    def getEEGfileName(self, sub, eventsKey, idKey, BIDS, dataset , session , secondsBefore = 30, secondsAfter = 30, startKey = "EEC" ):
+        ictalStartUsec = int(float(self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey][startKey])*1e6)
+        precitalStartUsec = int(ictalStartUsec - secondsBefore*1e6)
+        ictalStopUsec = int(float(self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey]["Stop"])*1e6)
+        postictalStopUsec = int(ictalStopUsec + secondsAfter*1e6)
+        startUsec = precitalStartUsec
+        stopUsec = postictalStopUsec
+        
+        fpath = self.getBIDSdirectoryToSaveiEEG(BIDS, dataset, sub, session )
+        echobase.check_path(fpath)
+        fname = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_ieeg.eeg")
+        return fname
+
+    
+    def get_FunctionalConnectivity(self, sub, idKey, username, password, BIDS , dataset, session, functionalConnectivityPath = None, secondsBefore = 30, secondsAfter = 30, startKey = "EEC", fsds = 256, montage = "bipolar", FCtype = "pearson"):
+        
+        #checking if file is saved. If true, then just pull from that file
+        if not functionalConnectivityPath == None:
+            FCname = utils.baseSplitext(self.getEEGfileName(sub, "Ictal", idKey, BIDS, dataset, session,  
+                                                                secondsBefore, secondsAfter))[:-4]
+            fname =  join(functionalConnectivityPath, FCname +   f"functionalConnectivity_{FCtype}_{montage}_interictalPreictalIctalPostictal.pickle")
+  
+        if utils.checkIfFileExists(fname, printBOOL=False):
+            FC = utils.openPickle(fname)
+            return FC
+        else:
+            # get data
+            AssociatedInterictalidKey = self.get_associatedInterictal(sub, idKey)
+            seizure, fs, ictalStartIndex, ictalStopIndex = self.get_precitalIctalPostictal(sub, "Ictal", idKey, username, password, BIDS, dataset, session ,secondsBefore=180, secondsAfter=180, load=True)
+                                                                                              
+            interictal, fs = self.get_iEEGData(sub, "Interictal", AssociatedInterictalidKey, username, password, BIDS, dataset, session, startKey="Start", load=True)
+        
+            print("\nPreprocessing data: Filtering and Downsampling")
+            ###filtering and downsampling
+            if FCtype == "coherence":
+                #Get Not prewhitened data (coherence measurement should not be used with pre-whitened data)
+                _, _, _, seizureFilt, channels = echobase.preprocess(seizure, fs, fs, montage=montage, prewhiten=False)
+                _, _, _, interictalFilt, _ = echobase.preprocess(interictal, fs, fs, montage=montage, prewhiten=False)
+            else:
+                #Get prewhitened data
+                _, _, _, seizureFilt, channels = echobase.preprocess(seizure, fs, fs, montage=montage, prewhiten=True)
+                _, _, _, interictalFilt, _ = echobase.preprocess(interictal, fs, fs, montage=montage, prewhiten=True)
+                
+            ictalStartIndexDS = int(ictalStartIndex * (fsds/fs))
+            ictalStopIndexDS = int(ictalStopIndex * (fsds/fs))
+            #downsample
+            seizureFiltDS = self.downsample(seizureFilt, fs, fsds)
+            interictalFiltDS = self.downsample(interictalFilt, fs, fsds)
+    
+            data = [interictalFiltDS, seizureFiltDS[:ictalStartIndexDS,:], seizureFiltDS[ictalStartIndexDS:ictalStopIndexDS+1,:]  , seizureFiltDS[ictalStopIndexDS+1:,:]   ]
+            data_FC = []
+            if FCtype == "pearson":
+                for x in range(4):
+                    print(f"\n\n {x}/3")
+                    data_FC.append( list(echobase.pearson_wrapper(data[x], fsds)[0]   )     ) #ind at [0] because don't need the p-values
+            if FCtype == "crossCorrelation":
+                 for x in range(4):
+                     print(f"\n\n {x}/3")
+                     data_FC.append( list(echobase.crossCorrelation_wrapper(data[x], fsds))     )
+            if FCtype == "coherence":
+                 for x in range(4):
+                     print(f"\n\n {x}/3")
+                     data_FC.append( list(echobase.coherence_wrapper(data[x], fsds))     )
+                     
+                    
+            FC = [channels, data_FC]
+            utils.savePickle([channels,data_FC], fname)
+            return FC
+            
+    def get_manual_resected_electrodes(self, sub):
+        manual_resected_electrodes = self.jsonFile["SUBJECTS"][sub]["MANUAL_RESECTED_ELECTRODES"]
+        return manual_resected_electrodes
+
 
     def downsample(self, data, fs, fsds):
         #fsds = fs_downsample: the frequency to downsample to

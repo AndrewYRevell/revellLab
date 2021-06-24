@@ -6,7 +6,7 @@ Created on Tue Mar  2 11:01:56 2021
 @author: arevell
 """
 
-import sys, os, time, copy, glob, smtplib, ssl
+import sys, os, time, copy, glob, smtplib, ssl, pickle
 import pandas as pd
 import numpy as np
 import nibabel as nib
@@ -15,6 +15,7 @@ from os import listdir
 from os.path import join, isfile, splitext, basename
 from email.header import Header
 from email.mime.text import MIMEText
+import bct
 #import seaborn as sns
 
 #%% Input
@@ -130,10 +131,25 @@ def checkIfFileDoesNotExistGlob(path, returnOpposite = False, printBOOL = True):
             else: 
                 return False
 
+#%%
 def executeCommand(cmd, printBOOL = True):
     if printBOOL: print(f"\n\nExecuting Command Line: \n{cmd}\n\n") 
     os.system(cmd)
 
+def savePickle(data, fname):
+    with open(fname, 'wb') as output:  # Overwrites any existing file.
+        pickle.dump(data, output, pickle.HIGHEST_PROTOCOL)
+        
+def openPickle(fname):
+    with open(fname, 'rb') as f: data = pickle.load(f)
+    return data
+
+
+def baseSplitext(path):
+    base = basename(path)
+    split = splitext(base)[0]
+    return split
+#%%
 def channel2stdCSV(outputTissueCoordinates):
     df = pd.read_csv(outputTissueCoordinates, sep=",", header=0)
     for e in range(len( df  )):
@@ -148,6 +164,7 @@ def baseSplitextNiiGz(path):
     basesplit = basename(split)
     return base, split, basesplit
 
+
 def calculateTimeToComplete(t0, t1, total, completed):
     td = np.round(t1-t0,2)
     tr = np.round((total - completed- 1) * td,2)
@@ -160,13 +177,30 @@ def getSubType(name):
     if "RID" in name:
         return "subjects"
 
+def savefig(fname, saveFigures = True):
+    #allows option to not save figures when saveFigures == False
+    if saveFigures == True:
+        plt.savefig(fname)
 
-def getUpperTriangle(data,k=1):
+def getUpperTriangle(data, k=1):
     return data[np.triu_indices_from(data, k)]
     
 def reorderAdj(adj, ind):
     adj = adj[ind[:,None], ind[None,:]]
     return adj
+
+
+def getAdjSubset(adj, rows, cols):
+    #of an array, get the intersects of the rows (ind1) and cols (ind2)
+    adj = adj[rows[:,None], cols[None,:]]
+    return adj
+
+def findMaxDim(l, init = 0): 
+    #find the maximum second dimension of a list of arrays.
+    for i in range(len(l)):
+        if l[i].shape[1] > init:
+            init = l[i].shape[1]
+    return init
 
 def sendEmail(receiver_email = "andyrevell.python@gmail.com", subject ="Process is done", text = "done", port = 465, smtp_server = "smtp.gmail.com" , sender_email = "andyrevell.python@gmail.com"):
     
@@ -317,14 +351,223 @@ def readDSIstudioTxtSC(path):
     C = np.array(C.iloc[1:, :]).astype('float64')  
     return C
 
-
+"""
+#Use getUpperTriangle
 def getUpperTri(C, k = 1):
     return C[np.triu_indices( len(C), k=k)]
 
 
+"""
 
 
 
+def calculateModularity2(adj, labels, B = 'modularity'):
+    #from bctpy to calculate modularity and the partitions. Only use the modularity
+    #calculation part. community_louvain
+    W = adj
+    gamma=1
+    
+    n = len(W)
+    s = np.sum(W)
+    ci = labels
+    #if np.min(W) < -1e-10:
+    #    raise BCTParamError('adjmat must not contain negative weights')
+    
+    Mb = ci.copy()
+
+    if B in ('negative_sym', 'negative_asym'):
+        renormalize = True
+        W0 = W * (W > 0)
+        s0 = np.sum(W0)
+        B0 = W0 - gamma * np.outer(np.sum(W0, axis=1), np.sum(W0, axis=0)) / s0
+    
+        W1 = -W * (W < 0)
+        s1 = np.sum(W1)
+        if s1:
+            B1 = W1 - gamma * np.outer(np.sum(W1, axis=1), np.sum(W1, axis=0)) / s1
+        else:
+            B1 = 0
+    elif np.min(W) < -1e-10:
+        raise IOError("Input connection matrix contains negative "
+            'weights but objective function dealing with negative weights '
+            'was not selected')
+
+    if B == 'modularity':
+        B = W - gamma * np.outer(np.sum(W, axis=1), np.sum(W, axis=0)) / s
+    
+    elif B == 'negative_sym':
+        B = (B0 / (s0 + s1)) - (B1 / (s0 + s1))
+    elif B == 'negative_asym':
+        B = (B0 / s0) - (B1 / (s0 + s1))
+    
+    Hnm = np.zeros((n, n))
+    for m in range(1, n + 1):
+        Hnm[:, m - 1] = np.sum(B[:, ci == m], axis=1)  # node to module degree
+    H = np.sum(Hnm, axis=1)  # node degree
+    Hm = np.sum(Hnm, axis=0)  # module degree
+    
+    q0 = -np.inf
+    # compute modularity
+    q = np.sum(B[np.tile(ci, (n, 1)) == np.tile(ci, (n, 1)).T]) / s
+    q = np.trace(B)
+    return q
+
+
+def calculateModularity(adj, labels):
+    m = np.sum(adj)
+    N = len(adj)
+    degrees = bct.strengths_und(adj)
+    Q = 0
+    for r in range(N):
+        for c in range(N):
+            label_r = labels[r]
+            label_c = labels[c] 
+            if label_r == label_c: rc = 1
+            else: rc = 0
+            Q = Q + adj[r,c] - (  (degrees[r]*degrees[c])/(2*m)*rc   )
+    Q = Q/(2*m)
+    return Q
+            
+def calculateModularity3(W, ci, gamma=1, B='modularity'):
+    '''
+    The optimal community structure is a subdivision of the network into
+    nonoverlapping groups of nodes which maximizes the number of within-group
+    edges and minimizes the number of between-group edges.
+
+    This function is a fast an accurate multi-iterative generalization of the
+    louvain community detection algorithm. This function subsumes and improves
+    upon modularity_[louvain,finetune]_[und,dir]() and additionally allows to
+    optimize other objective functions (includes built-in Potts Model i
+    Hamiltonian, allows for custom objective-function matrices).
+
+    Parameters
+    ----------
+    W : NxN np.array
+        directed/undirected weighted/binary adjacency matrix
+    gamma : float
+        resolution parameter. default value=1. Values 0 <= gamma < 1 detect
+        larger modules while gamma > 1 detects smaller modules.
+        ignored if an objective function matrix is specified.
+    ci : Nx1 np.arraylike
+        initial community affiliation vector. default value=None
+    B : str | NxN np.arraylike
+        string describing objective function type, or provides a custom
+        NxN objective-function matrix. builtin values 
+            'modularity' uses Q-metric as objective function
+            'potts' uses Potts model Hamiltonian.
+            'negative_sym' symmetric treatment of negative weights
+            'negative_asym' asymmetric treatment of negative weights
+    seed : hashable, optional
+        If None (default), use the np.random's global random state to generate random numbers.
+        Otherwise, use a new np.random.RandomState instance seeded with the given value.
+
+    Returns
+    -------
+    ci : Nx1 np.array
+        final community structure
+    q : float
+        optimized q-statistic (modularity only)
+    '''
+    n = len(W)
+    s = np.sum(W)
+
+    #if np.min(W) < -1e-10:
+    #    raise BCTParamError('adjmat must not contain negative weights')
+
+    if len(ci) != n:
+        raise IOError('initial ci vector size must equal N')
+    _, ci = np.unique(ci, return_inverse=True)
+    ci += 1
+    Mb = ci.copy()
+    renormalize = False
+    if B in ('negative_sym', 'negative_asym'):
+        renormalize = True
+        W0 = W * (W > 0)
+        s0 = np.sum(W0)
+        B0 = W0 - gamma * np.outer(np.sum(W0, axis=1), np.sum(W0, axis=0)) / s0
+
+        W1 = -W * (W < 0)
+        s1 = np.sum(W1)
+        if s1:
+            B1 = W1 - gamma * np.outer(np.sum(W1, axis=1), np.sum(W1, axis=0)) / s1
+        else:
+            B1 = 0
+
+    elif np.min(W) < -1e-10:
+        raise IOError("Input connection matrix contains negative "
+            'weights but objective function dealing with negative weights '
+            'was not selected')
+
+    if B == 'potts' and np.any(np.logical_not(np.logical_or(W == 0, W == 1))):
+        raise IOError('Potts hamiltonian requires binary input matrix')
+
+    if B == 'modularity':
+        B = W - gamma * np.outer(np.sum(W, axis=1), np.sum(W, axis=0)) / s
+    elif B == 'potts':
+        B = W - gamma * np.logical_not(W)
+    elif B == 'negative_sym':
+        B = (B0 / (s0 + s1)) - (B1 / (s0 + s1))
+    elif B == 'negative_asym':
+        B = (B0 / s0) - (B1 / (s0 + s1))
+    else:
+        try:
+            B = np.array(B)
+        except:
+            raise IOError('unknown objective function type')
+
+        if B.shape != W.shape:
+            raise IOError('objective function matrix does not match '
+                                'size of adjacency matrix')
+        if not np.allclose(B, B.T):
+            print ('Warning: objective function matrix not symmetric, '
+                   'symmetrizing')
+            B = (B + B.T) / 2
+    
+    Hnm = np.zeros((n, n))
+    for m in range(1, n + 1):
+        Hnm[:, m - 1] = np.sum(B[:, ci == m], axis=1)  # node to module degree
+    H = np.sum(Hnm, axis=1)  # node degree
+    Hm = np.sum(Hnm, axis=0)  # module degree
+
+    q0 = -np.inf
+    # compute modularity
+    q = np.sum(B[np.tile(ci, (n, 1)) == np.tile(ci, (n, 1)).T]) / s
+    first_iteration = True
 
 
 
+    _, Mb = np.unique(Mb, return_inverse=True)
+    Mb += 1
+
+    M0 = ci.copy()
+    if first_iteration:
+        ci = Mb.copy()
+        first_iteration = False
+    else:
+        for u in range(1, n + 1):
+            ci[M0 == u] = Mb[u - 1]  # assign new modules
+
+    n = np.max(Mb)
+    b1 = np.zeros((n, n))
+    for i in range(1, n + 1):
+        for j in range(i, n + 1):
+            # pool weights of nodes in same module
+            bm = np.sum(B[np.ix_(Mb == i, Mb == j)])
+            b1[i - 1, j - 1] = bm
+            b1[j - 1, i - 1] = bm
+    B = b1.copy()
+
+    Mb = np.arange(1, n + 1)
+    Hnm = B.copy()
+    H = np.sum(B, axis=0)
+    Hm = H.copy()
+
+    q0 = q
+
+    q = np.trace(B)  # compute modularity
+    
+    # Workaround to normalize
+    if not renormalize:
+        return ci, q/s
+    else:
+        return ci, q
