@@ -6,16 +6,28 @@ Created on Tue Mar  2 11:01:56 2021
 @author: arevell
 """
 
-import sys, os, time, copy, glob, smtplib, ssl, pickle
-import pandas as pd
+import os
+import bct
+import ssl
+import sys
+import time
+import copy
+import glob
+import pickle 
+import smtplib
+
 import numpy as np
+import pandas as pd
+import seaborn as sns
 import nibabel as nib
 import matplotlib.pyplot as plt
+
+
 from os import listdir
-from os.path import join, isfile, splitext, basename
+from scipy import ndimage
 from email.header import Header
 from email.mime.text import MIMEText
-import bct
+from os.path import join, isfile, splitext, basename
 #import seaborn as sns
 
 #%% Input
@@ -237,21 +249,13 @@ def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, l
     if iteration == total:
         print()
 
-def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, saveFilename = None, isPath = True, cmap="gray"):
+def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, saveFilename = None, data_type = "path", cmap="gray"):
     
-    if isPath:
-        if checkIfFileExistsGlob(fname):
-            fname = glob.glob(fname)[0]
-            img = nib.load(fname)
-            imgdata = img.get_fdata()  
-        else:
-            return print(f"File does not exist: \n{fname}")
-    else:
-        imgdata = fname
+    img_data = load_img_data(fname, data_type = data_type )
     """ Function to display row of image slices """
-    slices1 = [   imgdata[:, :, int((imgdata.shape[2]*low)) ] , imgdata[:, :, int(imgdata.shape[2]*middle)] , imgdata[:, :, int(imgdata.shape[2]*high)]   ]
-    slices2 = [   imgdata[:, int((imgdata.shape[1]*low)), : ] , imgdata[:, int(imgdata.shape[1]*middle), :] , imgdata[:, int(imgdata.shape[1]*high), :]   ]
-    slices3 = [   imgdata[int((imgdata.shape[0]*low)), :, : ] , imgdata[int(imgdata.shape[0]*middle), :, :] , imgdata[int(imgdata.shape[0]*high), :, :]   ]
+    slices1 = [   img_data[:, :, int((img_data.shape[2]*low)) ] , img_data[:, :, int(img_data.shape[2]*middle)] , img_data[:, :, int(img_data.shape[2]*high)]   ]
+    slices2 = [   img_data[:, int((img_data.shape[1]*low)), : ] , img_data[:, int(img_data.shape[1]*middle), :] , img_data[:, int(img_data.shape[1]*high), :]   ]
+    slices3 = [   img_data[int((img_data.shape[0]*low)), :, : ] , img_data[int(img_data.shape[0]*middle), :, :] , img_data[int(img_data.shape[0]*high), :, :]   ]
     slices = [slices1, slices2, slices3]
     plt.style.use('dark_background')
     fig = plt.figure(constrained_layout=False, dpi=300, figsize=(5, 5))
@@ -275,74 +279,77 @@ def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, save
         if saveFilename == None:
             raise Exception("No file name was given to save figures")
         plt.savefig(saveFilename, transparent=True)
+    plt.show()
+
+def expand_region_in_image(img_data, data_type = "data", iterations = 10):
+    img_data = load_img_data(img_data, data_type = data_type )
+    img_data_expanded = copy.deepcopy(img_data)
+    img_data_expanded = ndimage.morphology.binary_dilation(img_data_expanded, iterations = iterations).astype(img_data_expanded.dtype)
+    return img_data_expanded
 
 
+def make_sphere_from_point(img_data, x0, y0, z0, radius):
+    img_data[x0,y0,z0] = 1
+    for x in range(x0-radius, x0+radius+1):
+        for y in range(y0-radius, y0+radius+1):
+            for z in range(z0-radius, z0+radius+1):   
+                if ( radius - np.sqrt(abs(x0-x)**2 + abs(y0-y)**2 + abs(z0-z)**2 ))>=0:
+                    #check to make sure bubble is inside image
+                    if x > img_data.shape[0]-1:
+                        x1 =  img_data.shape[0] - 1
+                    elif x < 0:
+                        x1 =  0
+                    else:
+                        x1 = x
+                    if y > img_data.shape[1]-1:
+                        y1 =  img_data.shape[1] - 1
+                    elif y < 0:
+                        y1 =  0
+                    else:
+                        y1 = y
+                    if z > img_data.shape[2] -1:
+                        z1 =  img_data.shape[2] - 1
+                    elif z < 0:
+                        z1 =  0
+                    else:
+                        z1 = z
+                    img_data[x1,y1,z1] = 1
+    return img_data
 
 
+def load_img_data(file, data_type = "path" ):
+    if data_type == "path":
+        if checkIfFileExistsGlob(file):
+            file = glob.glob(file)[0]
+            img = nib.load(file)
+            img_data = img.get_fdata()  
+        else:
+            return print(f"File does not exist: \n{file}")
+    if data_type == "data":
+        img_data = file
+    if data_type == "img":
+        img_data = file.get_fdata()
+    return img_data
 
-#%%
-"""
-# Download data programmatically from box.com (Python >= 3.5)
-
-# Note: You will have to create a box App first, using the following steps:
-# Go to developer.box.com, log into your box account (or create one) and create a new App
-# Find the Client ID, Client Secret, and access token (or developer token if you keep your app in developer mode) under your app's "Development" tab
-# In your online box.com account, navigate to the folder to download. The folder ID can be found at the end of the URL (the numbers after the last slash).
-
-# Last Updated: 3/19/2021
-# bscheid@seas.upenn.edu
-
-from boxsdk import Client, OAuth2
-import os
-
-# Define client ID, client secret, and developer token.
-# Note, Access token  (aka developer token) expires after 1 hour, go to developer.box.com and get new key
-CLIENT_ID = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'          # OAuth2.0 client ID for box app (in configuration tab)
-CLIENT_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'      # OAuth2.0 client secret (in configuration tab)
-ACCESS_TOKEN = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'       # box app access token (or developer token, in configuration tab)
-
-# Define Box folder ID (can find from URL), and path to deposit folder
-folderID = 'xxxxxxxx' # ID of box folder to download on box
-path = 'local/path/to/download/folder'
-
-auth = OAuth2(
-    client_id=CLIENT_ID,
-    client_secret=CLIENT_SECRET,
-    access_token=ACCESS_TOKEN,
-)
-
-client = Client(auth)
-
-# recursively download all files in folder
-def download(folderID, path):
-    folder = client.folder(folder_id=folderID).get()
-    items = client.folder(folder_id=folderID).get_items()
-
-    if ~os.path.exists(os.path.join(path, folder.name)):
-        os.makedirs(os.path.join(path, folder.name))
-
-    # mkdir folder name
-    for item in items:
-        # If item is a folder
-        if item.type == 'folder':
-            print(item.name)
-            download(item.id, os.path.join(path, folder.name))
-        # output_file = open('file.pdf', 'wb')
-        elif item.type == 'file':
-            if item.name[0] == '.':
-                continue
-            print('Downloading' + os.path.join(path, folder.name, item.name))
-            output_file = open(os.path.join(path, folder.name, item.name), 'wb')
-            client.file(file_id=item.id).download_to(output_file)
+def transform_coordinates_to_voxel(coordinates, affine):
+    """
+    input
+    coordinates: N x 3 numpy array
+    affine: affine matrix from img.get_fdata().affine 
+    
+    return
+    coordinates_voxels: N x 3 numpy array
+    """
+    coordinates_voxels = nib.affines.apply_affine(np.linalg.inv(affine), coordinates)
+    coordinates_voxels = np.round(coordinates_voxels)  # round to nearest voxel  
+    coordinates_voxels = coordinates_voxels.astype(int)  
+    return coordinates_voxels
 
 
-download(folderID, path)
-
-"""
 #%% structural connectivity
 
 
-def readDSIstudioTxtSC(path):
+def read_DSI_studio_Txt_files_SC(path):
     C = pd.read_table(path, header=None, dtype=object)
     #cleaning up structural data 
     C = C.drop([0,1], axis=1)
@@ -351,6 +358,19 @@ def readDSIstudioTxtSC(path):
     C = np.array(C.iloc[1:, :]).astype('float64')  
     return C
 
+
+def get_DSIstudio_TXT_file_ROI_names_for_spheres(path):
+    C = pd.read_table(path, header=None, dtype=object)
+    names = np.array(C.iloc[1])[2:-1]
+    names = np.array([i[-4:] for i in names])
+    return names
+
+
+def log_normalize_adj(C):
+    C[np.where(C == 0)] = 1
+    C = np.log10(C)
+    C = C/np.max(C)
+    return C
 """
 #Use getUpperTriangle
 def getUpperTri(C, k = 1):
@@ -358,8 +378,57 @@ def getUpperTri(C, k = 1):
 
 
 """
+def get_intersect1d_original_order(arr1, arr2):
+    ind = []
+    for c in range(len(arr1)):
+        ch = arr1[c]
+        loc = np.where(ch == arr2)[0]
+        if len(loc) > 0:
+            ind.append(np.where(ch == arr2)[0][0])
+    ind = np.array(ind)
+    return ind
+
+def find_missing(arr1, arr2):
+    ind = []
+    for c in range(len(arr1)):
+        ch = arr1[c]
+        loc = np.where(ch == arr2)[0]
+        if len(loc) == 0:
+            ind.append(c)
+    ind = np.array(ind)
+    return ind
+
+#%%Plotting
+
+def plot_adj_heatmap(adj, square=True, vmin = None, vmax = None, center = None, cmap = "mako" ):
+    if vmin == None: vmin = np.min(adj)
+    if vmax == None: vmax = np.max(adj)
+    if center == None: center = (vmax- vmin)/2
+    
+    fig, axes = plt.subplots(1, 1, figsize=(4, 4), dpi=300)
+    sns.heatmap(adj,  square=square, vmin = vmin, vmax =vmax, center = center, cmap = cmap , ax = axes)
+    plt.show()
+    
+def plot_histplot(data, bins = 20, kde=True):
+    fig, axes = plt.subplots(1, 1, figsize=(4, 4), dpi=300)
+    sns.histplot(data, bins = bins, kde=kde , ax = axes)
+    plt.show()
+def plot_make(r = 1, c = 1, size_length = None, size_height = None, dpi = 300 ):
+    if size_length == None:
+       size_length = 4* c 
+    if size_height == None:
+        size_height = 4 * r
+    fig, axes = plt.subplots(r, c, figsize=(size_length, size_height), dpi=dpi)
+    return fig, axes
+
+#%% Network Analysis
 
 
+def threshold_and_binarize_adj(adj, t = 0.2):
+    adj_copy = copy.deepcopy(adj)
+    adj_copy[np.where(adj_copy < t)] = 0
+    adj_copy[np.where(adj_copy > 0)] = 1
+    return adj_copy
 
 def calculateModularity2(adj, labels, B = 'modularity'):
     #from bctpy to calculate modularity and the partitions. Only use the modularity
@@ -571,3 +640,64 @@ def calculateModularity3(W, ci, gamma=1, B='modularity'):
         return ci, q/s
     else:
         return ci, q
+    
+    
+#%%
+"""
+# Download data programmatically from box.com (Python >= 3.5)
+
+# Note: You will have to create a box App first, using the following steps:
+# Go to developer.box.com, log into your box account (or create one) and create a new App
+# Find the Client ID, Client Secret, and access token (or developer token if you keep your app in developer mode) under your app's "Development" tab
+# In your online box.com account, navigate to the folder to download. The folder ID can be found at the end of the URL (the numbers after the last slash).
+
+# Last Updated: 3/19/2021
+# bscheid@seas.upenn.edu
+
+from boxsdk import Client, OAuth2
+import os
+
+# Define client ID, client secret, and developer token.
+# Note, Access token  (aka developer token) expires after 1 hour, go to developer.box.com and get new key
+CLIENT_ID = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'          # OAuth2.0 client ID for box app (in configuration tab)
+CLIENT_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'      # OAuth2.0 client secret (in configuration tab)
+ACCESS_TOKEN = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'       # box app access token (or developer token, in configuration tab)
+
+# Define Box folder ID (can find from URL), and path to deposit folder
+folderID = 'xxxxxxxx' # ID of box folder to download on box
+path = 'local/path/to/download/folder'
+
+auth = OAuth2(
+    client_id=CLIENT_ID,
+    client_secret=CLIENT_SECRET,
+    access_token=ACCESS_TOKEN,
+)
+
+client = Client(auth)
+
+# recursively download all files in folder
+def download(folderID, path):
+    folder = client.folder(folder_id=folderID).get()
+    items = client.folder(folder_id=folderID).get_items()
+
+    if ~os.path.exists(os.path.join(path, folder.name)):
+        os.makedirs(os.path.join(path, folder.name))
+
+    # mkdir folder name
+    for item in items:
+        # If item is a folder
+        if item.type == 'folder':
+            print(item.name)
+            download(item.id, os.path.join(path, folder.name))
+        # output_file = open('file.pdf', 'wb')
+        elif item.type == 'file':
+            if item.name[0] == '.':
+                continue
+            print('Downloading' + os.path.join(path, folder.name, item.name))
+            output_file = open(os.path.join(path, folder.name, item.name), 'wb')
+            client.file(file_id=item.id).download_to(output_file)
+
+
+download(folderID, path)
+
+"""
