@@ -14,7 +14,7 @@ from revellLab.packages.imaging.regionMorphology import regionMophology
 
 
 @dataclass
-class atlases:
+class dataclass_atlases:
     atlasfiles: dict = "unknown"
 
     def getAllAtlasPaths(self):

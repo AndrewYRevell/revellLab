@@ -13,8 +13,9 @@ import sys
 import time
 import copy
 import glob
-import pickle 
+import pickle
 import smtplib
+import scipy
 
 import numpy as np
 import pandas as pd
@@ -40,7 +41,7 @@ def checkPathError(path):
     """
     if not os.path.exists(path):
         raise IOError(f"\n\n\n\nPath or file does not exist:\n{path}\n\n\n\n" )
-        
+
 
 def checkPathErrorGlob(path):
     """
@@ -51,10 +52,10 @@ def checkPathErrorGlob(path):
     if len(files) > 1:
         IOError(f"More than 1 file exists: \n{files}")
     if len(files) == 0:
-        raise IOError(f"\n\n\n\nPath or file does not exist:\n{path}\n\n\n\n" )        
-        
-        
-def checkPathAndMake(pathToCheck, pathToMake, make = True, printBOOL = True):
+        raise IOError(f"\n\n\n\nPath or file does not exist:\n{path}\n\n\n\n" )
+
+
+def checkPathAndMake(pathToCheck, pathToMake, make = True, printBOOL = True, exist_ok = True):
     """
     Check if pathToCheck exists. If so, then option to make a second directory pathToMake (may be same as pathToCheck)
     """
@@ -63,42 +64,42 @@ def checkPathAndMake(pathToCheck, pathToMake, make = True, printBOOL = True):
     if make:
         if os.path.exists(pathToMake):
             if printBOOL: print(f"Path already exists\n{pathToMake}")
-        else: 
-            os.makedirs(pathToMake)
+        else:
+            os.makedirs(pathToMake, exist_ok=exist_ok)
             if printBOOL: print("Making Path")
 
 def checkIfFileExists(path, returnOpposite = False, printBOOL = True):
-    if (os.path.exists(path)): 
+    if (os.path.exists(path)):
         if printBOOL: print(f"\nFile exists:\n    {path}\n\n")
-        if returnOpposite: 
+        if returnOpposite:
             return False
             if printBOOL: print("\nHowever, re-writing over file\n\n")
-        else: 
+        else:
             return True
-    else: 
+    else:
         if printBOOL: print(f"\nFile does not exists:\n    {path}\n\n")
-        if returnOpposite: 
+        if returnOpposite:
             return True
-        else: 
+        else:
             return False
 
 
 
 
 def checkIfFileDoesNotExist(path, returnOpposite = False, printBOOL = True):
-    if not (os.path.exists(path)): 
+    if not (os.path.exists(path)):
         if printBOOL: print(f"\nFile does not exist:\n    {path}\n\n")
-        if returnOpposite: 
+        if returnOpposite:
             return False
         else:
             return True
-    else: 
+    else:
         if printBOOL: print(f"\nFile exists:\n    {path}\n\n")
-        if returnOpposite: 
+        if returnOpposite:
             return True
-        else: 
+        else:
             return False
-        
+
 def checkIfFileExistsGlob(path, returnOpposite = False, printBOOL = True):
     files = glob.glob(path)
     if len(files) > 1:
@@ -107,19 +108,19 @@ def checkIfFileExistsGlob(path, returnOpposite = False, printBOOL = True):
         if len(files) == 0: file = ""
         else:
             file = files[0]
-        
-        if (os.path.exists(file)): 
+
+        if (os.path.exists(file)):
             if printBOOL: print(f"\nFile exists:\n    {path}\n\n")
-            if returnOpposite: 
+            if returnOpposite:
                 return False
                 if printBOOL: print("\nHowever, re-writing over file\n\n")
-            else: 
+            else:
                 return True
-        else: 
+        else:
             if printBOOL: print(f"\nFile does not exists:\n    {path}\n\n")
-            if returnOpposite: 
+            if returnOpposite:
                 return True
-            else: 
+            else:
                 return False
 
 def checkIfFileDoesNotExistGlob(path, returnOpposite = False, printBOOL = True):
@@ -130,29 +131,29 @@ def checkIfFileDoesNotExistGlob(path, returnOpposite = False, printBOOL = True):
         if len(files) == 0: file = ""
         else:
             file = files[0]
-        if not (os.path.exists(file)): 
+        if not (os.path.exists(file)):
             if printBOOL: print(f"\nFile does not exist:\n    {path}\n\n")
-            if returnOpposite: 
+            if returnOpposite:
                 return False
             else:
                 return True
-        else: 
+        else:
             if printBOOL: print(f"\nFile exists:\n    {file}\n\n")
-            if returnOpposite: 
+            if returnOpposite:
                 return True
-            else: 
+            else:
                 return False
 
 #%%
 def executeCommand(cmd, printBOOL = True):
-    if printBOOL: print(f"\n\nExecuting Command Line: \n{cmd}\n\n") 
+    if printBOOL: print(f"\n\nExecuting Command Line: \n{cmd}\n\n")
     os.system(cmd)
 
-def savePickle(data, fname):
+def save_pickle(data, fname):
     with open(fname, 'wb') as output:  # Overwrites any existing file.
         pickle.dump(data, output, pickle.HIGHEST_PROTOCOL)
-        
-def openPickle(fname):
+
+def open_pickle(fname):
     with open(fname, 'rb') as f: data = pickle.load(f)
     return data
 
@@ -189,14 +190,14 @@ def getSubType(name):
     if "RID" in name:
         return "subjects"
 
-def savefig(fname, saveFigures = True):
+def save_figure(fname, save_figure = True):
     #allows option to not save figures when saveFigures == False
-    if saveFigures == True:
+    if save_figure == True:
         plt.savefig(fname)
 
 def getUpperTriangle(data, k=1):
     return data[np.triu_indices_from(data, k)]
-    
+
 def reorderAdj(adj, ind):
     adj = adj[ind[:,None], ind[None,:]]
     return adj
@@ -207,7 +208,7 @@ def getAdjSubset(adj, rows, cols):
     adj = adj[rows[:,None], cols[None,:]]
     return adj
 
-def findMaxDim(l, init = 0): 
+def findMaxDim(l, init = 0):
     #find the maximum second dimension of a list of arrays.
     for i in range(len(l)):
         if l[i].shape[1] > init:
@@ -215,7 +216,7 @@ def findMaxDim(l, init = 0):
     return init
 
 def sendEmail(receiver_email = "andyrevell.python@gmail.com", subject ="Process is done", text = "done", port = 465, smtp_server = "smtp.gmail.com" , sender_email = "andyrevell.python@gmail.com"):
-    
+
     AppPassword_twoAuthentication = "vgkpolyhiwzzifcc"
     email_message = MIMEText(text, 'plain', 'utf-8')
     email_message['From'] = sender_email
@@ -226,8 +227,8 @@ def sendEmail(receiver_email = "andyrevell.python@gmail.com", subject ="Process 
         server.login(sender_email, AppPassword_twoAuthentication)
         server.sendmail(sender_email, receiver_email, email_message.as_string())
     print(f"Email sent to {receiver_email}")
-    
-    
+
+
 def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, length = 25, fill = "X", printEnd = "\r"):
     """
     Call in a loop to create terminal progress bar
@@ -250,7 +251,7 @@ def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, l
         print()
 
 def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, saveFilename = None, data_type = "path", cmap="gray"):
-    
+
     img_data = load_img_data(fname, data_type = data_type )
     """ Function to display row of image slices """
     slices1 = [   img_data[:, :, int((img_data.shape[2]*low)) ] , img_data[:, :, int(img_data.shape[2]*middle)] , img_data[:, :, int(img_data.shape[2]*high)]   ]
@@ -292,7 +293,7 @@ def make_sphere_from_point(img_data, x0, y0, z0, radius):
     img_data[x0,y0,z0] = 1
     for x in range(x0-radius, x0+radius+1):
         for y in range(y0-radius, y0+radius+1):
-            for z in range(z0-radius, z0+radius+1):   
+            for z in range(z0-radius, z0+radius+1):
                 if ( radius - np.sqrt(abs(x0-x)**2 + abs(y0-y)**2 + abs(z0-z)**2 ))>=0:
                     #check to make sure bubble is inside image
                     if x > img_data.shape[0]-1:
@@ -322,7 +323,7 @@ def load_img_data(file, data_type = "path" ):
         if checkIfFileExistsGlob(file):
             file = glob.glob(file)[0]
             img = nib.load(file)
-            img_data = img.get_fdata()  
+            img_data = img.get_fdata()
         else:
             return print(f"File does not exist: \n{file}")
     if data_type == "data":
@@ -335,27 +336,36 @@ def transform_coordinates_to_voxel(coordinates, affine):
     """
     input
     coordinates: N x 3 numpy array
-    affine: affine matrix from img.get_fdata().affine 
-    
+    affine: affine matrix from img.get_fdata().affine
+
     return
     coordinates_voxels: N x 3 numpy array
     """
     coordinates_voxels = nib.affines.apply_affine(np.linalg.inv(affine), coordinates)
-    coordinates_voxels = np.round(coordinates_voxels)  # round to nearest voxel  
-    coordinates_voxels = coordinates_voxels.astype(int)  
+    coordinates_voxels = np.round(coordinates_voxels)  # round to nearest voxel
+    coordinates_voxels = coordinates_voxels.astype(int)
     return coordinates_voxels
 
-
+def get_pariwise_distances(dist_coordinates_array):
+    nchan = len(dist_coordinates_array)
+    dist_array = np.zeros((nchan, nchan))
+    for ch1 in range(nchan):
+        for ch2 in range(ch1 +1, nchan):
+            coord1 = dist_coordinates_array[ch1]
+            coord2 = dist_coordinates_array[ch2]
+            dist_array[ch1,ch2] = np.linalg.norm(coord1-coord2)
+    dist_array = dist_array + dist_array.T - np.diag(np.diag(dist_array))
+    return dist_array
 #%% structural connectivity
 
 
 def read_DSI_studio_Txt_files_SC(path):
     C = pd.read_table(path, header=None, dtype=object)
-    #cleaning up structural data 
+    #cleaning up structural data
     C = C.drop([0,1], axis=1)
     C = C.drop([0], axis=0)
     C = C.iloc[:, :-1]
-    C = np.array(C.iloc[1:, :]).astype('float64')  
+    C = np.array(C.iloc[1:, :]).astype('float64')
     return C
 
 
@@ -404,18 +414,18 @@ def plot_adj_heatmap(adj, square=True, vmin = None, vmax = None, center = None, 
     if vmin == None: vmin = np.min(adj)
     if vmax == None: vmax = np.max(adj)
     if center == None: center = (vmax- vmin)/2
-    
+
     fig, axes = plt.subplots(1, 1, figsize=(4, 4), dpi=300)
     sns.heatmap(adj,  square=square, vmin = vmin, vmax =vmax, center = center, cmap = cmap , ax = axes)
     plt.show()
-    
+
 def plot_histplot(data, bins = 20, kde=True):
     fig, axes = plt.subplots(1, 1, figsize=(4, 4), dpi=300)
     sns.histplot(data, bins = bins, kde=kde , ax = axes)
     plt.show()
 def plot_make(r = 1, c = 1, size_length = None, size_height = None, dpi = 300 ):
     if size_length == None:
-       size_length = 4* c 
+       size_length = 4* c
     if size_height == None:
         size_height = 4 * r
     fig, axes = plt.subplots(r, c, figsize=(size_length, size_height), dpi=dpi)
@@ -435,13 +445,13 @@ def calculateModularity2(adj, labels, B = 'modularity'):
     #calculation part. community_louvain
     W = adj
     gamma=1
-    
+
     n = len(W)
     s = np.sum(W)
     ci = labels
     #if np.min(W) < -1e-10:
     #    raise BCTParamError('adjmat must not contain negative weights')
-    
+
     Mb = ci.copy()
 
     if B in ('negative_sym', 'negative_asym'):
@@ -449,7 +459,7 @@ def calculateModularity2(adj, labels, B = 'modularity'):
         W0 = W * (W > 0)
         s0 = np.sum(W0)
         B0 = W0 - gamma * np.outer(np.sum(W0, axis=1), np.sum(W0, axis=0)) / s0
-    
+
         W1 = -W * (W < 0)
         s1 = np.sum(W1)
         if s1:
@@ -463,18 +473,18 @@ def calculateModularity2(adj, labels, B = 'modularity'):
 
     if B == 'modularity':
         B = W - gamma * np.outer(np.sum(W, axis=1), np.sum(W, axis=0)) / s
-    
+
     elif B == 'negative_sym':
         B = (B0 / (s0 + s1)) - (B1 / (s0 + s1))
     elif B == 'negative_asym':
         B = (B0 / s0) - (B1 / (s0 + s1))
-    
+
     Hnm = np.zeros((n, n))
     for m in range(1, n + 1):
         Hnm[:, m - 1] = np.sum(B[:, ci == m], axis=1)  # node to module degree
     H = np.sum(Hnm, axis=1)  # node degree
     Hm = np.sum(Hnm, axis=0)  # module degree
-    
+
     q0 = -np.inf
     # compute modularity
     q = np.sum(B[np.tile(ci, (n, 1)) == np.tile(ci, (n, 1)).T]) / s
@@ -490,13 +500,13 @@ def calculateModularity(adj, labels):
     for r in range(N):
         for c in range(N):
             label_r = labels[r]
-            label_c = labels[c] 
+            label_c = labels[c]
             if label_r == label_c: rc = 1
             else: rc = 0
             Q = Q + adj[r,c] - (  (degrees[r]*degrees[c])/(2*m)*rc   )
     Q = Q/(2*m)
     return Q
-            
+
 def calculateModularity3(W, ci, gamma=1, B='modularity'):
     '''
     The optimal community structure is a subdivision of the network into
@@ -521,7 +531,7 @@ def calculateModularity3(W, ci, gamma=1, B='modularity'):
         initial community affiliation vector. default value=None
     B : str | NxN np.arraylike
         string describing objective function type, or provides a custom
-        NxN objective-function matrix. builtin values 
+        NxN objective-function matrix. builtin values
             'modularity' uses Q-metric as objective function
             'potts' uses Potts model Hamiltonian.
             'negative_sym' symmetric treatment of negative weights
@@ -591,7 +601,7 @@ def calculateModularity3(W, ci, gamma=1, B='modularity'):
             print ('Warning: objective function matrix not symmetric, '
                    'symmetrizing')
             B = (B + B.T) / 2
-    
+
     Hnm = np.zeros((n, n))
     for m in range(1, n + 1):
         Hnm[:, m - 1] = np.sum(B[:, ci == m], axis=1)  # node to module degree
@@ -634,14 +644,14 @@ def calculateModularity3(W, ci, gamma=1, B='modularity'):
     q0 = q
 
     q = np.trace(B)  # compute modularity
-    
+
     # Workaround to normalize
     if not renormalize:
         return ci, q/s
     else:
         return ci, q
-    
-    
+
+
 #%%
 """
 # Download data programmatically from box.com (Python >= 3.5)

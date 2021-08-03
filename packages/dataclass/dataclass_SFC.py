@@ -20,7 +20,7 @@ from scipy import signal
 import bct
 
 @dataclass
-class sfc:
+class dataclass_sfc:
     subID: str = "unknown"
     electrode_localization: None = None
     streamlines: None = None

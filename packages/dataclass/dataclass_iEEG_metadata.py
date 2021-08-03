@@ -30,9 +30,9 @@ from revellLab.packages.utilities import utils
 
 
 @dataclass
-class DataClassJson:
+class dataclass_iEEG_metadata:
     jsonFile: dict = "unknown"
-    
+
     def get_iEEGData(self, sub, eventsKey, idKey, username, password,  BIDS = None, dataset= None, session = None, startUsec = None, stopUsec= None, startKey = "EEC", IGNORE_ELECTRODES = True, channels = "all", load = True):
         fname_iEEG = self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey]["FILE"]
         if IGNORE_ELECTRODES == True: #if you want to ignore electrodes, then set to True
@@ -46,13 +46,13 @@ class DataClassJson:
         if not BIDS == None:
             fpath = self.getBIDSdirectoryToSaveiEEG(BIDS, dataset, sub, session )
         else: fpath = None
-        
+
         if not fpath == None:
             echobase.check_path(fpath)
             fname = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_ieeg.eeg")
             fnameMetadata = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_ieeg.json")
             fnameEvents = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_events.tsv")
-            
+
             if os.path.exists(fname):
                 print(f"\nFile exist {fname}")
                 if load:
@@ -64,18 +64,18 @@ class DataClassJson:
                 print(f"\nFile does not exist. Saving to\n{fname}")
                 df, fs = downloadiEEGorg.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, channels, ignoreElectrodes = [])
                 self.saveEEG(fname, fnameMetadata, fnameEvents, df, fs, eventsKey, fname_iEEG, startUsec, stopUsec, eventsSave = False )
-        else: 
+        else:
             print("\nNo file path given. Not saving data. Downloading...")
             df, fs = downloadiEEGorg.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, channels, ignoreElectrodes = [])
         if load:
             print(f"ignored electrodes: {ignoreElectrodes}")
-            df = pd.DataFrame.drop(df, ignoreElectrodes, axis=1, errors='ignore') 
+            df = pd.DataFrame.drop(df, ignoreElectrodes, axis=1, errors='ignore')
             return df, fs
-        
-    
+
+
     def get_precitalIctalPostictal(self, sub, eventsKey, idKey, username, password, BIDS = None, dataset= None, session = None, secondsBefore = 30, secondsAfter = 30, startKey = "EEC", IGNORE_ELECTRODES = True, channels = "all", load = True):
         fname_iEEG = self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey]["FILE"]
-        if IGNORE_ELECTRODES: 
+        if IGNORE_ELECTRODES:
             ignoreElectrodes =  self.jsonFile["SUBJECTS"][sub]["IGNORE_ELECTRODES"]
         else:
             ignoreElectrodes = []
@@ -87,17 +87,17 @@ class DataClassJson:
         startUsec = precitalStartUsec
         stopUsec = postictalStopUsec
         duration = (ictalStopUsec - ictalStartUsec)/1e6
-        
+
         if not BIDS == None:
             fpath = self.getBIDSdirectoryToSaveiEEG(BIDS, dataset, sub, session )
         else: fpath = None
-        
+
         if not fpath == None:
             echobase.check_path(fpath)
             fname = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_ieeg.eeg")
             fnameMetadata = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_ieeg.json")
             fnameEvents = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_events.tsv")
-            
+
             if os.path.exists(fname):
                 print(f"\nFile exist {fname}")
                 if load:
@@ -109,24 +109,24 @@ class DataClassJson:
                 print(f"\nFile does not exist. Saving to\n{fname}")
                 df, fs = downloadiEEGorg.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec , channels, ignoreElectrodes = [])
                 self.saveEEG(fname, fnameMetadata, fnameEvents, df, fs, eventsKey, fname_iEEG, startUsec, stopUsec, secondsBefore, duration, ictalStartUsec, ictalStopUsec , eventsSave = True)
-        else: 
+        else:
             print("\nNo file path given. Downloading data")
             df, fs = downloadiEEGorg.get_iEEG_data(username, password, fname_iEEG, startUsec, stopUsec, channels, ignoreElectrodes = [])
         if load:
             print(f"ignored electrodes: {ignoreElectrodes}")
             ictalStartIndex  = int(secondsBefore*fs)
             ictalStopIndex = int(secondsBefore*fs + (ictalStopUsec - ictalStartUsec)/1e6*fs)
-            df = pd.DataFrame.drop(df, ignoreElectrodes, axis=1, errors='ignore') 
+            df = pd.DataFrame.drop(df, ignoreElectrodes, axis=1, errors='ignore')
             return df, fs, ictalStartIndex, ictalStopIndex
-        
+
 
     def getBIDSdirectoryToSaveiEEG(self, BIDS, dataset, sub, session ):
         echobase.check_path(join(BIDS, dataset))
         directory = join(BIDS, dataset,  f"sub-{sub}", f"ses-{session}", "ieeg" )
-        echobase.makePath(directory)    
+        echobase.makePath(directory)
         return directory
 
-        
+
     def saveEEG(self, fname, fnameMetadata, fnameEvents, df, fs, eventsKey, fname_iEEG, startUsec, stopUsec, secondsBefore = None, duration = None, ictalStartUsec = None, ictalStopUsec  = None , eventsSave = False):
         df.to_csv(fname, index=True, header=True, sep=',')
         #saving metadata
@@ -134,14 +134,14 @@ class DataClassJson:
                    "iEEGReference": "unknown",
                    "RecordingDuration": (stopUsec-startUsec)/1e6,
                    "SamplingFrequency": fs,
-                   "PowerLineFrequency": 60, "SoftwareFilters": "n/a"}   
+                   "PowerLineFrequency": 60, "SoftwareFilters": "n/a"}
         with open(fnameMetadata, 'w', encoding='utf-8') as f: json.dump(metadata, f, ensure_ascii=False, indent=4)
         if eventsSave:
             ictalStartIndex  = int(secondsBefore*fs)
             ictalStopIndex = int(secondsBefore*fs + (ictalStopUsec - ictalStartUsec)/1e6*fs)
             events = pd.DataFrame([dict(onset = secondsBefore, duration = duration, ictalStartUsecEEC = ictalStartUsec, ictalStopUsec = ictalStopUsec, ictalStartIndexEEC = ictalStartIndex,  ictalStopIndex = ictalStopIndex )])
             fnameEvents = events.to_csv(fnameEvents, index=False, header=True, sep='\t')
-    
+
     def getEEGfileName(self, sub, eventsKey, idKey, BIDS, dataset , session , secondsBefore = 30, secondsAfter = 30, startKey = "EEC" ):
         ictalStartUsec = int(float(self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey][startKey])*1e6)
         precitalStartUsec = int(ictalStartUsec - secondsBefore*1e6)
@@ -149,31 +149,31 @@ class DataClassJson:
         postictalStopUsec = int(ictalStopUsec + secondsAfter*1e6)
         startUsec = precitalStartUsec
         stopUsec = postictalStopUsec
-        
+
         fpath = self.getBIDSdirectoryToSaveiEEG(BIDS, dataset, sub, session )
         echobase.check_path(fpath)
         fname = os.path.join(fpath, f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_ieeg.eeg")
         return fname
 
-    
+
     def get_FunctionalConnectivity(self, sub, idKey, username, password, BIDS , dataset, session, functionalConnectivityPath = None, secondsBefore = 30, secondsAfter = 30, startKey = "EEC", fsds = 256, montage = "bipolar", FCtype = "pearson"):
-        
+
         #checking if file is saved. If true, then just pull from that file
         if not functionalConnectivityPath == None:
-            FCname = utils.baseSplitext(self.getEEGfileName(sub, "Ictal", idKey, BIDS, dataset, session,  
+            FCname = utils.baseSplitext(self.getEEGfileName(sub, "Ictal", idKey, BIDS, dataset, session,
                                                                 secondsBefore, secondsAfter))[:-4]
             fname =  join(functionalConnectivityPath, FCname +   f"functionalConnectivity_{FCtype}_{montage}_interictalPreictalIctalPostictal.pickle")
-  
+
         if utils.checkIfFileExists(fname, printBOOL=False):
-            FC = utils.openPickle(fname)
+            FC = utils.open_pickle(fname)
             return FC
         else:
             # get data
             AssociatedInterictalidKey = self.get_associatedInterictal(sub, idKey)
             seizure, fs, ictalStartIndex, ictalStopIndex = self.get_precitalIctalPostictal(sub, "Ictal", idKey, username, password, BIDS, dataset, session ,secondsBefore=180, secondsAfter=180, load=True)
-                                                                                              
+
             interictal, fs = self.get_iEEGData(sub, "Interictal", AssociatedInterictalidKey, username, password, BIDS, dataset, session, startKey="Start", load=True)
-        
+
             print("\nPreprocessing data: Filtering and Downsampling")
             ###filtering and downsampling
             if FCtype == "coherence":
@@ -184,13 +184,13 @@ class DataClassJson:
                 #Get prewhitened data
                 _, _, _, seizureFilt, channels = echobase.preprocess(seizure, fs, fs, montage=montage, prewhiten=True)
                 _, _, _, interictalFilt, _ = echobase.preprocess(interictal, fs, fs, montage=montage, prewhiten=True)
-                
+
             ictalStartIndexDS = int(ictalStartIndex * (fsds/fs))
             ictalStopIndexDS = int(ictalStopIndex * (fsds/fs))
             #downsample
             seizureFiltDS = self.downsample(seizureFilt, fs, fsds)
             interictalFiltDS = self.downsample(interictalFilt, fs, fsds)
-    
+
             data = [interictalFiltDS, seizureFiltDS[:ictalStartIndexDS,:], seizureFiltDS[ictalStartIndexDS:ictalStopIndexDS+1,:]  , seizureFiltDS[ictalStopIndexDS+1:,:]   ]
             data_FC = []
             if FCtype == "pearson":
@@ -205,12 +205,12 @@ class DataClassJson:
                  for x in range(4):
                      print(f"\n\n {x}/3")
                      data_FC.append( list(echobase.coherence_wrapper(data[x], fsds))     )
-                     
-                    
+
+
             FC = [channels, data_FC]
             utils.savePickle([channels,data_FC], fname)
             return FC
-            
+
     def get_manual_resected_electrodes(self, sub):
         manual_resected_electrodes = self.jsonFile["SUBJECTS"][sub]["MANUAL_RESECTED_ELECTRODES"]
         return manual_resected_electrodes
@@ -221,22 +221,22 @@ class DataClassJson:
         downsampleFactor = int(fs/fsds) #downsample to specified frequency
         data_downsampled = signal.decimate(data, downsampleFactor, axis=0)#downsample data
         return data_downsampled
-    
+
     def get_annotations(self, sub, eventsKey, idKey, annotationLayerName, username, password):
-        annotations = downloadiEEGorg.get_iEEG_annotations(username, password, self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey]["FILE"], annotationLayerName)    
+        annotations = downloadiEEGorg.get_iEEG_annotations(username, password, self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey]["FILE"], annotationLayerName)
         return annotations
-    
-    #extract the annotated segments in data 
+
+    #extract the annotated segments in data
     def get_annotations_iEEG(self, annotations, data, channels, index):
         dataAnnotation = []
         dataAnnotationChannels = []
         for c in range(len(annotations)):
             annElec = annotations["electrode"][c]
             #convert name to standard channel name:
-            annElec = echobase.channel2std(    np.array([annElec]  ).astype("object")   ) 
+            annElec = echobase.channel2std(    np.array([annElec]  ).astype("object")   )
             annStr = annotations["start"][c]
             annStp = annotations["stop"][c]
-            
+
             annIndex = np.where((index >=annStr) & (index <=annStp))
             if len(annIndex[0]) > 0:
                 if any(channels == annElec): #if data contains electrode in annotations
@@ -260,7 +260,7 @@ class DataClassJson:
                         AssociatedInterictal = self.jsonFile["SUBJECTS"][subjects[s]]["Events"]["Ictal"][idKeys[i]]["AssociatedInterictal"]
                         patientsWithAnnotations = patientsWithAnnotations.append(dict(subject =  subjects[s], idKey = idKeys[i], AssociatedInterictal = AssociatedInterictal),ignore_index=True)
         return patientsWithAnnotations
-    
+
     def get_patientsWithSeizuresAndInterictal(self):
         patientsWithseizures = pd.DataFrame(columns = ["subject", "idKey", "AssociatedInterictal", "EEC", "UEO", "stop"])
         subjects = list(self.jsonFile["SUBJECTS"].keys())
@@ -274,8 +274,11 @@ class DataClassJson:
                         UEO = float(self.jsonFile["SUBJECTS"][subjects[s]]["Events"]["Ictal"][idKeys[i]]["UEO"])
                         stop = float(self.jsonFile["SUBJECTS"][subjects[s]]["Events"]["Ictal"][idKeys[i]]["Stop"])
                         patientsWithseizures = patientsWithseizures.append(dict(subject =  subjects[s], idKey = idKeys[i], AssociatedInterictal = AssociatedInterictal, EEC = EEC, UEO = UEO, stop = stop),  ignore_index=True)
+        #calculate length of the seizures
+        patientsWithseizures = pd.concat([patientsWithseizures, pd.DataFrame(patientsWithseizures["stop"] - patientsWithseizures["EEC"], columns=['length'])], axis=1)
         return patientsWithseizures
-    
+
+
     def preprocessNormalizeDownsample(self, df, df_interictal, fs, fsds, montage = "bipolar", prewhiten = True):
         #% Preprocessing
         data, data_ref, _, data_filt, channels = echobase.preprocess(df, fs, fsds, montage=montage, prewhiten = prewhiten)
@@ -289,9 +292,9 @@ class DataClassJson:
         dataII_scalerDS = self.downsample(dataII_scaler, fs, fsds)
         data_scalerDS = self.downsample(data_scaler, fs, fsds)
         return dataII_scaler, data_scaler, dataII_scalerDS, data_scalerDS, channels
-       
 
-        
+
+
     def get_dataXY(self, sub, idKey, AssociatedInterictal, username, password, annotationLayerName, BIDS = None, dataset= None, session = None, fsds = 128, window = 10 , skipWindow = 0.25, secondsBefore = 60, secondsAfter = 60, montage = "bipolar", prewhiten = True):
         print("\nGetting ictal data")
         df, fs, _, _ = self.get_precitalIctalPostictal(sub, "Ictal", idKey, username, password, BIDS = BIDS, dataset= dataset, session = session, secondsBefore = secondsBefore, secondsAfter = secondsAfter)
@@ -300,7 +303,7 @@ class DataClassJson:
         print(f"\nPreprocessing data\nMontage: {montage}\nPrewhiten: {prewhiten}")
         dataII_scaler, data_scaler, dataII_scalerDS, data_scalerDS, channels = self.preprocessNormalizeDownsample(df, df_interictal, fs, fsds, montage = montage, prewhiten = prewhiten)
         time_step, skip = int(window*fsds), int(skipWindow*fsds)
-        annotations = self.get_annotations(sub, "Ictal", idKey, annotationLayerName, username, password) 
+        annotations = self.get_annotations(sub, "Ictal", idKey, annotationLayerName, username, password)
         print("\nAnnotations")
         #get annotated segments of preprocessed data
         #alter annotations to include time_step seconds beforehand
@@ -312,7 +315,7 @@ class DataClassJson:
         dataAnnotationDS = copy.deepcopy(dataAnnotation)
         for i in range(len(dataAnnotationDS)):
             dataAnnotationDS[i] = self.downsample(dataAnnotationDS[i], fs, fsds)
-        #d.plot_eeg(dataAnnotationDS[10], fsds, nchan = 1, dpi = 300)    
+        #d.plot_eeg(dataAnnotationDS[10], fsds, nchan = 1, dpi = 300)
         #d.plot_eeg(data_scalerDS, fsds, nchan = 1, dpi = 300)
         print("Constructing classes")
         #% Classes
@@ -341,7 +344,7 @@ class DataClassJson:
         X = X[shuffle,:,:]
         Y = Y[shuffle,:]
         return X, Y, data_scalerDS, dataII_scalerDS, dataAnnotationDS
-    
+
     ##Plotting functions
     def plot_eeg(self, data, fs, startSec = None, stopSec = None, nchan = None, markers = [], aspect = 20, height = 0.3, hspace = -0.3, dpi = 300, lw=1, fill = False, savefig = False, pathFig = None):
         if stopSec == None:
@@ -363,11 +366,11 @@ class DataClassJson:
         if fill == True:
             g.map(sns.lineplot,"index", "value", clip_on=False, color="w", lw=0.8)
             g.map(plt.fill_between,  "index", "value")
-                
+
         else:
             g.map(sns.lineplot, "index", "value", clip_on=False, alpha=1, linewidth=lw)
-        if len(markers) > 0:    
-            axes = g.axes  
+        if len(markers) > 0:
+            axes = g.axes
             if len(markers) > 1:
                 for c in range(len(axes)):
                     axes[c][0].axvline(x=markers[c])
@@ -379,50 +382,50 @@ class DataClassJson:
         g.set(yticks=[])
         g.set(xticks=[])
         g.set_axis_labels("", "")
-        g.despine(bottom=True, left=True)        
-        
+        g.despine(bottom=True, left=True)
+
         if savefig:
             if pathFig == None:
                 print("Must provide figure path and filename to save")
             else: plt.savefig(pathFig, transparent=True)
 
-    
-    
-    
+
+
+
 
 #%%
-    
-    
 
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
-    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

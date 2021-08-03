@@ -14,7 +14,7 @@ from revellLab.packages.imaging.regionMorphology import regionMophology
 
 
 @dataclass
-class brainAtlasCohort:
+class dataclass_cohort_brain_atlas:
     cohortJson: dict = "unknown"
 
     def getWithDTI(self):
