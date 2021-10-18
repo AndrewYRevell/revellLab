@@ -154,7 +154,7 @@ plot_adj_allbands(adj_mi_all, vmin = 0, vmax = 1 )
 
 
 """
-A. Main
+B. Main
 """
 #%%
 # Wrapper scripts
@@ -876,7 +876,7 @@ def multitaper(data, fs, time_band, n_taper, cf):
 
 #%%
 """
-B. Referencing and Filters
+C. Referencing and Filters
 """
 
 def common_avg_ref(data):
@@ -1294,7 +1294,7 @@ def power_interpolate(data, dataInterictal, ictalStartIndex, ictalEndIndex, leng
 
 #%%
 """
-C. Utilities:
+D. Utilities:
 """
 def channel2std(channelsArr):
     nchan = len(channelsArr)
