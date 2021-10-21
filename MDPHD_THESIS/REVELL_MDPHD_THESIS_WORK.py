@@ -10,6 +10,7 @@ import copy
 import time
 import bct
 import glob
+import math
 import random
 import pickle
 import pingouin
@@ -29,6 +30,7 @@ from scipy import interpolate
 from scipy.integrate import simps
 from scipy.stats import pearsonr, spearmanr
 from os.path import join, splitext, basename
+from pathos.multiprocessing import ProcessingPool as Pool
 
 #revellLab
 #utilities, constants/parameters, and thesis helper functions
@@ -44,11 +46,12 @@ from revellLab.packages.eeg.ieegOrg import downloadiEEGorg
 from revellLab.packages.atlasLocalization import atlasLocalizationFunctions as atl
 from revellLab.packages.eeg.echobase import echobase
 from revellLab.packages.imaging.tractography import tractography
+from revellLab.packages.imaging.makeSphericalRegions import make_spherical_regions
 
 #plotting
 from revellLab.MDPHD_THESIS.plotting import plot_GMvsWM
 from revellLab.MDPHD_THESIS.plotting import plot_seizure_distributions
-#%% 2/4 Paths and File names
+#% 2/4 Paths and File names
 
 
 with open(paths.METADATA_IEEG_DATA) as f: JSON_iEEG_metadata = json.load(f)
@@ -60,7 +63,7 @@ atlases = dataclass_atlases.dataclass_atlases(JSON_atlas_files)
 metadata_iEEG = dataclass_iEEG_metadata.dataclass_iEEG_metadata(JSON_iEEG_metadata)
 
 
-#%% 3/4 Paramters
+#% 3/4 Paramters
 
 #ieeg.org username and password
 USERNAME = IEEG_USERNAME_PASSWORD["username"]
@@ -98,7 +101,7 @@ WM_DEFINITION_SEQUENCE_IND = TISSUE_DEFINITION[4]
 
 
 
-#%% 4/4 General Parameter calculation
+#% 4/4 General Parameter calculation
 # get all the patients with annotated seizures
 patientsWithseizures = metadata_iEEG.get_patientsWithSeizuresAndInterictal()
 N = len(patientsWithseizures)
@@ -110,11 +113,11 @@ iEEGpatientList = ["sub-" + s for s in iEEGpatientList]
 #%% Graphing summary statistics of seizures and patient population
 #plot distribution of seizures per patient
 plot_seizure_distributions.plot_distribution_seizures_per_patient(patientsWithseizures)
-utils.save_figure(f"{paths.FIGURES}/seizureSummaryStats/seizureCounts.pdf", save_figure = SAVE_FIGURES)
+utils.save_figure(f"{paths.FIGURES}/seizureSummaryStats/seizureCounts2.pdf", save_figure = True)
 
 #plot distribution of seizure lengths
 plot_seizure_distributions.plot_distribution_seizure_length(patientsWithseizures)
-utils.save_figure(f"{paths.FIGURES}/seizureSummaryStats/seizureLengthDistribution.pdf", save_figure = SAVE_FIGURES)
+utils.save_figure(f"{paths.FIGURES}/seizureSummaryStats/seizureLengthDistribution2.pdf", save_figure = True)
 
 #%% Electrode and atlas localization
 atl.atlasLocalizationBIDSwrapper(iEEGpatientList,  paths.BIDS, "PIER", SESSION, IEEG_SPACE, ACQ,  paths.BIDS_DERIVATIVES_RECONALL,  paths.BIDS_DERIVATIVES_ATLAS_LOCALIZATION,
@@ -187,84 +190,148 @@ for fc in range(len(FC_TYPES)):
 #Combine FC from the above saved calculation, and calculate differences
 summaryStatsLong, FCtissueAll, seizure_number = helper.combine_functional_connectivity_from_all_patients_and_segments(patientsWithseizures, np.array(range(3, N)), metadata_iEEG, MONTAGE, FC_TYPES,
                                                                    STATE_NUMBER, FREQUENCY_NAMES, USERNAME, PASSWORD, FREQUENCY_DOWN_SAMPLE,
-                                                                   paths, SESSION,  params.TISSUE_DEFINITION_DISTANCE[0], params.TISSUE_DEFINITION_DISTANCE[1], params.TISSUE_DEFINITION_DISTANCE[2])
+                                                                   paths, SESSION,  params.TISSUE_DEFINITION_PERCENT[0], params.TISSUE_DEFINITION_PERCENT[1], params.TISSUE_DEFINITION_PERCENT[2])
 
+patient_outcomes_good = ["RID0238", "RID0267", "RID0279", "RID0294", "RID0307", "RID0309", "RID0320", "RID0365", "RID0440", "RID0424"]
+patient_outcomes_poor = ["RID0274", "RID0278", "RID0371", "RID0382", "RID0405", "RID0442", "RID0322"]
+patients = patient_outcomes_good + patient_outcomes_poor
+
+summaryStatsLong = helper.add_outcomes_to_summaryStatsLong(summaryStatsLong, patient_outcomes_good, patient_outcomes_poor)
+
+#%%
 #bootstrap
-iterations = 100
-pvals = np.zeros((iterations, STATE_NUMBER))
-pvals_deltaT = np.zeros((iterations, STATE_NUMBER +1))
-for it in range(iterations):
-    func = 1
-    freq = 5
-    summaryStatsLong_bootstrap, seizure_number_bootstrap = helper.summaryStatsLong_bootstrap(summaryStatsLong, ratio_patients = 0.8, max_seizures = 2)
 
-    FCtissueAll_bootstrap = helper.FCtissueAll_bootstrap(FCtissueAll, seizure_number, seizure_number_bootstrap)
-    FCtissueAll_bootstrap_flatten, pvals_iter = helper.FCtissueAll_flatten(FCtissueAll_bootstrap, STATE_NUMBER, func  ,freq  , max_connections = 20)
+medians_list = []
+means_deltaT_list = []
 
-    pvals[it,:] = pvals_iter
-    pvals_deltaT[it,:] = helper.deltaT_stats(summaryStatsLong_bootstrap, FREQUENCY_NAMES, FC_TYPES, func , freq )
+cores = 12
+iterations = 12
+total = 409
+func = 2
+freq = 7
+for i in range(total):
+    simulation =  helper.deltaT_multicore_wrapper(cores, iterations, summaryStatsLong,
+                                                  FCtissueAll, STATE_NUMBER,seizure_number,  FREQUENCY_NAMES,
+                                                  FC_TYPES,func  ,freq  , max_connections = 50)
 
-    utils.printProgressBar(it +1, iterations)
+    medians_list.append([a_tuple[0] for a_tuple in simulation])
+    medians = [item for sublist in medians_list for item in sublist]
+    means_deltaT_list.append([a_tuple[1] for a_tuple in simulation])
+    means_deltaT = [item for sublist in means_deltaT_list for item in sublist]
+    if i+1 ==total:
+        medians = np.dstack(medians)
+        means_deltaT = np.vstack(means_deltaT)
+    utils.printProgressBar(i +1 , total)
 
+len(means_deltaT)
+fig, axes = utils.plot_make(c = STATE_NUMBER, size_length = 12, sharey = True)
+
+
+for x in range(STATE_NUMBER):
+
+    data = pd.DataFrame(  dict( gm = medians[0, x, :], wm = medians[1, x, :]))
+    xlim = [math.floor(data.to_numpy().min() * 1000)/1000 , math.ceil(data.to_numpy().max() * 1000)/1000]
+    sns.histplot(data =data, palette = plot.COLORS_TISSUE_LIGHT_MED_DARK[1], kde = True, ax = axes[x], bins = 10, line_kws=dict(linewidth = 8), edgecolor = None)
+    #sns.kdeplot(data =data, palette = plot.COLORS_TISSUE_LIGHT_MED_DARK[1], ax = axes[x], linewidth = 10)
+    axes[x].set_xlim(xlim)
+    #axes[x].set_ylim([0,350])
+    print(stats.wilcoxon(data["gm"], data["wm"])[1])
+    axes[x].spines['top'].set_visible(False)
+    axes[x].spines['right'].set_visible(False)
+    pvalue = stats.wilcoxon(data["gm"], data["wm"])[1]
+    axes[x].set_title(pvalue)
+    #print(stats.mannwhitneyu(data["gm"], data["wm"])[1])
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM",
+                  f"22boot_ECDF_all_patients_GMvsWM_ECDF2_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
+                  save_figure=False)
+
+
+data = pd.DataFrame(means_deltaT, columns = STATE_NAMES)
+fig, axes = utils.plot_make()
+sns.histplot(data =data, palette = plot.COLORS_STATE4[1], kde = True, ax = axes, binwidth = 0.001, binrange = [-0.002,0.025],
+             line_kws = dict(lw = 2), kde_kws = dict(bw_method = 1), edgecolor = None)
+#sns.kdeplot(data =data, palette = plot.COLORS_STATE4[1], ax = axes, lw = 5)
+data.mean()
+axes.set_xlim([-0.002,0.022])
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+axes.set_title(f"{stats.wilcoxon(data['preictal'], data['ictal'])[1]} {stats.ttest_1samp(data['ictal'], 0)[1]}")
+for k in range(len(data.mean())):
+    axes.axvline(x=data.mean()[k], color = plot.COLORS_STATE4[1][k], linestyle='--')
+axes.legend([],[], frameon=False)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM",
+                  f"22BOOTSTRAP_all_patients_GMvsWM_ECDF2_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
+                  save_figure=False)
+
+
+FCtissueAll_bootstrap_flatten,_ = helper.FCtissueAll_flatten(FCtissueAll, STATE_NUMBER, func = 2 ,freq = 7, max_connections = 50)
 plot_GMvsWM.plot_FC_all_patients_GMvsWM_ECDF(FCtissueAll_bootstrap_flatten, STATE_NUMBER , plot)
 utils.save_figure(join(paths.FIGURES, "GM_vs_WM",
-                  f"ECDF_all_patients_GMvsWM_ECDF2_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
-                  save_figure=SAVE_FIGURES)
-
-plot_GMvsWM.plot_FC_all_patients_GMvsWM_ECDF_PVALUES(pvals, STATE_NUMBER , plot)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM",
-                  f"ECDF_histplot_pvalues_all_patients_GMvsWM_ECDF_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
-                  save_figure=SAVE_FIGURES)
+                  f"2ECDF_all_patients_GMvsWM_ECDF2_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
+                  save_figure=False)
 
 
-plot_GMvsWM.plot_boxplot_single_FC_deltaT(summaryStatsLong_bootstrap, FREQUENCY_NAMES, FC_TYPES, func, freq, plot)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM",
-                  f"boxplot_single_FC_deltaT_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
-                  save_figure=SAVE_FIGURES)
-plot_GMvsWM.plot_FC_deltaT_PVALUES(pvals_deltaT, plot)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM",
-                  f"boxplot_FC_deltaT_PVALUES_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
-                  save_figure=SAVE_FIGURES)
 
-plot_GMvsWM.plot_boxplot_all_FC_deltaT(summaryStatsLong_bootstrap, FREQUENCY_NAMES, FC_TYPES, plot.COLORS_STATE4[0], plot.COLORS_STATE4[1])
+plot_GMvsWM.plot_boxplot_single_FC_deltaT(summaryStatsLong, FREQUENCY_NAMES, FC_TYPES, 2, 5, plot)
 utils.save_figure(join(paths.FIGURES, "GM_vs_WM",
-                  f"boxplot_all_FC_deltaT_Supplement_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
-                  save_figure=SAVE_FIGURES)
+                  f"boxplot2_single_FC_deltaT_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
+                  save_figure=False)
+
+
+
+plot_GMvsWM.plot_boxplot_all_FC_deltaT(summaryStatsLong, FREQUENCY_NAMES, FC_TYPES, plot.COLORS_STATE4[0], plot.COLORS_STATE4[1])
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM",
+                  f"boxplot2_all_FC_deltaT_Supplement_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
+                  save_figure=False)
 
 
 #%%
 #% Plot FC distributions for example patient
 #for i in range(3,N):
-i=51
-func = 1
-freq = 5
+i=43
+func = 2
+freq = 7
 state = 2
 sub = patientsWithseizures["subject"][i]
 FC_type = FC_TYPES[func]
 
 FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue = helper.get_functional_connectivity_and_tissue_subnetworks_for_single_patient(patientsWithseizures,
                                                  i, metadata_iEEG, SESSION, USERNAME, PASSWORD, paths,
-                                                 FREQUENCY_DOWN_SAMPLE, MONTAGE, FC_TYPES, params.TISSUE_DEFINITION_DISTANCE[0], params.TISSUE_DEFINITION_DISTANCE[1], 3,
+                                                 FREQUENCY_DOWN_SAMPLE, MONTAGE, FC_TYPES,
+                                                 params.TISSUE_DEFINITION_PERCENT[0], params.TISSUE_DEFINITION_PERCENT[1], params.TISSUE_DEFINITION_PERCENT[2],
                                                  func, freq)
 
 plot_GMvsWM.plot_FC_example_patient_ADJ(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot)
-plot_GMvsWM.plot_FC_example_patient_GMWM(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot)
+
+
+plot_GMvsWM.plot_FC_example_patient_GMWMall(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order,
+                                         FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot,
+                                         xlim = [0,0.6])
 utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"hist_GM_vs_WM_distribution_of_FC_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
-plot_GMvsWM.plot_FC_example_patient_GMvsWM(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot)
-plt.show()
+plot_GMvsWM.plot_FC_example_patient_GMvsWM(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order,
+                                           FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot,
+                                           xlim = [0,0.6])
+
 utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"hist_GM_vs_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
+
 plot_GMvsWM.plot_FC_example_patient_GMvsWM_ECDF(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot)
 utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"ECDF_GM_vs_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
 
-
+#GM-to-WM connections
+plot_GMvsWM.plot_FC_example_patient_GMWM(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order,
+                                         FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot,
+                                         xlim = [0,0.6])
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"hist_GM_to_WM_distribution_of_FC_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
+plot_GMvsWM.plot_FC_example_patient_GMWM_ECDF(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"ECDF_GM_to_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
 
 
 #%% Calculate FC as a function of purity
 
 save_directory = join(paths.DATA, "GMvsWM")
-func = 2; freq = 5; state = 2
+func = 2; freq = 0; state = 2
 
-## WM definition = percent
+## WM definition =  distance
 summaryStats_Wm_FC = helper.get_FC_vs_tissue_definition(save_directory, patientsWithseizures, range(3,5), MONTAGE,  params.TISSUE_DEFINITION_DISTANCE,
                                  0, FC_TYPES, FREQUENCY_NAMES,  metadata_iEEG, SESSION, USERNAME, PASSWORD, paths, FREQUENCY_DOWN_SAMPLE, save_pickle = False , recalculate = False)
 
@@ -272,19 +339,14 @@ summaryStats_Wm_FC_bootstrap_func_freq_long_state, result_lin = helper.bootstrap
 plot_GMvsWM.plot_FC_vs_contact_distance(summaryStats_Wm_FC_bootstrap_func_freq_long_state)
 plot_GMvsWM.plot_FC_vs_WM_cutoff(summaryStats_Wm_FC_bootstrap_func_freq_long_state)
 
-pvalues = helper.bootstrap_FC_vs_WM_cutoff_summaryStats_Wm_FC_PVALUES(25, summaryStats_Wm_FC, FC_TYPES, FREQUENCY_NAMES, STATE_NAMES, func, freq, state)
-plot_GMvsWM.plot_FC_vs_WM_cutoff_PVALUES(pvalues, 0.00005, [-0.0,0.001], plot)
 
 
-## WM definition = distance
+## WM definition = percent
 summaryStats_Wm_FC = helper.get_FC_vs_tissue_definition(save_directory, patientsWithseizures, range(3,5), MONTAGE,  params.TISSUE_DEFINITION_PERCENT,
                                  1, FC_TYPES, FREQUENCY_NAMES,  metadata_iEEG, SESSION, USERNAME, PASSWORD, paths, FREQUENCY_DOWN_SAMPLE, save_pickle = False , recalculate = False)
 summaryStats_Wm_FC_bootstrap_func_freq_long_state, result_lin = helper.bootstrap_FC_vs_WM_cutoff_summaryStats_Wm_FC(iterations, summaryStats_Wm_FC, FC_TYPES, FREQUENCY_NAMES, STATE_NAMES, func, freq, state, print_results = True)
 plot_GMvsWM.plot_FC_vs_contact_distance(summaryStats_Wm_FC_bootstrap_func_freq_long_state,xlim = [15,80] ,ylim = [0.02,0.2])
 plot_GMvsWM.plot_FC_vs_WM_cutoff(summaryStats_Wm_FC_bootstrap_func_freq_long_state)
-
-pvalues = helper.bootstrap_FC_vs_WM_cutoff_summaryStats_Wm_FC_PVALUES(25, summaryStats_Wm_FC, FC_TYPES, FREQUENCY_NAMES, STATE_NAMES, func, freq, state)
-plot_GMvsWM.plot_FC_vs_WM_cutoff_PVALUES(pvalues, 0.005, [-0.0,0.1], plot)
 
 
 #%%
@@ -306,884 +368,315 @@ plot_GMvsWM.plot_FC_vs_WM_cutoff_PVALUES(pvalues, 0.005, [-0.0,0.1], plot)
 #get patients in patientsWithseizures that have dti
 sfc_patient_list = tractography.get_patients_with_dwi(np.unique(patientsWithseizures["subject"]), paths, dataset = "PIER", SESSION_RESEARCH3T = SESSION_RESEARCH3T)
 cmd = tractography.print_dwi_image_correction_QSIprep(sfc_patient_list, paths, dataset = "PIER")
-
-tractography.get_tracts(paths.BIDS, paths.DSI_STUDIO_SINGULARITY, pathDWI, pathTracts)
-
 tractography.get_tracts_loop_through_patient_list(sfc_patient_list, paths, SESSION_RESEARCH3T = SESSION_RESEARCH3T)
 
-patients_list = [3, 75 , 103, 104,105, 109, 110, 111, 112, 113, 115 ]
-for i in sfc_patient_list:
 
-
-    ses="research3T*"
-
-    pathDWI = join(paths['qsiprep'], "qsiprep", f"sub-{sub}", f"ses-{ses}", "dwi", f"sub-{sub}_ses-{ses}_space-T1w_desc-preproc_dwi.nii.gz" )
-    pathTracts = join(paths['tractography'], f"sub-{sub}", "tracts")
-    utils.checkPathAndMake(pathTracts, pathTracts)
-    utils.checkIfFileExistsGlob(  pathDWI)
-
-    pathDWI = glob.glob(pathDWI)[0]
-
-    trkName = f"{join(pathTracts, utils.baseSplitextNiiGz(pathDWI)[2])}.trk.gz"
-    if False:
-        tractography.get_tracts(paths['BIDS'], paths['dsiStudioSingularity'], pathDWI, pathTracts)
-
-
-#make electrode specific ROIs
-
-#radii = [1, 2,5, 10, 15, 25, 40]
-
-    # Get atlas localization and distances
-    file = join(paths["atlasLocaliztion"], f"sub-{patientsWithseizures['subject'][i]}", "ses-implant01", f"sub-{patientsWithseizures['subject'][i]}_ses-implant01_desc-atlasLocalization.csv")
-    if utils.checkIfFileExistsGlob(file, printBOOL=False):
-        localization = pd.read_csv(file)
-        localizationChannels = localization["channel"]
-        localizationChannels = echobase.channel2std(
-        np.array(localizationChannels))
-
-    ses = "implant*"
-    #t1_image = join(paths['BIDS'], "PIER", f"sub-{sub}", f"ses-{ses}", "anat", f"sub-{sub}_ses-{ses}_space-T1w_desc-preproc_dwi.nii.gz" )
-    t1_image = glob.glob(join(paths['atlasLocaliztion'], f"sub-{sub}", f"ses-{ses}", "tmp", "orig_nu_std.nii.gz" ))[0]
-    img = nib.load(t1_image)
-    utils.show_slices(img, data_type = "img")
-    img_data = img.get_fdata()
-    affine = img.affine
-    shape = img_data.shape
-
-    coordinates = np.array(localization[["x", "y", "z"]])
-
-    coordinates_voxels = utils.transform_coordinates_to_voxel(coordinates, affine)
-
-    path_spheres = join(paths['tractography'], f"sub-{sub}", "electrodeContactSphereROIs")
-    utils.checkPathAndMake(path_spheres,path_spheres)
-
-    for e in range(len(localizationChannels)):
-
-        img_data_sphere = copy.deepcopy(img_data)
-        img_data_sphere[  np.where(img_data_sphere != 0)  ] = 0
-
-        x = coordinates_voxels[e][0]
-        y = coordinates_voxels[e][1]
-        z = coordinates_voxels[e][2]
-        img_data_sphere = utils.make_sphere_from_point(img_data_sphere, x, y, z, radius = 7) #radius = 7mm
-
-        fname_ROIs_sub_ID = join(path_spheres, f"sub-{sub}_ses-implant01_desc-{localizationChannels[e]}.nii.gz")
-        img_sphere = nib.Nifti1Image(img_data_sphere, img.affine)
-        nib.save(img_sphere, fname_ROIs_sub_ID)
-
-        #utils.show_slices(img_data_sphere, data_type = "data")
-        utils.printProgressBar(e, len(localizationChannels))
-
-
-
+make_spherical_regions.make_spherical_regions(sfc_patient_list, SESSION, paths, radius = 7, rerun = False, show_slices = False)
 #%%
-#WM-to-WM connectivity increases more during seizures in poor outcome patients than in good outcome patients.
-summaryStatsLong = pd.melt(summaryStats, id_vars = ["patient", "seizure_number", "frequency", "FC_type"], var_name = "state", value_name = "FC")
-#summaryStatsLong = summaryStatsLong.groupby(['patient', "frequency", "FC_type", "state"]).mean()
-summaryStatsLong.reset_index(inplace=True)
-df = summaryStatsLong.loc[summaryStatsLong['FC_type'] == FC_type].loc[summaryStatsLong['frequency'] == FREQUENCY_NAMES[freq]]
-#Bootstrap, get unique
-patient_unique = np.unique(df["patient"])
 
-def legend_without_duplicate_labels(ax):
-    handles, labels = ax.get_legend_handles_labels()
-    unique = [(h, l) for i, (h, l) in enumerate(zip(handles, labels)) if l not in labels[:i]]
-    ax.legend(*zip(*unique))
-
-pval = []
-pval2 = []
-iterations = 10000
-for sim in range(iterations):
-    ind = []
-    for i in range(len(patient_unique)):
-       seizures_unique = np.unique(df[df["patient"] == patient_unique[i]]["seizure_number"])
-       if len(seizures_unique) > 2:
-           ind.append(random.sample(list(seizures_unique.astype(int)), 2))
-       elif len(seizures_unique) == 2:
-           ind.append(random.sample(list(seizures_unique.astype(int)), 2))
-       else:
-           ind.append([seizures_unique[0]])
-
-    ind = [item for sublist in ind for item in sublist]
-    df_bootstrap = df[df['seizure_number'].isin(ind)]
-
-    patinets_good_outcomes = ["RID0309", "RID0238", "RID0440", "RID0320", "RID0307", "RID0365", "RID0274", "RID0371"]
-    patinets_poor_outcomes = ["RID0278", "RID0405", "RID0442", "RID0382"]
-    df_good = df_bootstrap[df_bootstrap['patient'].isin(patinets_good_outcomes)]
-    df_poor = df_bootstrap[df_bootstrap['patient'].isin(patinets_poor_outcomes)]
-
-    df_bootstrap["outcome"] = np.nan
-    df_bootstrap.loc[df_bootstrap['patient'].isin(patinets_good_outcomes),"outcome"] = "good"
-    df_bootstrap.loc[df_bootstrap['patient'].isin(patinets_poor_outcomes),"outcome"] = "poor"
-    """
-    plot5, axes5 = plt.subplots(1,1,figsize=(7, 5), dpi = 600)
-    sns.boxplot(data = df_bootstrap, x = "state", y = "FC", hue = "outcome", order=["interictal", "preictal", "ictal", "postictal"], showfliers=False, palette ="Set2", ax = axes5)
-    sns.stripplot(data = df_bootstrap, x = "state", y = "FC", hue = "outcome",order=["interictal", "preictal", "ictal", "postictal"], dodge=True, palette = colorsInterPreIctalPost4, ax = axes5)
-    axes5.spines['top'].set_visible(False)
-    axes5.spines['right'].set_visible(False)
-    axes5.set_ylim([-0.005, 0.05]);
-    legend_without_duplicate_labels(axes5)
-    utils.savefig(f"{paths.FIGURES}/GMvsWM/boxplot_FC_differences_deltaT_GMvsWM.pdf", saveFigures=saveFigures)
-    """
+#Analyzing SFC
 
 
-    tmp1 = df_good[df_good["state"] == "ictal"]["FC"]
-    tmp2 = df_poor[df_poor["state"] == "ictal"]["FC"]
+means_list = []
+means_delta_corr_list = []
 
-    stats.mannwhitneyu(tmp1,tmp2)[1]
-    p = stats.ttest_ind(tmp1,tmp2)[1]
-    #print(p)
-    utils.printProgressBar(sim, iterations)
-    pval.append(p)
-    p2 = stats.ttest_1samp(np.array(df_bootstrap.loc[df_bootstrap["state"] == "ictal"]["FC"]), 0)[1]
-    pval2.append(p2)
-utils.plot_histplot(pval)
-utils.plot_histplot(pval2)
+cores = 24
+iterations = 24
+total = 416
+func = 2
+freq = 7
+for i in range(total):
+    utils.printProgressBar(i, total)
+    simulation = helper.multicore_sfc_wrapper(cores,iterations, params.TISSUE_TYPE_NAMES2, STATE_NUMBER, patientsWithseizures, sfc_patient_list, paths,
+                       FC_TYPES, STATE_NAMES, FREQUENCY_NAMES, metadata_iEEG, SESSION, USERNAME, PASSWORD,FREQUENCY_DOWN_SAMPLE, MONTAGE,
+                       params.TISSUE_DEFINITION_PERCENT[0], params.TISSUE_DEFINITION_PERCENT[1], params.TISSUE_DEFINITION_PERCENT[2],
+                       ratio_patients = 5, max_seizures = 1,
+                       func = 2, freq = 0, print_pvalues = False )
 
-len(np.where(   np.array(pval) < 0.05   )[0])/iterations
+    means_list.append([a_tuple[0] for a_tuple in simulation])
+    means = [item for sublist in means_list for item in sublist]
+    means_delta_corr_list.append([a_tuple[1] for a_tuple in simulation])
+    means_delta_corr = [item for sublist in means_delta_corr_list for item in sublist]
+    utils.printProgressBar(i+1, total)
+    if i+1 == total:
+        means = np.dstack(means)
+        means_delta_corr =  np.vstack(means_delta_corr)
 
-df = summaryStatsLong.loc[summaryStatsLong['FC_type'] == FC_type].loc[summaryStatsLong['frequency'] == FREQUENCY_NAMES[freq]]
-plot5, axes5 = plt.subplots(1,1,figsize=(7, 5), dpi = 600)
-sns.boxplot( data= df_bootstrap, x = "state", y = "FC", order=["interictal", "preictal", "ictal", "postictal"], showfliers=False, palette = colorsInterPreIctalPost3, ax = axes5)
-sns.stripplot( data= df_bootstrap, x = "state", y = "FC",order=["interictal", "preictal", "ictal", "postictal"], dodge=True, palette = colorsInterPreIctalPost4, ax = axes5)
-axes5.spines['top'].set_visible(False)
-axes5.spines['right'].set_visible(False)
-axes5.set_ylim([-0.0125, 0.0425]);
-utils.savefig(f"{paths.FIGURES}/GMvsWM/boxplot_FC_differences_deltaT_GMvsWM.pdf", saveFigures=saveFigures)
+cols = pd.MultiIndex.from_product([ params.TISSUE_TYPE_NAMES2, STATE_NAMES])
+means_df = pd.DataFrame(columns = ["tissue", "state", "SFC"])
+for t in range(len(params.TISSUE_TYPE_NAMES)):
+    df_tissue = pd.DataFrame(means[:,t,:].T, columns = STATE_NAMES)
+    df_tissue = pd.melt(df_tissue, var_name = ["state"], value_name = "SFC")
+    df_tissue["tissue"] = params.TISSUE_TYPE_NAMES2[t]
+    means_df = pd.concat([means_df, df_tissue])
 
-#%% Calculate FC as a function of purity
-WMdef = np.arange(0.5, 1.0, 0.025 )
-paientList = pd.DataFrame(columns=["patient"])
-summaryStatsWmFC = pd.DataFrame( columns=["patient", "seizure_number", "FC_type", "frequency", "WM_percent", "WM_median_distance", "interictal", "preictal", "ictal", "postictal"] )
-FCtissueAll = np.empty((len(FC_types), stateNum, len(FREQUENCY_NAMES), 2),dtype=object)
-
-for func in range(len(FC_types)):
-    for freq in range(len(FREQUENCY_NAMES)):
-        count = 0
-        for i in range(3, N):#[3, 5, 22]: #
-            FC_type = FC_TYPEs[func]
-            sub = patientsWithseizures["subject"][i]
-            print(f"{montage}, {FC_type}, {FREQUENCY_NAMES[freq]}, {sub}")
-            paientList = paientList.append(dict(patient=patientsWithseizures["subject"][i]), ignore_index=True)
-            functionalConnectivityPath = join(paths["functionalConnectivityiEEG"], f"sub-{sub}")
-            utils.checkPathAndMake(functionalConnectivityPath, functionalConnectivityPath, printBOOL=False)
-
-            channels, FC = metadata.get_FunctionalConnectivity(patientsWithseizures["subject"][i], idKey = patientsWithseizures["idKey"][i], username = username, password = password,
-                                                BIDS =paths['BIDS'], dataset ="derivatives/iEEGorgDownload", session ="implant01",
-                                                functionalConnectivityPath = functionalConnectivityPath,
-                                                secondsBefore=180, secondsAfter=180, startKey = "EEC",
-                                                fsds = param.FREQUENCY_DOWN_SAMPLE, montage = MONTAGE, FCtype = FC_TYPE)
-            #if cross correlation, take absolute value
-            if func == 2 or func == 0:
-                for per in range(len(FC)):
-                    for f in range(len(FC[per])):
-                        FC[per][f] = abs(FC[per][f])
-            # Get atlas localization and distances
-            file = join(paths["atlasLocaliztion"], f"sub-{patientsWithseizures['subject'][i]}", "ses-implant01", f"sub-{patientsWithseizures['subject'][i]}_ses-implant01_desc-atlasLocalization.csv")
-            if utils.checkIfFileExistsGlob(file, printBOOL=False):
-                localization = pd.read_csv(file)
-                localizationChannels = localization["channel"]
-                localizationChannels = echobase.channel2std(
-                    np.array(localizationChannels))
-            # getting distances
-            dist = pd.DataFrame(channels, columns=["channels"])
-            dist["distance"] = np.nan
-            dist_coordinates = pd.DataFrame(channels, columns=["channels"])
-            dist_coordinates["x"] = np.nan
-            dist_coordinates["y"] = np.nan
-            dist_coordinates["z"] = np.nan
-            for ch in range(len(channels)):# Getting distances of the channels
-                channelName = channels[ch]
-                if any(channelName == localizationChannels):
-                    dist.iloc[ch, 1] = localization["percent_WM"][np.where(#percent_WM, distance_to_GM_millimeters
-                        channelName == localizationChannels)[0][0]]
-                    dist_coordinates.iloc[ch, 1]  = localization["x"][np.where(
-                        channelName == localizationChannels)[0][0]]
-                    dist_coordinates.iloc[ch, 2]  = localization["y"][np.where(
-                        channelName == localizationChannels)[0][0]]
-                    dist_coordinates.iloc[ch, 3]  = localization["z"][np.where(
-                        channelName == localizationChannels)[0][0]]
-                else:
-                    # if channel has no localization, then just assume GM.
-                    dist.iloc[ch, 1] = 0
-            dist_coordinates_array = np.array(dist_coordinates[["x","y","z"]])
-            distance_pairwise = utils.get_pariwise_distances(dist_coordinates_array)
-            for wm in range(len(WMdef)):
-
-                GMindex = np.where(dist["distance"] <= 0.5)[0]
-                WMindex = np.where(dist["distance"] > WMdef[wm])[0]
-
-                #get FC values for just the GM-GM connections and WM-WM connections
-                FCtissue = [None] *2
-                for t in range(len(FCtissue)):
-                    FCtissue[t] = []
-                for s in range(len(FC)):
-                    #Reorder/get just the tissue index, and then just get the upper half of triangle (exluding diagonal)
-                    FCtissue[0].append(   utils.getUpperTriangle(     utils.reorderAdj(FC[s][freq], GMindex)       )   )
-                    FCtissue[1].append(   utils.getUpperTriangle(     utils.reorderAdj(FC[s][freq], WMindex)       )   )
-                    if count == 0:
-                        FCtissueAll[func][s][freq][0] = utils.getUpperTriangle(     utils.reorderAdj(FC[s][freq], GMindex)    )
-                        FCtissueAll[func][s][freq][1] = utils.getUpperTriangle(     utils.reorderAdj(FC[s][freq], WMindex)    )
-                    else:
-                        FCtissueAll[func][s][freq][0] = np.concatenate([  FCtissueAll[func][s][freq][0] , utils.getUpperTriangle(     utils.reorderAdj(FC[s][freq], GMindex)       )  ]   )
-                        FCtissueAll[func][s][freq][1] = np.concatenate([  FCtissueAll[func][s][freq][1] , utils.getUpperTriangle(     utils.reorderAdj(FC[s][freq], WMindex)       )  ]   )
-                wm_median_distance = np.nanmedian(utils.getUpperTriangle( utils.reorderAdj(distance_pairwise, WMindex)))
-                wmFC = np.array([np.nanmedian(k) for k in zip(FCtissue[1] )])
-                summaryStatsWmFC = summaryStatsWmFC.append(dict(patient = sub ,seizure_number = i, FCtype = FC_TYPE, frequency = FREQUENCY_NAMES[freq], WM_percent = WMdef[wm], WM_median_distance = wm_median_distance , interictal = wmFC[0], preictal = wmFC[1], ictal = wmFC[2], postictal = wmFC[3]) , ignore_index=True   )
-            count = count + 1
+wm_preictal = means_df.query('tissue == "WM" and state == "preictal"')["SFC"]
+wm_ictal = means_df.query('tissue == "WM" and state == "ictal"')["SFC"]
+stats.ttest_rel(means_df.query('tissue == "WM" and state == "ictal"')["SFC"] ,means_df.query('tissue == "WM" and state == "preictal"')["SFC"])[1]
+print(stats.wilcoxon(wm_preictal, wm_ictal)[1])
+print(stats.mannwhitneyu(wm_preictal, wm_ictal)[1])
 
 
-#%%
-bootstrap_ind = []
-paientList_unique = np.unique(paientList)
-for i in range(len(paientList_unique)):
-    ind = np.unique(summaryStatsWmFC.loc[summaryStatsWmFC["patient"] == paientList_unique[i]]["seizure_number"])
-    if len(ind)> 2:
-        bootstrap_ind.append(random.sample(list(ind), 2))
-    if len(ind) > 1:
-        bootstrap_ind.append(random.sample(list(ind), 1))
-    else:
-        bootstrap_ind.append(list(ind))
-bootstrap_ind = [item for sublist in bootstrap_ind for item in sublist]
-
-
-summaryStatsWmFC_bootstrap = summaryStatsWmFC.loc[summaryStatsWmFC["seizure_number"].isin(bootstrap_ind)]
-summaryStatsWmFC_bootstrap.reset_index(inplace=True)
-
-func = 1
-freq = 5
-state = 2
-FCtype = FC_TYPEs[func]
-tmp = summaryStatsWmFC_bootstrap.loc[summaryStatsWmFC_bootstrap["FCtype"] == FCtype].loc[summaryStatsWmFC_bootstrap["frequency"] == FREQUENCY_NAMES[freq]]
-
-tmp = tmp.groupby(['patient', "WM_percent", "WM_median_distance"]).mean()
-tmp.reset_index(inplace=True)
-
-tmp_long = pd.melt(tmp, id_vars = ["patient", "WM_percent", "WM_median_distance"], var_name = "state", value_name = "FC")
-tmp_long_tmp = tmp_long.loc[tmp_long["state"] == state_names[state]]
-fig, axes = utils.plot_make()
-sns.lineplot(data=tmp_long_tmp, x = "WM_percent", y = "FC")
-
-fig, axes = utils.plot_make()
-sns.regplot(data=tmp_long_tmp, x = "WM_median_distance", y = "FC")
-
+palette_long = ["#808080", "#808080", "#282828", "#808080"] + ["#a08269", "#a08269", "#675241", "#a08269"] + ["#8a6ca1", "#8a6ca1", "#511e79", "#8a6ca1"]+ ["#76afdf", "#76afdf", "#1f5785", "#76afdf"]
+palette = ["#bbbbbb", "#bbbbbb", "#282828", "#bbbbbb"] + ["#cebeb1", "#cebeb1", "#675241", "#cebeb1"] + ["#cdc0d7", "#cdc0d7", "#511e79", "#cdc0d7"] + ["#b6d4ee", "#b6d4ee", "#1f5785", "#b6d4ee"]
 
 
 fig, axes = utils.plot_make()
-sns.lineplot(data=tmp_long_tmp, x = "WM_percent", y = "WM_median_distance")
-"""
-pingouin.ancova(data=tmp_long_tmp, dv = "FC", between = "WM_percent", covar = "WM_median_distance")
-
-from pingouin import ancova, read_dataset
-df_pingouin = read_dataset('ancova')
-ancova(data=df_pingouin, dv='Scores', covar='Income', between='Method')
-"""
-model_lin = sm.OLS.from_formula("FC ~ WM_percent + WM_median_distance", data=tmp_long_tmp)
-result_lin = model_lin.fit()
-print(result_lin.summary())
-
-#%% Network analysis comparison
-
-
-networkMeasures = pd.DataFrame( columns=["patient", "FCtype", "frequency", "state", "tissueType", "density", "characteristicPathLength", "transitivity", "degree", "clusteringCoefficient", "betweennessCentrality"] )
-
-for i in range(3, N):#[3, 5, 22]: #
-    sub = patientsWithseizures["subject"][i]
-    # Get atlas localization and distances
-    file = join(paths["atlasLocaliztion"], f"sub-{patientsWithseizures['subject'][i]}", "ses-implant01", f"sub-{patientsWithseizures['subject'][i]}_ses-implant01_desc-atlasLocalization.csv")
-    if utils.checkIfFileExistsGlob(file, printBOOL=False):
-        localization = pd.read_csv(file)
-        localizationChannels = localization["channel"]
-        localizationChannels = echobase.channel2std(
-            np.array(localizationChannels))
-    # getting distances
-    dist = pd.DataFrame(channels, columns=["channels"])
-    dist["distance"] = np.nan
-    for ch in range(len(channels)):# Getting distances of the channels
-        channelName = channels[ch]
-        if any(channelName == localizationChannels):
-            dist.iloc[ch, 1] = localization["distance_to_GM_millimeters"][np.where(
-                channelName == localizationChannels)[0][0]]
-        else:
-            # if channel has no localization, then just assume GM.
-            dist.iloc[ch, 1] = 0
-
-    GMindex = np.where(dist["distance"] <= WMdefinition2)[0]
-    WMindex = np.where(dist["distance"] > WMdefinition2)[0]
-    distOrderInd = np.array(np.argsort(dist["distance"]))
-    distOrder = dist.iloc[distOrderInd].reset_index()
-
-    for func in range(len(FCtypes)):
-        FCtype = FC_TYPEs[func]
-
-        functionalConnectivityPath = join(paths["functionalConnectivityiEEG"], f"sub-{sub}")
-        channels, FC = metadata.get_FunctionalConnectivity(patientsWithseizures["subject"][i], idKey = patientsWithseizures["idKey"][i], username = username, password = password,
-                                            BIDS =paths['BIDS'], dataset ="derivatives/iEEGorgDownload", session ="implant01",
-                                            functionalConnectivityPath = functionalConnectivityPath,
-                                            secondsBefore=180, secondsAfter=180, startKey = "EEC",
-                                            fsds = param.FREQUENCY_DOWN_SAMPLE, montage = MONTAGE, FCtype = FC_TYPE)
-
-        for freq in range(len(FREQUENCY_NAMES)):
-            print(f"{FCtype}, {FREQUENCY_NAMES[freq]}, {sub}")
-
-
-            s=2
-            #networks: 0 = all tissue, 1 = GM-GM, 2 = WM-WM, 3 = GM-WM
-            networks = [ copy.deepcopy(FC[s][freq] ),  utils.reorderAdj(FC[s][freq], GMindex)  ,  utils.reorderAdj(FC[s][freq], WMindex) , utils.getAdjSubset(FC[s][freq], GMindex, WMindex)   ]
-            networksThreshold = copy.deepcopy(networks)
-
-            #thresholding
-            thresholdPearson = 0.0
-            for t in range(len(networksThreshold)):
-                networksThreshold[t][np.where(networksThreshold[t] < thresholdPearson)] = 0
-
-
-            binwidth = 0.01
-            plot, axes = plt.subplots(1,1,figsize=(5, 5), dpi = 600)
-            sns.histplot( utils.getUpperTriangle(networks[0]), color = (0.5, 0.5, 0.5), ax = axes  , binwidth =binwidth , binrange = [-1,1] , kde = True)
-            sns.histplot( networks[3].flatten(), color = (0.9, 0.686, 0.875), ax = axes, binwidth =binwidth , binrange = [-1,1]  , kde = True )
-            sns.histplot( utils.getUpperTriangle(networks[2]), color = (0.463, 0.686, 0.875), ax = axes , binwidth =binwidth , binrange = [-1,1] , kde = True )
-            sns.histplot( utils.getUpperTriangle(networks[1]), color = (0.545, 0.439, 0.345), ax = axes , binwidth =binwidth  , binrange = [-1,1] , kde = True)
-            axes.set_xlim([-0.6,0.6])
-
-            sign = 0
-
-            plot, axes = plt.subplots(1,1,figsize=(5, 5), dpi = 600)
-            sns.kdeplot( bct.strengths_und_sign(networks[0])[sign], color = (0.5, 0.5, 0.5, 1) , ax = axes )
-            sns.kdeplot( bct.strengths_und_sign(networks[1])[sign], color = (0.545, 0.439, 0.345), ax = axes  )
-            sns.kdeplot( bct.strengths_und_sign(networks[2])[sign], color = (0.463, 0.686, 0.875) , ax = axes )
-            plot.suptitle(f"{sub}, {FCtype}, {freq} Strengths, Sign: {sign}")
-
-            plot, axes = plt.subplots(1,1,figsize=(5, 5), dpi = 600)
-            sns.kdeplot( bct.clustering_coef_wu_sign(networks[0])[sign], color = (0.5, 0.5, 0.5, 1) , ax = axes )
-            sns.kdeplot( bct.clustering_coef_wu_sign(networks[1])[sign], color = (0.545, 0.439, 0.345), ax = axes  )
-            sns.kdeplot( bct.clustering_coef_wu_sign(networks[2])[sign], color = (0.463, 0.686, 0.875) , ax = axes )
-            plot.suptitle(f"{sub}, {FCtype}, {freq} Clustering, Sign: {sign}")
-
-
-
-            #modularity
-
-            modularity1 = bct.community_louvain(  networks[0] , B = "negative_sym" )
-            bct.community_louvain(  networks[0] , B = "negative_sym" , ci = modularity1[0])
-            utils.calculateModularity3(networks[0], modularity1[0] , B = "negative_sym")
-
-
-            modularity2 = np.zeros(shape = (len(channels)))
-            modularity2[GMindex] = 2
-            modularity2[WMindex] = 1
-
-            modularity2 = utils.calculateModularity3(networks[0], modularity2 , B = "negative_sym")
-            modularity2
-
-            modularity2[1] - modularity1[1]
-
-            tmp = []
-            it = 1000
-            for k in range(it):
-                tmp.append(  utils.calculateModularity3(networks[0], np.random.choice(2, size=len(channels), replace=True) , B = "negative_sym")[1]   )
-                print(k)
-
-            sns.histplot( np.array(tmp), color = (0.5, 0.5, 0.5)    , kde = True)
-
-
-
-            tmp = np.concatenate(  [ utils.getUpperTriangle(networks[2]), utils.getUpperTriangle(networks[1]) ,networks[3].flatten()  ]   )
-            tmp2 = utils.getUpperTriangle(networks[0])
-            binwidth = 0.01
-            plot, axes = plt.subplots(1,1,figsize=(5, 5), dpi = 600)
-            sns.histplot( tmp, color = (0.463, 0.686, 0.875), ax = axes  , binwidth =binwidth , fill = False )
-            sns.histplot( tmp2, color = (0.5, 0.5, 0.5), ax = axes  , binwidth =binwidth , fill = False )
-
-
-
-
-
-#%% DWI correction and tractography
-patients_list = [3, 75 , 103, 104,105, 109, 110, 111, 112, 113, 115 ]
-for i in patients_list:
-    sub = patientsWithseizures["subject"][i]
-    #01 DTI correction
-    cmd = f"qsiprep-docker {join(paths['BIDS'], 'PIER')} {paths['qsiprep']} participant --output-resolution 1.5 --fs-license-file {paths['freesurferLicense']} -w {paths['qsiprep']} --participant_label {sub}"
-    print(cmd)
-    #os.system(cmd) cannot run this docker command inside python interactive shell. Must run the printed command in terminal using qsiprep environment in mad in environment directory
-
-    ses="research3T*"
-    pathDWI = join(paths['qsiprep'], "qsiprep", f"sub-{sub}", f"ses-{ses}", "dwi", f"sub-{sub}_ses-{ses}_space-T1w_desc-preproc_dwi.nii.gz" )
-    pathTracts = join(paths['tractography'], f"sub-{sub}", "tracts")
-    utils.checkPathAndMake(pathTracts,pathTracts)
-    utils.checkIfFileExistsGlob(  pathDWI)
-
-    pathDWI = glob.glob(pathDWI)[0]
-
-    trkName = f"{join(pathTracts, utils.baseSplitextNiiGz(pathDWI)[2])}.trk.gz"
-    if False:
-        tractography.getTracts(paths['BIDS'], paths['dsiStudioSingularity'], pathDWI, pathTracts)
-
-
-#make electrode specific ROIs
-
-#radii = [1, 2,5, 10, 15, 25, 40]
-
-    # Get atlas localization and distances
-    file = join(paths["atlasLocaliztion"], f"sub-{patientsWithseizures['subject'][i]}", "ses-implant01", f"sub-{patientsWithseizures['subject'][i]}_ses-implant01_desc-atlasLocalization.csv")
-    if utils.checkIfFileExistsGlob(file, printBOOL=False):
-        localization = pd.read_csv(file)
-        localizationChannels = localization["channel"]
-        localizationChannels = echobase.channel2std(
-        np.array(localizationChannels))
-
-    ses = "implant*"
-    #t1_image = join(paths['BIDS'], "PIER", f"sub-{sub}", f"ses-{ses}", "anat", f"sub-{sub}_ses-{ses}_space-T1w_desc-preproc_dwi.nii.gz" )
-    t1_image = glob.glob(join(paths['atlasLocaliztion'], f"sub-{sub}", f"ses-{ses}", "tmp", "orig_nu_std.nii.gz" ))[0]
-    img = nib.load(t1_image)
-    utils.show_slices(img, data_type = "img")
-    img_data = img.get_fdata()
-    affine = img.affine
-    shape = img_data.shape
-
-    coordinates = np.array(localization[["x", "y", "z"]])
-
-    coordinates_voxels = utils.transform_coordinates_to_voxel(coordinates, affine)
-
-    path_spheres = join(paths['tractography'], f"sub-{sub}", "electrodeContactSphereROIs")
-    utils.checkPathAndMake(path_spheres,path_spheres)
-
-    for e in range(len(localizationChannels)):
-
-        img_data_sphere = copy.deepcopy(img_data)
-        img_data_sphere[  np.where(img_data_sphere != 0)  ] = 0
-
-        x = coordinates_voxels[e][0]
-        y = coordinates_voxels[e][1]
-        z = coordinates_voxels[e][2]
-        img_data_sphere = utils.make_sphere_from_point(img_data_sphere, x, y, z, radius = 7) #radius = 7mm
-
-        fname_ROIs_sub_ID = join(path_spheres, f"sub-{sub}_ses-implant01_desc-{localizationChannels[e]}.nii.gz")
-        img_sphere = nib.Nifti1Image(img_data_sphere, img.affine)
-        nib.save(img_sphere, fname_ROIs_sub_ID)
-
-        #utils.show_slices(img_data_sphere, data_type = "data")
-        utils.printProgressBar(e, len(localizationChannels))
-
-
-#get structural connectivity
-
-#%% Analyzing SFC
-
-
-#194: 3
-#278: 21-24
-#309: 39-51
-#320: 52-54
-#365: 60-65
-#420: 75
-#440: 78-81
-#502: 103
-#508: 104
-#536: 105-108
-#572: 109
-#583: 110
-#595: 111
-#596: 112
-#648: 113
-#652: 115-116
-np.unique(np.array(summaryStats.loc[summaryStats["patient"] == "RID0" + "652"]["seizure_number"])).astype(int)
-patients_with_SC = ["RID0194", "RID0278","RID0309","RID0320","RID0365","RID0420","RID0440","RID0502","RID0508","RID0536","RID0572","RID0583","RID0595","RID0596","RID0648","RID0652"]
-#%%
-#bootstrapping patients and seizures
-bootstrap_ind = []
-for i in range(len(patients_with_SC)):
-    ind = np.unique(summaryStats.loc[summaryStats["patient"] == patients_with_SC[i]]["seizure_number"])
-    if len(ind)> 2:
-        bootstrap_ind.append(random.sample(list(ind), 2))
-    if len(ind) > 1:
-        bootstrap_ind.append(random.sample(list(ind), 1))
-    else:
-        bootstrap_ind.append(list(ind))
-bootstrap_ind = [item for sublist in bootstrap_ind for item in sublist]
-
-
-all_corr = np.zeros((len(bootstrap_ind),4))
-all_corr_gm = np.zeros((len(bootstrap_ind),4))
-all_corr_wm = np.zeros((len(bootstrap_ind),4))
-all_corr_gmwm = np.zeros((len(bootstrap_ind),4))
-for b in range(len(bootstrap_ind)):
-    i = bootstrap_ind[b]
-    sub = patientsWithseizures["subject"][i]
-    print(f"{sub}: {i}")
-    path_SC = join(paths['tractography'], f"sub-{sub}", "connectivity", "electrodeContactAtlas")
-
-
-    path_SC_contacts = glob.glob(join(path_SC, "*.txt"))[0]
-    SC = utils.read_DSI_studio_Txt_files_SC(path_SC_contacts)
-
-    SC_names = utils.get_DSIstudio_TXT_file_ROI_names_for_spheres(path_SC_contacts)
-
-
-    SC = utils.log_normalize_adj(SC)
-
-    #utils.plot_adj_heatmap(SC)
-
-
-    ##%% Look at FC for SC
-
-    sub = patientsWithseizures["subject"][i]
-    func = 2
-    FCtype = FC_TYPEs[func]
-    freq = 7
-    print(f"{FCtype}, {FREQUENCY_NAMES[freq]}, {sub}")
-    functionalConnectivityPath = join(paths["functionalConnectivityiEEG"], f"sub-{sub}")
-    channels, FC = metadata.get_FunctionalConnectivity(patientsWithseizures["subject"][i], idKey = patientsWithseizures["idKey"][i], username = username, password = password,
-                                        BIDS =paths['BIDS'], dataset ="derivatives/iEEGorgDownload", session ="implant01",
-                                        functionalConnectivityPath = functionalConnectivityPath,
-                                        secondsBefore=180, secondsAfter=180, startKey = "EEC",
-                                        fsds = param.FREQUENCY_DOWN_SAMPLE, montage = MONTAGE, FCtype = FC_TYPE)
-    if func == 0 or func == 2:
-        for per in range(len(FC)):
-            for f in range(len(FC[per])):
-                FC[per][f] = abs(FC[per][f])
-    # Get atlas localization and distances
-    file = join(paths["atlasLocaliztion"], f"sub-{patientsWithseizures['subject'][i]}", "ses-implant01", f"sub-{patientsWithseizures['subject'][i]}_ses-implant01_desc-atlasLocalization.csv")
-    if utils.checkIfFileExistsGlob(file, printBOOL=False):
-        localization = pd.read_csv(file)
-        localizationChannels = localization["channel"]
-        localizationChannels = echobase.channel2std(
-            np.array(localizationChannels))
-    # getting distances
-    dist = pd.DataFrame(channels, columns=["channels"])
-    dist["distance"] = np.nan
-    for ch in range(len(channels)):# Getting distances of the channels
-        channelName = channels[ch]
-        if any(channelName == localizationChannels):
-            dist.iloc[ch, 1] = localization["percent_WM"][np.where(#percent_WM, distance_to_GM_millimeters
-                channelName == localizationChannels)[0][0]]
-        else:
-            # if channel has no localization, then just assume GM.
-            dist.iloc[ch, 1] = 0
-    # definition of WM by distance
-    WMdef = WMdefinitionPercent3
-    GMindex = np.where(dist["distance"] <= WMdef)[0]
-    WMindex = np.where(dist["distance"] > WMdef)[0]
-
-
-    manual_resected_electrodes = metadata.get_manual_resected_electrodes(sub)
-    manual_resected_electrodes = np.array(echobase.channel2std(manual_resected_electrodes))
-    manual_resected_electrodes, _, manual_resected_electrodes_index = np.intersect1d(  manual_resected_electrodes, np.array(dist["channels"]), return_indices=True )
-
-
-
-    #get FC values for just the GM-GM connections and WM-WM connections
-    FCtissue = [None] *3
-    FCall = []
-    for t in range(len(FCtissue)):
-        FCtissue[t] = []
-    for s in range(len(FC)):
-        #Reorder/get just the tissue index, and then just get the upper half of triangle (exluding diagonal)
-        FCtissue[0].append(   utils.getUpperTriangle(     utils.reorderAdj(FC[s][freq], GMindex)       )   )
-        FCtissue[1].append(   utils.getUpperTriangle(     utils.reorderAdj(FC[s][freq], WMindex)       )   )
-        FCtissue[2].append(   utils.getAdjSubset(FC[s][freq], GMindex, WMindex).flatten()   )
-
-        FCall.append(  utils.getUpperTriangle(FC[s][freq]       )   )
-
-
-    #fig, axes = utils.plot_make()
-    corr = []
-    corr_gm = []
-    corr_wm = []
-    corr_gmwm = []
-    for s in range(len(FC)):
-        state = s
-        adj = copy.deepcopy(FC[state][freq])
-        order = utils.get_intersect1d_original_order(channels, SC_names)
-        SC_order = utils.reorderAdj(SC, order)
-        missing_delete_in_FC = utils.find_missing(channels, SC_names).astype(int)
-        adj = np.delete(adj, missing_delete_in_FC, 0)
-        adj = np.delete(adj, missing_delete_in_FC, 1) #making sure both SC and FC have the same rows and columns represented
-        #utils.plot_adj_heatmap(SC_order)
-        #utils.plot_adj_heatmap(adj)
-
-        corr.append( spearmanr(utils.getUpperTriangle(SC_order), utils.getUpperTriangle(adj))[0])
-        #sns.regplot(x = utils.getUpperTriangle(SC_order), y = utils.getUpperTriangle(adj), scatter_kws={'s':2}, ax = axes)
-        #plt.title(f"SFC {sub}")
-        #plt.xlabel("SC")
-        #plt.ylabel(f"FC ({FCtype} {FREQUENCY_NAMES[freq]})")
-        #fig.legend(labels = [ f"ii: {np.round(corr[0],3)}", f"pi: {np.round(corr[1],3)}", f"ic: {np.round(corr[2],3)}", f"po: {np.round(corr[3],3)}"])
-
-        if False:
-            adj = bct.null_model_und_sign(adj)[0] #utils.plot_adj_heatmap(adj); utils.plot_adj_heatmap(adj_rand)
-            SC_order = bct.null_model_und_sign(SC_order)[0] #utils.plot_adj_heatmap(SC_order); utils.plot_adj_heatmap(adj)
-        #SFC for tissue
-        dist_new = dist.drop(missing_delete_in_FC) #need new index of GM and WM because deleted FC channels that were not in SC
-        GMindex = np.where(dist_new["distance"] <= WMdef)[0]
-        WMindex = np.where(dist_new["distance"] > WMdef)[0]
-
-        adj_gm =  utils.reorderAdj(adj, GMindex)
-        SC_order_gm = utils.reorderAdj(SC_order, GMindex)
-        adj_wm =  utils.reorderAdj(adj, WMindex)
-        SC_order_wm = utils.reorderAdj(SC_order, WMindex)
-        adj_gmwm =  utils.getAdjSubset(adj, GMindex, WMindex)
-        SC_order_gmwm = utils.getAdjSubset(SC_order, GMindex, WMindex)
-        #fig, axes = utils.plot_make(c =3)
-        #sns.regplot(x = utils.getUpperTriangle(SC_order_gm), y = utils.getUpperTriangle(adj_gm), scatter_kws={'s':2}, ax = axes[0])
-        #sns.regplot(x = utils.getUpperTriangle(SC_order_wm), y = utils.getUpperTriangle(adj_wm), scatter_kws={'s':2}, ax = axes[1])
-        #sns.regplot(x =SC_order_gmwm.flatten(), y = adj_gmwm.flatten(), scatter_kws={'s':2}, ax = axes[2])
-
-
-        corr_gm.append(spearmanr(utils.getUpperTriangle(SC_order_gm), utils.getUpperTriangle(adj_gm))[0])
-        corr_wm.append(spearmanr(utils.getUpperTriangle(SC_order_wm), utils.getUpperTriangle(adj_wm))[0])
-        corr_gmwm.append(spearmanr(SC_order_gmwm.flatten(), adj_gmwm.flatten())[0])
-    all_corr[b,:] = corr
-    all_corr_gm[b,:] = corr_gm
-    all_corr_wm[b,:] = corr_wm
-    all_corr_gmwm[b,:] = corr_gmwm
-
-print(stats.ttest_rel(all_corr[:,2] ,all_corr[:,1])[1]*4)
-print(stats.ttest_rel(all_corr_gm[:,2] ,all_corr_gm[:,1])[1]*4)
-print(stats.ttest_rel(all_corr_wm[:,2] ,all_corr_wm[:,1])[1]*4)
-print(stats.ttest_rel(all_corr_gmwm[:,2] ,all_corr_gmwm[:,1])[1]*4)
-
-
-#%
-all_corr[:,2]
-all_corr[:,1]
-xlim = [-0.2, 0.3]
-fig, axes = utils.plot_make(r =4)
-sns.boxplot(x = all_corr[:,2] - all_corr[:,1] ,ax = axes[0]   )
-sns.boxplot(x =all_corr_gm[:,2] - all_corr_gm[:,1] ,ax = axes[1]   )
-sns.boxplot(x =all_corr_wm[:,2] - all_corr_wm[:,1] ,ax = axes[2]   )
-sns.boxplot(x = all_corr_gmwm[:,2] - all_corr_gmwm[:,1] ,ax = axes[3]   )
-sns.swarmplot(x = all_corr[:,2] - all_corr[:,1], ax = axes[0], color = "red")
-sns.swarmplot(x =all_corr_gm[:,2] - all_corr_gm[:,1] ,ax = axes[1] , color = "red"  )
-sns.swarmplot(x =all_corr_wm[:,2] - all_corr_wm[:,1] ,ax = axes[2]  , color = "red" )
-sns.swarmplot(x = all_corr_gmwm[:,2] - all_corr_gmwm[:,1] ,ax = axes[3]  , color = "red" )
-axes[0].set_xlim(xlim)
-axes[1].set_xlim(xlim)
-axes[2].set_xlim(xlim)
-axes[3].set_xlim(xlim)
-
-"""
-print(stats.ttest_1samp(all_corr[:,2] - all_corr[:,1], 0)[1] *4)
-print(stats.ttest_1samp(all_corr_gm[:,2] - all_corr_gm[:,1], 0)[1] *4)
-print(stats.ttest_1samp(all_corr_wm[:,2] - all_corr_wm[:,1], 0)[1] *4)
-print(stats.ttest_1samp(all_corr_gmwm[:,2] - all_corr_gmwm[:,1], 0)[1] * 4)
-"""
-
-#%%
-all_corr_rand = copy.deepcopy(all_corr)
-all_corr_gm_rand = copy.deepcopy(all_corr_gm)
-all_corr_wm_rand = copy.deepcopy(all_corr_wm)
-all_corr_gmwm_rand = copy.deepcopy(all_corr_gmwm)
-
-stats.ttest_ind(all_corr[:,2] - all_corr[:,1], all_corr_rand[:,2] - all_corr_rand[:,1])[1]
-stats.ttest_ind(all_corr_gm[:,2] - all_corr_gm[:,1], all_corr_gm_rand[:,2] - all_corr_gm_rand[:,1])[1]
-stats.ttest_ind(all_corr_wm[:,2] - all_corr_wm[:,1], all_corr_wm_rand[:,2] - all_corr_wm_rand[:,1])[1]
-stats.ttest_ind(all_corr_gmwm[:,2] - all_corr_gmwm[:,1], all_corr_gmwm_rand[:,2] - all_corr_gmwm_rand[:,1])[1]
-
-#%%
-#seeing if removing resected electrodes secreases the change in correlation
-
-#bootstrapping patients and seizures
-bootstrap_ind = []
-for i in range(len(patients_with_SC)):
-    ind = np.unique(summaryStats.loc[summaryStats["patient"] == patients_with_SC[i]]["seizure_number"])
-    if len(ind)> 2:
-        bootstrap_ind.append(random.sample(list(ind), 2))
-    if len(ind) > 1:
-        bootstrap_ind.append(random.sample(list(ind), 1))
-    else:
-        bootstrap_ind.append(list(ind))
-bootstrap_ind = [item for sublist in bootstrap_ind for item in sublist]
-
-
-all_corr = np.zeros((len(bootstrap_ind),4))
-all_corr_gm = np.zeros((len(bootstrap_ind),4))
-all_corr_wm = np.zeros((len(bootstrap_ind),4))
-all_corr_gmwm = np.zeros((len(bootstrap_ind),4))
-all_corr_ablated = np.zeros((len(bootstrap_ind),4))
-all_corr_gm_ablated = np.zeros((len(bootstrap_ind),4))
-all_corr_wm_ablated = np.zeros((len(bootstrap_ind),4))
-all_corr_gmwm_ablated = np.zeros((len(bootstrap_ind),4))
+sns.boxplot(data = means_df , x = "tissue", y = "SFC", hue = "state", ax = axes, showfliers=False, order = ["Full Network", "GM", "GM-WM", "WM"])
+plt.setp(axes.lines, zorder=100); plt.setp(axes.collections, zorder=100, label="")
+#sns.stripplot(data= means_df, x = "tissue", y = "SFC", hue = "state", dodge=True, color = "#444444", ax = axes,s = 1, order = ["Full Network", "GM", "GM-WM", "WM"])
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+axes.legend([],[], frameon=False)
+
+
+for a in range(len( axes.artists)):
+    mybox = axes.artists[a]
+    # Change the appearance of that box
+    mybox.set_facecolor(palette[a])
+    mybox.set_edgecolor(palette[a])
+    #mybox.set_linewidth(3)
 count = 0
-for b in range(len(bootstrap_ind)):
-    i = bootstrap_ind[b]
-    sub = patientsWithseizures["subject"][i]
-    print(f"{sub}: {i}")
-    path_SC = join(paths['tractography'], f"sub-{sub}", "connectivity", "electrodeContactAtlas")
+a = 0
+for line in axes.get_lines():
+    line.set_color(palette[a])
+    count = count + 1
+    if count % 5 ==0:
+        a = a +1
+    if count % 5 ==0: #set mean line
+        line.set_color("#222222")
+        #line.set_ls("-")
+        #line.set_lw(2.5)
 
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
 
-    path_SC_contacts = glob.glob(join(path_SC, "*.txt"))[0]
-    SC = utils.read_DSI_studio_Txt_files_SC(path_SC_contacts)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2SFC_bootstrap_10000.pdf"), save_figure=True)
 
-    SC_names = utils.get_DSIstudio_TXT_file_ROI_names_for_spheres(path_SC_contacts)
-
-
-    SC = utils.log_normalize_adj(SC)
-
-    #utils.plot_adj_heatmap(SC)
-
-
-    ##%% Look at FC for SC
-
-    sub = patientsWithseizures["subject"][i]
-    func = 2
-    FCtype = FC_TYPEs[func]
-    freq = 7
-    print(f"{FCtype}, {FREQUENCY_NAMES[freq]}, {sub}")
-    functionalConnectivityPath = join(paths["functionalConnectivityiEEG"], f"sub-{sub}")
-    channels, FC = metadata.get_FunctionalConnectivity(patientsWithseizures["subject"][i], idKey = patientsWithseizures["idKey"][i], username = username, password = password,
-                                        BIDS =paths['BIDS'], dataset ="derivatives/iEEGorgDownload", session ="implant01",
-                                        functionalConnectivityPath = functionalConnectivityPath,
-                                        secondsBefore=180, secondsAfter=180, startKey = "EEC",
-                                        fsds = param.FREQUENCY_DOWN_SAMPLE, montage = MONTAGE, FCtype = FC_TYPE)
-    if func == 0 or func == 2:
-        for per in range(len(FC)):
-            for f in range(len(FC[per])):
-                FC[per][f] = abs(FC[per][f])
-    # Get atlas localization and distances
-    file = join(paths["atlasLocaliztion"], f"sub-{patientsWithseizures['subject'][i]}", "ses-implant01", f"sub-{patientsWithseizures['subject'][i]}_ses-implant01_desc-atlasLocalization.csv")
-    if utils.checkIfFileExistsGlob(file, printBOOL=False):
-        localization = pd.read_csv(file)
-        localizationChannels = localization["channel"]
-        localizationChannels = echobase.channel2std(
-            np.array(localizationChannels))
-    # getting distances
-    dist = pd.DataFrame(channels, columns=["channels"])
-    dist["distance"] = np.nan
-    for ch in range(len(channels)):# Getting distances of the channels
-        channelName = channels[ch]
-        if any(channelName == localizationChannels):
-            dist.iloc[ch, 1] = localization["percent_WM"][np.where(#percent_WM, distance_to_GM_millimeters
-                channelName == localizationChannels)[0][0]]
-        else:
-            # if channel has no localization, then just assume GM.
-            dist.iloc[ch, 1] = 0
-    # definition of WM by distance
-    WMdef = WMdefinitionPercent3
-    GMindex = np.where(dist["distance"] <= WMdef)[0]
-    WMindex = np.where(dist["distance"] > WMdef)[0]
-
-
-    manual_resected_electrodes = metadata.get_manual_resected_electrodes(sub)
-    manual_resected_electrodes = np.array(echobase.channel2std(manual_resected_electrodes))
-    manual_resected_electrodes, _, manual_resected_electrodes_index = np.intersect1d(  manual_resected_electrodes, np.array(dist["channels"]), return_indices=True )
-
-    if len(manual_resected_electrodes)>0:
+confidence_intervals = pd.DataFrame(columns = ["tissue", "state", "ci_lower", "ci_upper"])
+for t in range(len(params.TISSUE_TYPE_NAMES)):
+    for s in range(len(STATE_NAMES)):
+        df_ci =  means_df.query(f'tissue == "{params.TISSUE_TYPE_NAMES2[t]}" and state == "{STATE_NAMES[s]}"')["SFC"]
+        ci = stats.t.interval(alpha=0.95, df=len(df_ci)-1, loc=np.mean(df_ci), scale=stats.sem(df_ci))
+        confidence_intervals = confidence_intervals.append(dict(tissue = params.TISSUE_TYPE_NAMES[t], state = STATE_NAMES[s], ci_lower = ci[0], ci_upper = ci[1]  ),ignore_index=True)
 
 
 
-        #fig, axes = utils.plot_make()
-        corr = []
-        corr_gm = []
-        corr_wm = []
-        corr_gmwm = []
-        corr_ablated = []
-        corr_gm_ablated = []
-        corr_wm_ablated = []
-        corr_gmwm_ablated = []
-        for s in range(len(FC)):
-            state = s
-            adj = copy.deepcopy(FC[state][freq])
-            order = utils.get_intersect1d_original_order(channels, SC_names)
-            SC_order = utils.reorderAdj(SC, order)
-            missing_delete_in_FC = utils.find_missing(channels, SC_names).astype(int)
-            adj = np.delete(adj, missing_delete_in_FC, 0)
-            adj = np.delete(adj, missing_delete_in_FC, 1) #making sure both SC and FC have the same rows and columns represented
-            #utils.plot_adj_heatmap(SC_order)
-            #utils.plot_adj_heatmap(adj)
+palette2 = ["#bbbbbb" , "#cebeb1"  , "#b6d4ee", "#cdc0d7"]
+palette3 = ["#808080" , "#a08269"  , "#76afdf", "#8a6ca1"]
 
-            corr.append( spearmanr(utils.getUpperTriangle(SC_order), utils.getUpperTriangle(adj))[0])
-            #sns.regplot(x = utils.getUpperTriangle(SC_order), y = utils.getUpperTriangle(adj), scatter_kws={'s':2}, ax = axes)
-            #plt.title(f"SFC {sub}")
-            #plt.xlabel("SC")
-            #plt.ylabel(f"FC ({FCtype} {FREQUENCY_NAMES[freq]})")
-            #fig.legend(labels = [ f"ii: {np.round(corr[0],3)}", f"pi: {np.round(corr[1],3)}", f"ic: {np.round(corr[2],3)}", f"po: {np.round(corr[3],3)}"])
+#reorder for plotting
+df = pd.DataFrame(means_delta_corr, columns =params.TISSUE_TYPE_NAMES )
+order =  [params.TISSUE_TYPE_NAMES[i] for i in [3,1,2,0]]
+df = df[order]
+
+palette2_reorder = [palette2[i] for i in [3,1,2,0]]
+palette3_reorder = [palette3[i] for i in [0,2,1,3]] #idk why but seaborn and python are so stupid in their plotting. Makes no sense.
+
+fig, axes = utils.plot_make()
+sns.histplot(data = df, palette = palette2_reorder, ax = axes, binwidth = 0.01 , line_kws = dict(lw = 5), alpha=1 , edgecolor=None, kde = True)
+#sns.kdeplot(data = df, palette =  palette3_reorder, ax = axes , lw = 5, bw_method = 0.1)
+axes.set_xlim([-0.025, 0.14])
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+axes.legend([],[], frameon=False)
+for l in range(len(axes.lines)):
+    axes.lines[l].set_color(palette3_reorder[l])
+
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2SFC_bootstrap_delta_histogram_10000bootstrap.pdf"), save_figure=False)
+
+stats.t.interval(alpha=0.95, df=len(df)-1, loc=np.mean(df), scale=stats.sem(df))
 
 
-            #SFC for tissue
-            dist_new = dist.drop(missing_delete_in_FC).reset_index() #need new index of GM and WM because deleted FC channels that were not in SC
-            GMindex = np.where(dist_new["distance"] <= WMdef)[0]
-            WMindex = np.where(dist_new["distance"] > WMdef)[0]
-
-            adj_gm =  utils.reorderAdj(adj, GMindex)
-            SC_order_gm = utils.reorderAdj(SC_order, GMindex)
-            adj_wm =  utils.reorderAdj(adj, WMindex)
-            SC_order_wm = utils.reorderAdj(SC_order, WMindex)
-            adj_gmwm =  utils.getAdjSubset(adj, GMindex, WMindex)
-            SC_order_gmwm = utils.getAdjSubset(SC_order, GMindex, WMindex)
-            #fig, axes = utils.plot_make(c =3)
-            #sns.regplot(x = utils.getUpperTriangle(SC_order_gm), y = utils.getUpperTriangle(adj_gm), scatter_kws={'s':2}, ax = axes[0])
-            #sns.regplot(x = utils.getUpperTriangle(SC_order_wm), y = utils.getUpperTriangle(adj_wm), scatter_kws={'s':2}, ax = axes[1])
-            #sns.regplot(x =SC_order_gmwm.flatten(), y = adj_gmwm.flatten(), scatter_kws={'s':2}, ax = axes[2])
+#%%#%%
+df_long, delta_corr = helper.get_tissue_SFC(patientsWithseizures, sfc_patient_list, paths,
+                       FC_TYPES, STATE_NAMES, FREQUENCY_NAMES, metadata_iEEG, SESSION, USERNAME, PASSWORD,FREQUENCY_DOWN_SAMPLE, MONTAGE,
+                       params.TISSUE_DEFINITION_PERCENT[0], params.TISSUE_DEFINITION_PERCENT[1], params.TISSUE_DEFINITION_PERCENT[2],
+                       ratio_patients = 5, max_seizures = 1,
+                       func = 2, freq = 0, print_pvalues = True)
 
 
-            corr_gm.append(spearmanr(utils.getUpperTriangle(SC_order_gm), utils.getUpperTriangle(adj_gm))[0])
-            corr_wm.append(spearmanr(utils.getUpperTriangle(SC_order_wm), utils.getUpperTriangle(adj_wm))[0])
-            corr_gmwm.append(spearmanr(SC_order_gmwm.flatten(), adj_gmwm.flatten())[0])
+palette = ["#bbbbbb", "#808080", "#282828", "#808080"] + ["#cebeb1", "#a08269", "#675241", "#a08269"] +  ["#cdc0d7", "#8a6ca1", "#511e79", "#8a6ca1"] + ["#b6d4ee", "#76afdf", "#1f5785", "#76afdf"]
+palette = ["#bbbbbb", "#bbbbbb", "#282828", "#bbbbbb"] + ["#cebeb1", "#cebeb1", "#675241", "#cebeb1"] + ["#cdc0d7", "#cdc0d7", "#511e79", "#cdc0d7"] + ["#b6d4ee", "#b6d4ee", "#1f5785", "#b6d4ee"]
+palette2 = ["#808080", "#808080", "#282828", "#808080"] + ["#a08269", "#a08269", "#675241", "#a08269"] + ["#8a6ca1", "#8a6ca1", "#511e79", "#8a6ca1"]+ ["#76afdf", "#76afdf", "#1f5785", "#76afdf"]
 
-            ablated_ind = utils.get_intersect1d_original_order( manual_resected_electrodes,dist.channels)
-            ablated_ind = random.sample(range(len(dist.channels)), len(manual_resected_electrodes))
-            adj_ablated = np.delete(adj, ablated_ind, 0)
-            adj_ablated = np.delete(adj, ablated_ind, 1) #resection
-            SC_order_ablated = np.delete(SC_order, ablated_ind, 0)
-            SC_order_ablated = np.delete(SC_order, ablated_ind, 1) # utils.plot_adj_heatmap(SC_order)
-            corr_ablated.append( spearmanr(utils.getUpperTriangle(SC_order_ablated), utils.getUpperTriangle(adj_ablated))[0])
-            dist_new_ablated = dist.drop(ablated_ind).reset_index() #need new index of GM and WM because deleted FC channels that were not in SC
-            GMindex_ablated = np.where(dist_new_ablated["distance"] <= WMdef)[0]
-            WMindex_ablated = np.where(dist_new_ablated["distance"] > WMdef)[0]
-            adj_gm_ablated =  utils.reorderAdj(adj_ablated, GMindex_ablated)
-            SC_order_gm_ablated = utils.reorderAdj(SC_order_ablated, GMindex_ablated)
-            adj_wm_ablated =  utils.reorderAdj(adj_ablated, WMindex_ablated)
-            SC_order_wm_ablated = utils.reorderAdj(SC_order_ablated, WMindex_ablated)
-            adj_gmwm_ablated =  utils.getAdjSubset(adj_ablated, GMindex_ablated, WMindex_ablated)
-            SC_order_gmwm_ablated = utils.getAdjSubset(SC_order_ablated, GMindex_ablated, WMindex_ablated)
-            #fig, axes = utils.plot_make(c =3)
-            #sns.regplot(x = utils.getUpperTriangle(SC_order_gm), y = utils.getUpperTriangle(adj_gm), scatter_kws={'s':2}, ax = axes[0])
-            #sns.regplot(x = utils.getUpperTriangle(SC_order_wm), y = utils.getUpperTriangle(adj_wm), scatter_kws={'s':2}, ax = axes[1])
-            #sns.regplot(x =SC_order_gmwm.flatten(), y = adj_gmwm.flatten(), scatter_kws={'s':2}, ax = axes[2])
+#%%
+fig, axes = utils.plot_make(size_length = 5, size_height = 4)
 
+meanprops={"marker":"o", "markerfacecolor":"white",  "markeredgecolor":"black", "markersize":"10"}
 
-            corr_gm_ablated.append(spearmanr(utils.getUpperTriangle(SC_order_gm_ablated), utils.getUpperTriangle(adj_gm_ablated))[0])
-            corr_wm_ablated.append(spearmanr(utils.getUpperTriangle(SC_order_wm_ablated), utils.getUpperTriangle(adj_wm_ablated))[0])
-            corr_gmwm_ablated.append(spearmanr(SC_order_gmwm_ablated.flatten(), adj_gmwm_ablated.flatten())[0])
-        all_corr[count,:] = corr
-        all_corr_gm[count,:] = corr_gm
-        all_corr_wm[count,:] = corr_wm
-        all_corr_gmwm[count,:] = corr_gmwm
-        all_corr_ablated[count,:] = corr_ablated
-        all_corr_gm_ablated[count,:] = corr_gm_ablated
-        all_corr_wm_ablated[count,:] = corr_wm_ablated
-        all_corr_gmwm_ablated[count,:] = corr_gmwm_ablated
-        count = count +1
+sns.boxplot(data = df_long, x = "tissue", y = "FC", hue = "state", ax = axes , whis = 1,showmeans=True , meanline=True)
+axes.legend([],[], frameon=False)
 
-all_corr = np.delete(all_corr, range(count, len(bootstrap_ind)), axis = 0)
-all_corr_gm = np.delete(all_corr_gm, range(count, len(bootstrap_ind)), axis = 0)
-all_corr_wm = np.delete(all_corr_wm, range(count, len(bootstrap_ind)), axis = 0)
-all_corr_gmwm = np.delete(all_corr_gmwm, range(count, len(bootstrap_ind)), axis = 0)
-all_corr_ablated = np.delete(all_corr_ablated, range(count, len(bootstrap_ind)), axis = 0)
-all_corr_gm_ablated = np.delete(all_corr_gm_ablated, range(count, len(bootstrap_ind)), axis = 0)
-all_corr_wm_ablated = np.delete(all_corr_wm_ablated, range(count, len(bootstrap_ind)), axis = 0)
-all_corr_gmwm_ablated = np.delete(all_corr_gmwm_ablated, range(count, len(bootstrap_ind)), axis = 0)
+for a in range(len( axes.artists)):
+    mybox = axes.artists[a]
 
+    # Change the appearance of that box
+    mybox.set_facecolor(palette[a])
+    mybox.set_edgecolor(palette[a])
+    #mybox.set_linewidth(3)
 
-tmp1 = all_corr_gm[:,0]
-tmp2 = all_corr_gm_ablated[:,0]
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
 
-xlim = [-0.2, 0.5]
-fig, axes = utils.plot_make(r =2)
-sns.boxplot(x = tmp1 ,ax = axes[0]   )
-sns.boxplot(x =tmp2 ,ax = axes[1]   )
-sns.swarmplot(x = tmp1 ,ax = axes[0], color = "red"   )
-sns.swarmplot(x =tmp2 ,ax = axes[1] , color = "red"   )
-axes[0].set_xlim(xlim)
-axes[1].set_xlim(xlim)
-np.nanmean(tmp1)
-np.nanmean(tmp2)
+count = 0
+a = 0
+for line in axes.get_lines():
+    line.set_color(palette2[a])
+    count = count + 1
+    if count % 7 ==0:
+        a = a +1
+    if count % 7 ==5: #set median line
+        line.set_color("white")
+        line.set_ls("--")
+        line.set_lw(1)
+    if count % 7 ==6: #set mean line
+        line.set_color("#970707")
+        line.set_ls("-")
+        line.set_lw(2.5)
 
-print(stats.ttest_rel(tmp1, tmp2)[1]*4)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"SFC_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
 #%%
 
 
+fig, axes = utils.plot_make()
+binrange = [-0.3,0.3]
+binwidth = 0.01
+sns.histplot( delta_corr[:,1], ax = axes , binrange = binrange, binwidth = binwidth, kde = True, color = "red" )
+sns.histplot( delta_corr[:,2], ax = axes ,  binrange = binrange, binwidth = binwidth , kde = True, color = "blue" )
+sns.histplot( delta_corr[:,3], ax = axes ,  binrange = binrange, binwidth = binwidth , kde = True, color = "purple" )
+
+
+
+func = 2
+freq = 0
+i=83 #3, 21, 51, 54, 63, 75, 78, 103, 104, 105, 109, 110, 111, 112, 113, 116
+for s in range(STATE_NUMBER):
+    SC_order, SC_order_gm, SC_order_wm, SC_order_gmwm, adj, adj_gm, adj_wm, adj_gmwm = helper.get_SC_and_FC_adj(patientsWithseizures,
+                                                     i, metadata_iEEG, SESSION, USERNAME, PASSWORD, paths,
+                                                     FREQUENCY_DOWN_SAMPLE, MONTAGE, FC_TYPES,
+                                                     TISSUE_DEFINITION_NAME,
+                                                     TISSUE_DEFINITION_GM,
+                                                     0.5,
+                                                     func = func, freq = freq, state = s )
+    if s == 0:
+        interictal = [SC_order, SC_order_gm, SC_order_wm, SC_order_gmwm, adj, adj_gm, adj_wm, adj_gmwm]
+    if s == 1:
+        preictal = [SC_order, SC_order_gm, SC_order_wm, SC_order_gmwm, adj, adj_gm, adj_wm, adj_gmwm]
+    if s == 2:
+        ictal = [SC_order, SC_order_gm, SC_order_wm, SC_order_gmwm, adj, adj_gm, adj_wm, adj_gmwm]
+    if s == 3:
+        postictal = [SC_order, SC_order_gm, SC_order_wm, SC_order_gmwm, adj, adj_gm, adj_wm, adj_gmwm]
+
+
+
+#109      116, 111   104?    78
+def plot_adj_heatmap(adj, vmin = 0, vmax = 1, center = 0.5, cmap = "mako" ):
+    fig, axes = plt.subplots(1, 1, figsize=(4, 4), dpi=300)
+    sns.heatmap(adj, vmin = vmin, vmax =vmax, center = center, cmap = cmap , ax = axes,  square=True , cbar = False, xticklabels = False, yticklabels = False )
+
+
+cmap_structural = sns.cubehelix_palette(start=2.8, rot=-0.1, dark=.2, light=0.95, hue = 1, gamma = 4, reverse=True, as_cmap=True)
+
+
+plot_adj_heatmap(SC_order, cmap = cmap_structural, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_SC_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
+plot_adj_heatmap(SC_order_gm, cmap = cmap_structural, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_SC_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
+plot_adj_heatmap(SC_order_wm, cmap = cmap_structural, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_SC_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
+plot_adj_heatmap(SC_order_gmwm, cmap = cmap_structural, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_SC_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
+
+pad = 0.015
+cmap_functional = sns.cubehelix_palette(start=0.7, rot=-0.1, dark=0, light=0.95, hue = 0.8, gamma = 0.8, reverse=True, as_cmap=True)
+t = 4
+plot_adj_heatmap(interictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_0_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+plot_adj_heatmap(preictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_1_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+plot_adj_heatmap(ictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_2_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+plot_adj_heatmap(postictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_3_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+
+t = 5
+plot_adj_heatmap(interictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_0_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+plot_adj_heatmap(preictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_1_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+plot_adj_heatmap(ictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_2_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+plot_adj_heatmap(postictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_3_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+
+
+t = 6
+plot_adj_heatmap(interictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_0_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+plot_adj_heatmap(preictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_1_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+plot_adj_heatmap(ictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_2_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+plot_adj_heatmap(postictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_3_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+
+
+
+t = 7
+plot_adj_heatmap(interictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_0_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+plot_adj_heatmap(preictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_1_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+plot_adj_heatmap(ictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_2_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+plot_adj_heatmap(postictal[t], cmap = cmap_functional, center = 0.5)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_3_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+
+
+
+from sklearn import linear_model
+
+reg = linear_model.TweedieRegressor(power=1, alpha=0)
+#reg = linear_model.LinearRegression()
+
+states_SFC = [interictal, preictal, ictal, postictal]
+
+fig, axes = utils.plot_make(c =STATE_NUMBER, size_length = 16, size_height = 3, sharey = True)
+for s in range(STATE_NUMBER):
+    matrix = states_SFC[s]
+    x = utils.getUpperTriangle(SC_order)
+    y = utils.getUpperTriangle(matrix[4])
+    reg.fit(x.reshape(-1, 1), y)
+    y_predict = reg.predict(x.reshape(-1, 1))
+    sns.lineplot(x = x[1::10], y = y_predict[1::10], ax= axes[s], color = plot.COLORS_STATE4[1][s], lw = 5, alpha = 0.7);
+    sns.scatterplot(x = x[1::2], y = y[1::2], ax= axes[s], s = 5, color = plot.COLORS_STATE4[1][s], linewidth=0, alpha = 0.3)
+
+    axes[s].title.set_text( np.round( spearmanr(utils.getUpperTriangle(SC_order), utils.getUpperTriangle(matrix[4]))[0],2)   )
+    axes[s].set_ylim([0,1])
+
+    axes[s].spines['top'].set_visible(False)
+    axes[s].spines['right'].set_visible(False)
+
+
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"GLM_SFC_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -1191,929 +684,673 @@ print(stats.ttest_rel(tmp1, tmp2)[1]*4)
 #%%
 
 
-#analysis of determining how ablated contacts are connected to diff GM/WM regions
-
-#Good 309, Engel 1a (1 year)        39-51  random.randrange(39,52)       #51
-#good 238, Engel 1a (9 months)      4-10   random.randrange(4,11)        #9
-#good 440, Engel 1b (       )       78-81  random.randrange(78,82)       #78
-#good 320, Engel 1B (1 year)        52-54  random.randrange(52,55)       #52
-#good 307, Engel 1A (4 years)       37-38  random.randrange(37,39)       #37
-#good 365, Engel 1B (2 years)       60-65  random.randrange(60,66)       #62
-
-#fair 274, Engel 2A (1 year)        19-20  random.randrange(19,21)       #20
-#fair 371, Engel 2A  (1 year)        66-69  random.randrange(66,70)       #68
-
-#poor 278, Engel 4c (2 years)       21-24  random.randrange(21,25)       #24
-#poor 405, Engel 3  (2 years)       73-74  random.randrange(73,75)       #73
-#poor 442, Engel 3  (2.5 years)     82-102 random.randrange(82,103)      #96
-#poor 382, Engel 3  (3 years)       70-72  random.randrange(70,73)       #71
-
-
-#poor 322, engel 4a   55-59 #57
-pvals = []
-pvals2 = []
-pvals_gm_to_wm = []
-pvals_gm_to_wm_closest = []
-for kk in range(50):
-    print(f"{kk}")
-    #patient_inds = [51, 9, 78, 52, 37, 62, 20, 68, 24, 73, 96, 71]
-    #bootstrapping patients and seizures
-    patient_inds = [random.randrange(39,52), random.randrange(55,59) , random.randrange(78,82)  ,
-                    random.randrange(52,55) , random.randrange(37,39) , random.randrange(60,66)  ,
-                    random.randrange(19,21) , random.randrange(66,70),
-                    random.randrange(21,25) , random.randrange(73,75)  , random.randrange(82,103) , random.randrange(71,73)  ]
-    patient_inds_good = random.sample(patient_inds[:6], 3)
-    patient_inds_poor = random.sample(patient_inds[8:], 3)
-    patient_inds_bootstrap = patient_inds_good + patient_inds_poor
-    patient_zscores_ictal = []
-    patient_zscores_preictal = []
-    delta = []
-    delta_zscore = []
-    icccc = []
-    piiii = []
-    filler_zscore_all = []
-    difference_in_gmwm_fc = []
-    percent_top_gm_to_wm_all = []
-    zscores_ablated_contact_significantl_correlated_to_wm_all = []
-
-    gm_to_wm_all = []
-    gm_to_wm_all_ablated = []
-    gm_to_wm_all_ablated_closest_wm = []
-    gm_to_wm_all_ablated_closest_wm_gradient = []
-    for pt in range(len(patient_inds_bootstrap)):
-        i = patient_inds_bootstrap[pt]
-
-        sub = patientsWithseizures["subject"][i]
-        func = 2
-        FCtype = FC_TYPEs[func]
-        freq = 0
-        #print(f"{FCtype}, {FREQUENCY_NAMES[freq]}, {sub}")
-        functionalConnectivityPath = join(paths["functionalConnectivityiEEG"], f"sub-{sub}")
-        channels, FC = metadata.get_FunctionalConnectivity(patientsWithseizures["subject"][i], idKey = patientsWithseizures["idKey"][i], username = username, password = password,
-                                            BIDS =paths['BIDS'], dataset ="derivatives/iEEGorgDownload", session ="implant01",
-                                            functionalConnectivityPath = functionalConnectivityPath,
-                                            secondsBefore=180, secondsAfter=180, startKey = "EEC",
-                                            fsds = param.FREQUENCY_DOWN_SAMPLE, montage = MONTAGE, FCtype = FC_TYPE)
-
-        #if cross correlation, take absolute value
-        if func == 2 or func == 0:
-            for per in range(len(FC)):
-                for f in range(len(FC[per])):
-                    FC[per][f] = abs(FC[per][f])
-        # Get atlas localization and distances
-        file = join(paths["atlasLocaliztion"], f"sub-{patientsWithseizures['subject'][i]}", "ses-implant01", f"sub-{patientsWithseizures['subject'][i]}_ses-implant01_desc-atlasLocalization.csv")
-        if utils.checkIfFileExistsGlob(file, printBOOL=False):
-            localization = pd.read_csv(file)
-            localizationChannels = localization["channel"]
-            localizationChannels = echobase.channel2std(
-                np.array(localizationChannels))
-        # getting distances
-        dist = pd.DataFrame(channels, columns=["channels"])
-        dist["distance"] = np.nan
-        for ch in range(len(channels)):# Getting distances of the channels
-            channelName = channels[ch]
-            if any(channelName == localizationChannels):
-                dist.iloc[ch, 1] = localization["percent_WM"][np.where( #percent_WM, distance_to_GM_millimeters
-                    channelName == localizationChannels)[0][0]]
-            else:
-                # if channel has no localization, then just assume GM.
-                dist.iloc[ch, 1] = 0
-        # definition of WM by distance
-        dist_coordinates = pd.DataFrame(channels, columns=["channels"])
-        dist_coordinates["x"] = np.nan
-        dist_coordinates["y"] = np.nan
-        dist_coordinates["z"] = np.nan
-        for ch in range(len(channels)):# Getting distances of the channels
-            channelName = channels[ch]
-            if any(channelName == localizationChannels):
-                dist.iloc[ch, 1] = localization["percent_WM"][np.where(#percent_WM, distance_to_GM_millimeters
-                    channelName == localizationChannels)[0][0]]
-                dist_coordinates.iloc[ch, 1]  = localization["x"][np.where(
-                    channelName == localizationChannels)[0][0]]
-                dist_coordinates.iloc[ch, 2]  = localization["y"][np.where(
-                    channelName == localizationChannels)[0][0]]
-                dist_coordinates.iloc[ch, 3]  = localization["z"][np.where(
-                    channelName == localizationChannels)[0][0]]
-            else:
-                # if channel has no localization, then just assume GM.
-                dist.iloc[ch, 1] = 0
-        dist_coordinates_array = np.array(dist_coordinates[["x","y","z"]])
-        distance_pairwise = utils.get_pariwise_distances(dist_coordinates_array)
-        closest_wm_threshold = 20 #in mm
-
-        GMindex = np.where(dist["distance"] <= WMdefinitionPercent2)[0]
-        WMindex = np.where(dist["distance"] > WMdefinitionPercent2)[0]
-        distOrderInd = np.array(np.argsort(dist["distance"]))
-        distOrder = dist.iloc[distOrderInd].reset_index()
-
-        manual_resected_electrodes = metadata.get_manual_resected_electrodes(sub)
-        manual_resected_electrodes = np.array(echobase.channel2std(manual_resected_electrodes))
-        manual_resected_electrodes, _, manual_resected_electrodes_index = np.intersect1d(  manual_resected_electrodes, np.array(dist["channels"]), return_indices=True )
-
-
-        #get FC values for just the GM-GM connections and WM-WM connections and GM-WM connections
-        FCtissue = [None] *3
-        FCall = []
-        for t in range(len(FCtissue)):
-            FCtissue[t] = []
-        for s in range(len(FC)):
-            #Reorder/get just the tissue index, and then just get the upper half of triangle (exluding diagonal)
-            FCtissue[0].append(   utils.getUpperTriangle(     utils.reorderAdj(FC[s][freq], GMindex)       )   )
-            FCtissue[1].append(   utils.getUpperTriangle(     utils.reorderAdj(FC[s][freq], WMindex)       )   )
-            FCtissue[2].append(   utils.getAdjSubset(FC[s][freq], GMindex, WMindex).flatten()   )
-            FCall.append(  utils.getUpperTriangle(FC[s][freq]       )   )
-
-
-        utils.get_pariwise_distances(dist_coordinates_array)
-
-
-        ictal = []
-        preictal = []
-        ictal_zscore = []
-        preictal_zscore = []
-
-        preictal_all_connectivity_per_channel = []
-        ictal_all_connectivity_per_channel = []
-
-        gm_to_wm_per_patient = []
-        gm_to_wm_per_patient_ablated = []
-        gm_to_wm_per_patient_ablated_closest_wm = []
-        gm_to_wm_per_patient_ablated_closest_wm_gradient = []
-        for s in range(4): #getting average gm-to-wm connectivity
-            state = s
-
-
-            adj = FC[state][freq]
-
-            gm_to_wm = utils.getAdjSubset(adj, GMindex, WMindex)
-            gm_to_wm_median= np.nanmedian(utils.getUpperTriangle(gm_to_wm))
-            #sns.histplot(utils.getUpperTriangle(gm_to_wm), bins = 20)
-            gm_to_wm_per_patient.append(gm_to_wm.flatten())
-        gm_to_wm_all.append(gm_to_wm_per_patient)
-        for s in [1,2]:
-            state = s
-
-
-            adj = FC[state][freq]
-
-            gm_to_wm = utils.getAdjSubset(adj, GMindex, WMindex)
-            gm_to_wm_average = np.nanmedian(gm_to_wm, axis = 1)
-            #sns.histplot(gm_to_wm_average, bins = 20)
-            gm_to_wm_per_patient_ablated_per_channel = []
-            gm_to_wm_per_patient_ablated_per_channel_closest = []
-            gm_to_wm_per_patient_ablated_per_channel_closest_gradient = []
-            for ch in range(len(manual_resected_electrodes)):
-                #ch = 1
-                #print(dist[channels == manual_resected_electrodes[ch]])
-                ablated_ind = np.where(manual_resected_electrodes[ch] == channels)[0]
-                ablated_wm_fc = utils.getAdjSubset(adj, ablated_ind, WMindex)[0]
-                gm_to_wm_per_patient_ablated_per_channel.append(ablated_wm_fc.flatten())
-                gm_to_wm = utils.getAdjSubset(adj, GMindex, WMindex  )
-                gm_to_wm_average = np.nanmedian(gm_to_wm, axis = 1)
-                #sns.histplot(gm_to_wm_average, bins = 20)
-                #plt.show()
-                value = np.nanmedian(ablated_wm_fc)
-                #print(np.nanmedian(ablated_wm_fc))
-                zz = stats.zscore( np.concatenate([[np.array(value)], gm_to_wm_average]) )[0]
-
-                all_wm_connectivity = utils.getAdjSubset(adj, np.array(range(len(adj))), WMindex  )
-                all_wm_connectivity_average = np.nanmedian(all_wm_connectivity, axis = 1)
-
-                #getting FC of closest WM to ablated region
-                closest_wm_index = WMindex[np.where(distance_pairwise[ablated_ind,:][0][WMindex] < closest_wm_threshold)[0]]
-                ablated_closest_wm_fc = utils.getAdjSubset(adj, ablated_ind, closest_wm_index)[0]
-                gm_to_wm_per_patient_ablated_per_channel_closest.append(ablated_closest_wm_fc.flatten())
-                #getting FC of closest WM to ablated region GRADIENT
-                closest_wm_threshold_gradient = np.arange(15, 125,5 )  #in mm
-                gradient = []
-                for gr in range(len(closest_wm_threshold_gradient)):
-                    closest_wm_index = WMindex[np.where((distance_pairwise[ablated_ind,:][0][WMindex] < closest_wm_threshold_gradient[gr] ) & (distance_pairwise[ablated_ind,:][0][WMindex] > closest_wm_threshold_gradient[gr] - 15))[0]]
-                    ablated_closest_wm_fc = utils.getAdjSubset(adj, ablated_ind, closest_wm_index)[0]
-                    gradient.append(ablated_closest_wm_fc.flatten())
-                gm_to_wm_per_patient_ablated_per_channel_closest_gradient.append(gradient)
-                ##
-                if s != 2:
-                    preictal.append(np.nanmedian(ablated_wm_fc))
-                    preictal_zscore.append(zz)
-                    preictal_all_connectivity_per_channel = all_wm_connectivity_average
-
-                if s == 2:
-                    ictal.append(np.nanmedian(ablated_wm_fc))
-                    ictal_zscore.append(zz)
-                    ictal_all_connectivity_per_channel = all_wm_connectivity_average
-            gm_to_wm_per_patient_ablated.append([item for sublist in gm_to_wm_per_patient_ablated_per_channel for item in sublist])
-            gm_to_wm_per_patient_ablated_closest_wm.append([item for sublist in gm_to_wm_per_patient_ablated_per_channel_closest for item in sublist])
-            #getting FC of closest WM to ablated region GRADIENT
-            gm_to_wm_per_patient_ablated_per_channel_closest_gradient_reorganized = []
-            for gr in range(len(closest_wm_threshold_gradient)):
-                gradient_tmp= []
-                for ch in range(len(manual_resected_electrodes)):
-                    gradient_tmp.append( gm_to_wm_per_patient_ablated_per_channel_closest_gradient[ch][gr])
-                tmp =   [item for sublist in gradient_tmp for item in sublist]
-                gm_to_wm_per_patient_ablated_per_channel_closest_gradient_reorganized.append(tmp)
-            gm_to_wm_per_patient_ablated_closest_wm_gradient.append(gm_to_wm_per_patient_ablated_per_channel_closest_gradient_reorganized)
-
-            if s == 2:
-                dd = np.array(ictal) - np.array(preictal)
-                delta.append(dd)
-                delta_zscore.append(np.array(ictal_zscore) - np.array(preictal_zscore))
-                icccc.append(ictal)
-                piiii.append(preictal)
-
-                diff1 = ictal_all_connectivity_per_channel - preictal_all_connectivity_per_channel
-                #sns.histplot(diff1, bins = 20)
-                #sns.histplot(np.array(ictal) - np.array(preictal), bins = 20)
-                filler_zscore = []
-                for ablated_channel in range(len(dd)):
-                    filler_zscore.append(stats.zscore( np.concatenate( [np.array([dd[ablated_channel]]), diff1]) )[0]    )
-                filler_zscore_all.append(filler_zscore)
-
-        gm_to_wm_all_ablated.append(gm_to_wm_per_patient_ablated)
-        gm_to_wm_all_ablated_closest_wm.append(gm_to_wm_per_patient_ablated_closest_wm)
-        gm_to_wm_all_ablated_closest_wm_gradient.append(gm_to_wm_per_patient_ablated_closest_wm_gradient)
-        """
-            z_scores_ablated = []
-            for ch in range(len(manual_resected_electrodes)):
-                ablated_ind = np.where(manual_resected_electrodes[ch] == channels)[0]
-                ablated_wm_fc = utils.getAdjSubset(adj, ablated_ind, WMindex)[0]
-                value = np.nanmedian(ablated_wm_fc)
-                distribution = [value]
-                iters = 50
-                for d in range(iters):
-                    if func == 5: #if pearson
-                        adj_scrambled = bct.randmio_und_signed(adj, itr = 2)[0]
-                    if func == 0 or func == 1 or func == 2: #if coherence
-                        adj_scrambled = bct.null_model_und_sign(adj)[0]
-                    ablated_wm_fc = utils.getAdjSubset(adj_scrambled, ablated_ind, WMindex)
-                    #gm_to_wm = utils.getAdjSubset(adj_scrambled, GMindex, WMindex)
-                    #gm_to_wm_average = np.nanmedian(gm_to_wm, axis = 1)
-                    #sns.histplot(gm_to_wm_average, bins = 20)
-                    avg = np.nanmedian(ablated_wm_fc)
-                    print(f"{d}: {sub}: {s}: {pt}/{len(patient_inds_bootstrap)}: {np.round(value,3)} ::: {np.round(avg,3)}")
-                    distribution.append(avg)
-
-                #sns.histplot(  distribution, bins = 20)
-                #plt.show()
-                z_scores = stats.zscore( distribution )
-                z_scores_ablated.append(z_scores[0])
-                print(z_scores_ablated)
-            if s != 2:
-                patient_zscores_preictal.append(z_scores_ablated)
-            if s == 2:
-                patient_zscores_ictal.append(z_scores_ablated)
-
-
-
-
-    good_preictal = np.concatenate(patient_zscores_preictal[:len(patient_inds_good)])
-    poor_preictal = np.concatenate(patient_zscores_preictal[len(patient_inds_good):])
-
-
-    good_ictal = np.concatenate(patient_zscores_ictal[:len(patient_inds_good)])
-    poor_ictal = np.concatenate(patient_zscores_ictal[len(patient_inds_good):])
-
-    np.nanmean(good_ictal - good_preictal)
-    np.nanmean(poor_ictal - poor_preictal)
-
-    df_good_delta = pd.DataFrame(dict(good = good_ictal - good_preictal))
-    df_poor_delta = pd.DataFrame(dict(poor = poor_ictal - poor_preictal))
-
-
-
-    df_patient = pd.concat([pd.melt(df_good_delta), pd.melt(df_poor_delta)]  )
-    """
-    """
-    fig, axes = plt.subplots(1, 1, figsize=(4, 4), dpi=300)
-    sns.boxplot(data = df_patient, x= "variable", y = "value", ax = axes )
-    sns.swarmplot(data = df_patient, x= "variable", y = "value", ax = axes)
-
-    stats.ttest_ind(good_ictal,poor_ictal)
-    """
-
-    #%
-
-    delta_mean = []
-    for x in delta:
-        delta_mean.append(sum(x)/len(x))
-
-    #good = np.concatenate(delta[:7])
-    #poor = np.concatenate(delta[8:])
-    good = np.concatenate(delta[:len(patient_inds_good)])
-    poor = np.concatenate(delta[len(patient_inds_good):])
-    #good = delta_mean[:len(patient_inds_good)]
-    #poor = delta_mean[len(patient_inds_good):]
-    df_good = pd.DataFrame(dict(good = good))
-    df_poor = pd.DataFrame(dict(poor = poor))
-
-
-
-    df_patient = pd.concat([pd.melt(df_good), pd.melt(df_poor)]  )
-    """
-    fig, axes = plt.subplots(1, 1, figsize=(4, 4), dpi=300)
-    sns.boxplot(data = df_patient, x= "variable", y = "value", ax = axes )
-    sns.swarmplot(data = df_patient, x= "variable", y = "value", ax = axes)
-    plt.show()
-    """
-    stats.mannwhitneyu(good,poor)[1]
-    stats.ttest_ind(good,poor)[1]
-    pvals.append(stats.mannwhitneyu(good,poor)[1])
-
-
-    #gm_to_wm on a node basis
-    difference_gm_to_wm = []
-    for l in range(len(gm_to_wm_all)):
-        difference_gm_to_wm.append(gm_to_wm_all[l][2] - gm_to_wm_all[l][1])
-    difference_gm_to_wm_good = difference_gm_to_wm[:len(patient_inds_good)]
-    difference_gm_to_wm_poor = difference_gm_to_wm[len(patient_inds_good):]
-    difference_gm_to_wm_good = [item for sublist in difference_gm_to_wm_good for item in sublist]
-    difference_gm_to_wm_poor = [item for sublist in difference_gm_to_wm_poor for item in sublist]
-    """
-    fig, axes = utils.plot_make()
-    sns.histplot(difference_gm_to_wm_good, ax = axes, kde = True, color = "blue", legend = True)
-    sns.histplot(difference_gm_to_wm_poor, ax = axes, kde = True, color = "orange")
-    fig.legend(labels=['good','poor'])
-    """
-    difference_gm_to_wm_ablated = []
-    for l in range(len(gm_to_wm_all_ablated)):
-        difference_gm_to_wm_ablated.append(np.array(gm_to_wm_all_ablated[l][1] )- np.array(gm_to_wm_all_ablated[l][0]))
-
-    difference_gm_to_wm_good_ablated = difference_gm_to_wm_ablated[:len(patient_inds_good)]
-    difference_gm_to_wm_poor_ablated = difference_gm_to_wm_ablated[len(patient_inds_good):]
-    difference_gm_to_wm_good_ablated = [item for sublist in difference_gm_to_wm_good_ablated for item in sublist]
-    difference_gm_to_wm_poor_ablated = [item for sublist in difference_gm_to_wm_poor_ablated for item in sublist]
-
-    pvals_gm_to_wm.append(stats.ks_2samp(difference_gm_to_wm_good_ablated,difference_gm_to_wm_poor_ablated)[1])
-
-    """
-    fig, axes = utils.plot_make()
-    sns.histplot(difference_gm_to_wm_good_ablated, ax = axes, kde = True, color = "blue", legend = True)
-    sns.histplot(difference_gm_to_wm_poor_ablated, ax = axes, kde = True, color = "orange")
-    fig.legend(labels=['good','poor'])
-
-    fig, axes = utils.plot_make()
-    sns.histplot(difference_gm_to_wm_good, ax = axes, color = "blue", legend = True)
-    sns.histplot(difference_gm_to_wm_good_ablated, ax = axes, color = "purple")
-    fig.legend(labels=['good_all_GM_to_WM_connections','good_ablated_to_WM'])
-
-
-    fig, axes = utils.plot_make()
-    sns.ecdfplot(difference_gm_to_wm_poor, ax = axes, color = "orange", legend = True)
-    sns.ecdfplot(difference_gm_to_wm_poor_ablated, ax = axes, color = "red")
-    fig.legend(labels=['good_all_GM_to_WM_connections','good_ablated_to_WM'])
-    """
-
-
-    #closest
-    difference_gm_to_wm_ablated_closest = []
-    for l in range(len(gm_to_wm_all_ablated_closest_wm)):
-        difference_gm_to_wm_ablated_closest.append(np.array(gm_to_wm_all_ablated_closest_wm[l][1] )- np.array(gm_to_wm_all_ablated_closest_wm[l][0]))
-
-    difference_gm_to_wm_good_ablated_closest = difference_gm_to_wm_ablated_closest[:len(patient_inds_good)]
-    difference_gm_to_wm_poor_ablated_closest = difference_gm_to_wm_ablated_closest[len(patient_inds_good):]
-    difference_gm_to_wm_good_ablated_closest = [item for sublist in difference_gm_to_wm_good_ablated_closest for item in sublist]
-    difference_gm_to_wm_poor_ablated_closest = [item for sublist in difference_gm_to_wm_poor_ablated_closest for item in sublist]
-    """
-    fig, axes = utils.plot_make()
-    sns.histplot(difference_gm_to_wm_good_ablated_closest, ax = axes, kde = True, color = "blue", legend = True)
-    sns.histplot(difference_gm_to_wm_poor_ablated_closest, ax = axes, kde = True, color = "orange")
-    fig.legend(labels=['good','poor'])
-
-    fig, axes = utils.plot_make()
-    sns.ecdfplot(difference_gm_to_wm_good_ablated_closest, ax = axes, color = "blue", legend = True)
-    sns.ecdfplot(difference_gm_to_wm_poor_ablated_closest, ax = axes, color = "orange")
-    fig.legend(labels=['difference_gm_to_wm_good_ablated_closest','difference_gm_to_wm_poor_ablated_closest'])
-
-
-    fig, axes = utils.plot_make()
-    sns.ecdfplot(difference_gm_to_wm_good, ax = axes, color = "blue", legend = True)
-    sns.ecdfplot(difference_gm_to_wm_good_ablated_closest, ax = axes, color = "purple")
-    fig.legend(labels=['good_all_GM_to_WM_connections','good_ablated_closest_to_WM'])
-
-
-    fig, axes = utils.plot_make()
-    sns.ecdfplot(difference_gm_to_wm_poor, ax = axes, color = "orange", legend = True)
-    sns.ecdfplot(difference_gm_to_wm_poor_ablated_closest, ax = axes, color = "red")
-    fig.legend(labels=['poor_all_GM_to_WM_connections','poor_ablated_closest_to_WM'])
-    """
-    pvals_gm_to_wm_closest.append(stats.ks_2samp(difference_gm_to_wm_good_ablated_closest,difference_gm_to_wm_poor_ablated_closest)[1])
-
-
-    #Closest gradient
-
-    difference_gm_to_wm_ablated_closest_gradient = []
-    for l in range(len(gm_to_wm_all_ablated_closest_wm_gradient)):
-        grad_tmp = []
-        for gr in range(len(closest_wm_threshold_gradient)):
-            grad_tmp.append(np.array(gm_to_wm_all_ablated_closest_wm_gradient[l][1][gr] )- np.array(gm_to_wm_all_ablated_closest_wm_gradient[l][0][gr]))
-        difference_gm_to_wm_ablated_closest_gradient.append(grad_tmp)
-
-    difference_gm_to_wm_good_ablated_closest_gradient = difference_gm_to_wm_ablated_closest_gradient[:len(patient_inds_good)]
-    difference_gm_to_wm_poor_ablated_closest_gradient = difference_gm_to_wm_ablated_closest_gradient[len(patient_inds_good):]
-    gradient_good = []
-    for gr in range(len(closest_wm_threshold_gradient)):
-        grad_tmp = []
-        for l in range(len(difference_gm_to_wm_good_ablated_closest_gradient)):
-            grad_tmp.append(difference_gm_to_wm_good_ablated_closest_gradient[l][gr])
-        gradient_good.append( [item for sublist in grad_tmp for item in sublist])
-
-    gradient_poor = []
-    for gr in range(len(closest_wm_threshold_gradient)):
-        grad_tmp = []
-        for l in range(len(difference_gm_to_wm_poor_ablated_closest_gradient)):
-            grad_tmp.append(difference_gm_to_wm_poor_ablated_closest_gradient[l][gr])
-        gradient_poor.append( [item for sublist in grad_tmp for item in sublist])
-
-
-    [np.nanmean(i) for i in gradient_good]
-    [np.nanmean(i) for i in gradient_poor]
-
-    df_good_gradient = pd.DataFrame(gradient_good).transpose()
-    df_poor_gradient = pd.DataFrame(gradient_poor).transpose()
-    df_good_gradient.columns = closest_wm_threshold_gradient
-    df_poor_gradient.columns = closest_wm_threshold_gradient
-
-    df_good_gradient_long = pd.melt(df_good_gradient, var_name = "distance", value_name = "FC")
-    df_poor_gradient_long = pd.melt(df_poor_gradient, var_name = "distance", value_name = "FC")
-
-    #fig, axes = utils.plot_make()
-    #sns.regplot(data = df_good_gradient_long, x= "distance", y = "FC", ax = axes, color = "blue", ci=95,x_estimator=np.mean, scatter_kws={"s": 10})
-    #sns.regplot(data = df_poor_gradient_long, x= "distance", y = "FC", ax = axes, color = "red", ci=95,x_estimator=np.mean, scatter_kws={"s": 10})
-
-    fig, axes = utils.plot_make()
-    sns.lineplot(data = df_good_gradient_long, x= "distance", y = "FC", ax = axes, color = "blue", ci=95, err_style="bars")
-    sns.lineplot(data = df_poor_gradient_long, x= "distance", y = "FC", ax = axes, color = "red", ci=95, err_style="bars")
-
-    sns.lineplot(data = df_good_gradient_long, x= "distance", y = "FC", ax = axes, color = "blue", ci=95)
-    sns.lineplot(data = df_poor_gradient_long, x= "distance", y = "FC", ax = axes, color = "red", ci=95)
-
-    #gm_to_wm
-    df_gm_to_wm = pd.DataFrame(gm_to_wm_all)
-    df_gm_to_wm_delta = df_gm_to_wm.loc[:,2] - df_gm_to_wm.loc[:,1]
-    df_gm_to_wm.columns = state_names
-    df_gm_to_wm["outcome"] = np.concatenate([np.repeat(["good"], len(patient_inds_good) ), np.repeat(["poor"], len(patient_inds_poor) )] )
-    df_gm_to_wm = df_gm_to_wm.reset_index()
-    df_gm_to_wm_delta = df_gm_to_wm_delta.reset_index()
-
-    df_gm_to_wm_delta.columns = ["index", "delta_gm_to_wm"]
-    df_gm_to_wm_delta["outcome"] = np.concatenate([np.repeat(["good"], len(patient_inds_good) ), np.repeat(["poor"], len(patient_inds_poor) )] )
-
-    good = np.array(df_gm_to_wm_delta.loc[df_gm_to_wm_delta["outcome"] == "good"]["delta_gm_to_wm"])
-    poor = np.array(df_gm_to_wm_delta.loc[df_gm_to_wm_delta["outcome"] == "poor"]["delta_gm_to_wm"])
-
-    #pvals_gm_to_wm.append(stats.mannwhitneyu(good,poor)[1])
-
-
-
-
-    """
-    fig, axes = utils.plot_make()
-    sns.boxplot(data = df_gm_to_wm, x= "outcome", y = "ictal", ax = axes )
-    sns.swarmplot(data = df_gm_to_wm, x= "outcome", y = "ictal", ax = axes)
-    plt.show()
-    """
-    """
-    fig, axes = utils.plot_make()
-    sns.boxplot(data = df_gm_to_wm_delta, x= "outcome", y = "delta_gm_to_wm", ax = axes )
-    sns.swarmplot(data = df_gm_to_wm_delta, x= "outcome", y = "delta_gm_to_wm", ax = axes)
-    plt.show()
-    """
-
-
-    #%%
-
-
-fig, axes = plt.subplots(1, 2, figsize=(8, 4), dpi=300)
-sns.boxplot(np.array(pvals), ax = axes[0])
-sns.histplot(np.array(pvals), bins = 50, ax =axes[1], kde = True)
-print(len(np.where(np.array(pvals) < 0.05)[0])/len(pvals))
-
-fig, axes = utils.plot_make(c = 2)
-sns.boxplot(np.array(pvals_gm_to_wm), ax = axes[0])
-sns.histplot(np.array(pvals_gm_to_wm), bins = 50, ax =axes[1], kde = True)
-print(len(np.where(np.array(pvals) < 0.05)[0])/len(pvals))
-
-
-fig, axes = utils.plot_make(c = 2)
-sns.boxplot(np.array(pvals_gm_to_wm_closest), ax = axes[0])
-sns.histplot(np.array(pvals_gm_to_wm_closest), bins = 50, ax =axes[1], kde = True)
-print(len(np.where(np.array(pvals) < 0.05)[0])/len(pvals))
+#analysis of determining how good vs poor outcome have diff GM-GM activity
+
+patient_outcomes_good = ["RID0238", "RID0267", "RID0279", "RID0294", "RID0307", "RID0309", "RID0320", "RID0365", "RID0440", "RID0424"]
+patient_outcomes_poor = ["RID0274", "RID0278", "RID0371", "RID0382", "RID0405", "RID0442", "RID0322"]
+
+
+
+original_array_list = []
+test_statistic_array_list = []
+
+ratio_patients = 5
+cores = 12
+iterations = 12
+total = 200
+max_seizures= 2
+func = 2
+freq = 7
+for i in range(total):
+    simulation = helper.mutilcore_permute_wrapper(cores, iterations, summaryStatsLong, FCtissueAll, seizure_number,
+                                                  patient_outcomes_good, patient_outcomes_poor,
+                                                  FC_TYPES, FREQUENCY_NAMES, STATE_NAMES,
+                                                  ratio_patients = ratio_patients, max_seizures = max_seizures, func = func, freq = freq)
+
+    original_array_list.append([a_tuple[0] for a_tuple in simulation])
+    original_array = [item for sublist in original_array_list for item in sublist]
+    test_statistic_array_list.append([a_tuple[1] for a_tuple in simulation])
+    test_statistic_array = [item for sublist in test_statistic_array_list for item in sublist]
+
+    Tstat = np.array(original_array)
+    permute  = np.array(test_statistic_array)
+    pvalue = len( np.where(permute >= Tstat.mean()) [0]) / len(Tstat)
+    print(f"{i}/{total}: {pvalue}")
+
+
+
+
+is_abs = 0
+Tstat = np.array(original_array)
+permute  = np.array(test_statistic_array)
+binrange = [  np.floor(np.min([Tstat, permute]) ),   np.ceil(np.max([Tstat, permute]) ) ]
+if is_abs == 1:
+    Tstat = abs(Tstat)
+    permute = abs(permute)
+    binrange = [0, 3]
+binwidth = 0.1
+
+fig, axes = utils.plot_make()
+sns.histplot(Tstat, kde = True, ax = axes, color = "#222222", binwidth = binwidth, binrange = binrange, edgecolor = None)
+sns.histplot(permute, kde = True, ax = axes, color = "#bbbbbb", binwidth = binwidth, binrange = binrange ,edgecolor = None)
+axes.axvline(x=abs(Tstat).mean(), color='k', linestyle='--')
+axes.set_xlim(binrange)
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+pvalue = len( np.where(permute >= Tstat.mean()) [0]) / len(Tstat)
+axes.set_title(f"{Tstat.mean()} {pvalue}" )
+
+
+
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_FC_deltaT_PVALUES_PERMUTATION_morePatients3.pdf"), save_figure=False,
+                      bbox_inches = "tight", pad_inches = 0.1)
+###############################################################
+###############################################################
+###############################################################
+###############################################################
+original,summaryStatsLong_bootstrap_outcome = permute_resampling_pvalues(summaryStatsLong, patient_outcomes_good, patient_outcomes_poor, ratio_patients = ratio_patients, max_seizures = max_seizures)
+
+fig, axes = utils.plot_make(size_length = 4, size_height = 4)
+
+sns.boxplot(data = summaryStatsLong_bootstrap_outcome, x = "state", y = "FC_deltaT", hue = "outcome", ax = axes,showfliers=False , palette = plot.COLORS_GOOD_VS_POOR)
+sns.stripplot(data = summaryStatsLong_bootstrap_outcome, x = "state", y = "FC_deltaT", hue = "outcome", ax = axes, palette = plot.COLORS_GOOD_VS_POOR,
+                          dodge=True, size=3)
+axes.legend([],[], frameon=False)
+
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+s = 2
+v1 = summaryStatsLong_bootstrap_outcome[(summaryStatsLong_bootstrap_outcome["state"]==STATE_NAMES[s])&(summaryStatsLong_bootstrap_outcome["outcome"]<="good")].dropna()["FC_deltaT"]
+v2 = summaryStatsLong_bootstrap_outcome[(summaryStatsLong_bootstrap_outcome["state"]==STATE_NAMES[s])&(summaryStatsLong_bootstrap_outcome["outcome"]<="poor")].dropna()["FC_deltaT"]
+stats.mannwhitneyu(v1, v2)[1]
+axes.set_title(f" {stats.mannwhitneyu(v1, v2)[1] }" )
+#axes.set_title(f" {stats.ttest_ind(v1, v2, equal_var=False)[1] }" )
+print(f" {stats.ttest_ind(v1, v2, equal_var=True)[1] }" )
+
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_FC_deltaT_morePatient2.pdf"), save_figure=False,
+                      bbox_inches = "tight", pad_inches = 0.1)
+
+######################################################
+######################################################
+######################################################
+FCtissueAll_bootstrap_outcomes = [FCtissueAll_bootstrap_good, FCtissueAll_bootstrap_poor]
+
+tissue_distribution = [None] * 2
+for o in range(2):
+    tissue_distribution[o] =  [None] * 4
+    for t in range(4):
+        tissue_distribution[o][t]  = [None] * 4
+
+
+OUTCOME_NAMES = ["good", "poor"]
+TISSUE_TYPE_NAMES = ["Full Network", "GM-only", "WM-only", "GM-WM"]
+
+
+for o in range(2):
+    for t in range(4):
+        for s in range(4):
+            FCtissueAll_bootstrap_outcomes_single = FCtissueAll_bootstrap_outcomes[o]
+            fc_patient = []
+            for i in range(len(FCtissueAll_bootstrap_outcomes_single)):
+                fc =  utils.getUpperTriangle(FCtissueAll_bootstrap_outcomes_single[i][func][freq][t][s])
+                fc_patient.append(fc)
+            tissue_distribution[o][t][s] = np.array([item for sublist in fc_patient for item in sublist])
+
+
+######################################################
+######################################################
+######################################################
+for s in [1,2]:
+    fig, axes = utils.plot_make(c = 2, r = 2, size_height = 5)
+    axes = axes.flatten()
+    for t in range(4):
+        sns.ecdfplot(data = tissue_distribution[0][t][s], ax = axes[t], color = plot.COLORS_GOOD_VS_POOR[0], lw = 6)
+        sns.ecdfplot(data = tissue_distribution[1][t][s], ax = axes[t], color =  plot.COLORS_GOOD_VS_POOR[1], lw = 6, ls = "-")
+        axes[t].set_title(f"{TISSUE_TYPE_NAMES[t]}, {STATE_NAMES[s]}   {stats.ks_2samp( tissue_distribution[0][t][s],  tissue_distribution[1][t][s] )[1]*16  }" )
+        axes[t].spines['top'].set_visible(False)
+        axes[t].spines['right'].set_visible(False)
+    utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_{STATE_NAMES[s]}.pdf"), save_figure=False,
+                      bbox_inches = "tight", pad_inches = 0.0)
+
+
+#good vs poor -- delta
+fig, axes = utils.plot_make()
+sns.ecdfplot(data = tissue_distribution[0][t][2] - tissue_distribution[0][t][1], ax = axes, color = "blue")
+sns.ecdfplot(data = tissue_distribution[1][t][2] - tissue_distribution[1][t][1], ax = axes, color = "red")
+
+
+#good vs poor -- ictal
+stats.ks_2samp( tissue_distribution[0][t][2], tissue_distribution[1][t][2])
+
+#good vs poor -- preictal
+stats.ks_2samp( tissue_distribution[0][t][1], tissue_distribution[0][t][1])
+
+#good vs poor -- delta
+stats.ks_2samp(  tissue_distribution[0][t][2] - tissue_distribution[0][t][1], tissue_distribution[1][t][2] - tissue_distribution[1][t][1]   )
+
+
+
+
+
+
+
+
+
+
+
+
+
+t = 1
+outcomes_good_tissue_preictal = []
+outcomes_good_tissue_ictal = []
+for i in range(len(FCtissueAll_bootstrap_good)):
+    outcomes_good_tissue_preictal.append(utils.getUpperTriangle(FCtissueAll_bootstrap_good[i][func][freq][t][1]))
+    outcomes_good_tissue_ictal.append( utils.getUpperTriangle(FCtissueAll_bootstrap_good[i][func][freq][t][2]))
+
+outcomes_good_tissue_preictal = np.array([item for sublist in outcomes_good_tissue_preictal for item in sublist])
+outcomes_good_tissue_ictal = np.array([item for sublist in outcomes_good_tissue_ictal for item in sublist])
+
+outcomes_poor_tissue_preictal = []
+outcomes_poor_tissue_ictal = []
+for i in range(len(FCtissueAll_bootstrap_poor)):
+    outcomes_poor_tissue_preictal.append( utils.getUpperTriangle(FCtissueAll_bootstrap_poor[i][func][freq][t][1]))
+    outcomes_poor_tissue_ictal.append( utils.getUpperTriangle(FCtissueAll_bootstrap_poor[i][func][freq][t][2]))
+
+outcomes_poor_tissue_preictal = np.array([item for sublist in outcomes_poor_tissue_preictal for item in sublist])
+outcomes_poor_tissue_ictal = np.array([item for sublist in outcomes_poor_tissue_ictal for item in sublist])
+
+
+
+fig, axes = utils.plot_make()
+sns.ecdfplot(data = outcomes_good_tissue_ictal, ax = axes, color = "blue")
+sns.ecdfplot(data = outcomes_poor_tissue_ictal, ax = axes, color = "red")
+
+fig, axes = utils.plot_make()
+sns.ecdfplot(data = outcomes_good_tissue_ictal - outcomes_good_tissue_preictal, ax = axes, color = "blue")
+sns.ecdfplot(data = outcomes_poor_tissue_ictal - outcomes_poor_tissue_preictal, ax = axes, color = "red")
+
+
+stats.ks_2samp( outcomes_good_tissue_ictal, outcomes_poor_tissue_ictal)
+stats.ks_2samp( outcomes_good_tissue_preictal, outcomes_poor_tissue_preictal)
+
+stats.ks_2samp( outcomes_good_tissue_ictal - outcomes_good_tissue_preictal, outcomes_poor_tissue_ictal - outcomes_poor_tissue_preictal)
+
+
+
+
+
+
+fig, axes = utils.plot_make()
+sns.ecdfplot(data = outcomes_good_tissue_preictal, ax = axes, color = "blue")
+sns.ecdfplot(data = outcomes_poor_tissue_preictal, ax = axes, color = "red")
+
+fig, axes = utils.plot_make()
+sns.ecdfplot(data = outcomes_good_tissue_preictal, ax = axes, color = "blue")
+sns.ecdfplot(data = outcomes_good_tissue_ictal, ax = axes, color = "red")
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+#%%
+#patient outcomes good vs poor
+
+
+
+max_seizures=1
+func = 2
+freq = 7
+
+
+test_statistic_array_delta_list = []
+test_statistic_array_delta_permutation_list = []
+
+ratio_patients = 5
+cores = 10
+iterations = 10
+total = 6
+for i in range(total):
+    simulation = helper.multicore_wm_good_vs_poor_wrapper(cores, iterations,
+                                  summaryStatsLong, patient_outcomes_good, patient_outcomes_poor,
+                                  patientsWithseizures, metadata_iEEG, SESSION, USERNAME, PASSWORD, paths,
+                                  FREQUENCY_DOWN_SAMPLE, MONTAGE, FC_TYPES, TISSUE_DEFINITION_NAME, TISSUE_DEFINITION_GM, TISSUE_DEFINITION_WM, ratio_patients = ratio_patients, max_seizures = 1, func = 2, freq = 7,
+                                  permute = False, closest_wm_threshold = 85, avg = 0)
+
+    test_statistic_array_delta_list.append([a_tuple[0] for a_tuple in simulation])
+    test_statistic_array_delta = [item for sublist in test_statistic_array_delta_list for item in sublist]
+    test_statistic_array_delta_permutation_list.append([a_tuple[1] for a_tuple in simulation])
+    test_statistic_array_delta_permutation = [item for sublist in test_statistic_array_delta_permutation_list for item in sublist]
+
+    Tstat = np.array(test_statistic_array_delta)
+    permute  = np.array(test_statistic_array_delta_permutation)
+    pvalue = len( np.where(permute >= Tstat.mean()) [0]) / len(Tstat)
+    print(f"{i}/{total}: {pvalue}")
+
+
+is_abs = 0
+Tstat = np.array(test_statistic_array_delta)
+permute  = np.array(test_statistic_array_delta_permutation)
+binrange = [  np.floor(np.min([Tstat, permute]) ),   np.ceil(np.max([Tstat, permute]) ) ]
+if is_abs == 1:
+    Tstat = abs(Tstat)
+    permute = abs(permute)
+    binrange = [0, 15]
+binwidth = 1#0.05
+
+fig, axes = utils.plot_make()
+sns.histplot(Tstat, kde = True, ax = axes, color = "#222222", binwidth = binwidth, binrange = binrange, edgecolor = None)
+sns.histplot(permute, kde = True, ax = axes, color = "#bbbbbb", binwidth = binwidth, binrange = binrange ,edgecolor = None)
+axes.axvline(x=abs(Tstat).mean(), color='k', linestyle='--')
+axes.set_xlim(binrange)
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+pvalue = len( np.where(permute >= Tstat.mean()) [0]) / len(Tstat)
+axes.set_title(f"{Tstat.mean()} {pvalue}" )
+
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_PERMUTE_delta_morePatients5_19.pdf"), save_figure=False,
+                      bbox_inches = "tight", pad_inches = 0.0)
+
+
+
+binwidth = 0.005
+binrange = [-0.5,0.5]
+fig, axes = utils.plot_make()
+sns.histplot(abs(test_statistic_array_ablated), kde = True, ax = axes, color = "#222222", binwidth = binwidth, binrange = binrange)
+sns.histplot(abs(test_statistic_array_ablated_permutation), kde = True, ax = axes, color = "#bbbbbb", binwidth = binwidth, binrange = binrange)
+axes.axvline(x=abs(test_statistic_array_ablated.mean()), color='k', linestyle='--')
+axes.set_xlim([-0,0.3])
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+pvalue = len( np.where(test_statistic_array_ablated_permutation  <= np.mean(test_statistic_array_ablated ) )[0]) / iterations
+pvalue = len( np.where( abs(test_statistic_array_ablated_permutation ) >= np.mean(abs(test_statistic_array_ablated )) )[0]) / iterations
+axes.set_title(f" {np.mean(abs(test_statistic_array_ablated) )}, {pvalue}" )
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_FC_ABLATION_PVALUES_PERMUTATION2.pdf"), save_figure=False,
+                      bbox_inches = "tight", pad_inches = 0.1)
+
+
+
 #%%
 
-#analysis of determining how ablated contacts are connected to diff GM/WM regions
-
-#Good 309, Engel 1a (1 year)        39-51  random.randrange(39,52)       #51
-#good 238, Engel 1a (9 months)      4-10   random.randrange(4,11)        #9
-#good 440, Engel 1b (       )       78-81  random.randrange(78,82)       #78
-#good 320, Engel 1B (1 year)        52-54  random.randrange(52,55)       #52
-#good 307, Engel 1A (4 years)       37-38  random.randrange(37,39)       #37
-#good 365, Engel 1B (2 years)       60-65  random.randrange(60,66)       #62
-
-#fair 274, Engel 2A (1 year)        19-20  random.randrange(19,21)       #20
-#fair 371, Engel 2A  (1 year)        66-69  random.randrange(66,70)       #68
-
-#poor 278, Engel 4c (2 years)       21-24  random.randrange(21,25)       #24
-#poor 405, Engel 3  (2 years)       73-74  random.randrange(73,75)       #73
-#poor 442, Engel 3  (2.5 years)     82-102 random.randrange(82,103)      #96
-#poor 382, Engel 3  (3 years)       70-72  random.randrange(70,73)       #71
-
-
-#poor 322, engel 4a   55-59 #57
-pvals = []
-pvals2 = []
-for kk in range(100):
-    print(f"{kk}")
-    #patient_inds = [51, 9, 78, 52, 37, 62, 20, 68, 24, 73, 96, 71]
-    #bootstrapping patients and seizures
-    patient_inds = [random.randrange(39,52), random.randrange(55,59) , random.randrange(78,82)  ,
-                    random.randrange(52,55) , random.randrange(37,39) , random.randrange(60,66)  ,
-                    random.randrange(19,21) , random.randrange(66,70),
-                    random.randrange(21,25) , random.randrange(73,75)  , random.randrange(82,103) , random.randrange(71,73)  ]
-    patient_inds_good = random.sample(patient_inds[:6], 6)
-    patient_inds_poor = random.sample(patient_inds[8:], 4)
-    patient_inds_bootstrap = patient_inds_good + patient_inds_poor
-    patient_zscores_ictal = []
-    patient_zscores_preictal = []
-    delta = []
-    delta_zscore = []
-    icccc = []
-    piiii = []
-    filler_zscore_all = []
-    difference_in_gmwm_fc = []
-    percent_top_gm_to_wm_all = []
-    zscores_ablated_contact_significantl_correlated_to_wm_all = []
-    for pt in range(len(patient_inds_bootstrap)):
-        i = patient_inds_bootstrap[pt]
-
-        sub = patientsWithseizures["subject"][i]
-        func = 2
-        FCtype = FC_TYPEs[func]
-        freq = 7
-        print(f"{FCtype}, {FREQUENCY_NAMES[freq]}, {sub}")
-        functionalConnectivityPath = join(paths["functionalConnectivityiEEG"], f"sub-{sub}")
-        channels, FC = metadata.get_FunctionalConnectivity(patientsWithseizures["subject"][i], idKey = patientsWithseizures["idKey"][i], username = username, password = password,
-                                            BIDS =paths['BIDS'], dataset ="derivatives/iEEGorgDownload", session ="implant01",
-                                            functionalConnectivityPath = functionalConnectivityPath,
-                                            secondsBefore=180, secondsAfter=180, startKey = "EEC",
-                                            fsds = param.FREQUENCY_DOWN_SAMPLE , montage = "bipolar", FCtype = FC_TYPE)
-
-        #if cross correlation, take absolute value
-        if func == 2 or func == 0:
-            for per in range(len(FC)):
-                for f in range(len(FC[per])):
-                    FC[per][f] = abs(FC[per][f])
-        # Get atlas localization and distances
-        file = join(paths["atlasLocaliztion"], f"sub-{patientsWithseizures['subject'][i]}", "ses-implant01", f"sub-{patientsWithseizures['subject'][i]}_ses-implant01_desc-atlasLocalization.csv")
-        if utils.checkIfFileExistsGlob(file, printBOOL=False):
-            localization = pd.read_csv(file)
-            localizationChannels = localization["channel"]
-            localizationChannels = echobase.channel2std(
-                np.array(localizationChannels))
-        # getting distances
-        dist = pd.DataFrame(channels, columns=["channels"])
-        dist["distance"] = np.nan
-        for ch in range(len(channels)):# Getting distances of the channels
-            channelName = channels[ch]
-            if any(channelName == localizationChannels):
-                dist.iloc[ch, 1] = localization["percent_WM"][np.where( #percent_WM, distance_to_GM_millimeters
-                    channelName == localizationChannels)[0][0]]
-            else:
-                # if channel has no localization, then just assume GM.
-                dist.iloc[ch, 1] = 0
-        # definition of WM by distance
-
-        GMindex = np.where(dist["distance"] <= WMdefinitionPercent2)[0]
-        WMindex = np.where(dist["distance"] > WMdefinitionPercent2)[0]
-        distOrderInd = np.array(np.argsort(dist["distance"]))
-        distOrder = dist.iloc[distOrderInd].reset_index()
-
-        manual_resected_electrodes = metadata.get_manual_resected_electrodes(sub)
-        manual_resected_electrodes = np.array(echobase.channel2std(manual_resected_electrodes))
-        manual_resected_electrodes, _, manual_resected_electrodes_index = np.intersect1d(  manual_resected_electrodes, np.array(dist["channels"]), return_indices=True )
-
-
-        #get FC values for just the GM-GM connections and WM-WM connections and GM-WM connections
-        FCtissue = [None] *3
-        FCall = []
-        for t in range(len(FCtissue)):
-            FCtissue[t] = []
-        for s in range(len(FC)):
-            #Reorder/get just the tissue index, and then just get the upper half of triangle (exluding diagonal)
-            FCtissue[0].append(   utils.getUpperTriangle(     utils.reorderAdj(FC[s][freq], GMindex)       )   )
-            FCtissue[1].append(   utils.getUpperTriangle(     utils.reorderAdj(FC[s][freq], WMindex)       )   )
-            FCtissue[2].append(   utils.getAdjSubset(FC[s][freq], GMindex, WMindex).flatten()   )
-            FCall.append(  utils.getUpperTriangle(FC[s][freq]       )   )
-
-        #sns.histplot(FCtissue[2][2]- FCtissue[2][0])
-
-        difference_in_gmwm_fc.append(np.nanmedian(FCtissue[2][2] - FCtissue[2][0]))
-
-
-        #utils.plot_adj_heatmap(FC[1][freq])
-        #utils.getUpperTriangle(FC[2][freq])
-        #utils.plot_histplot( utils.getUpperTriangle(FC[2][freq]), kde = True)
-        #utils.plot_histplot( utils.getUpperTriangle(FC[1][freq]), kde = True)
-        adj_ic = copy.deepcopy(FC[2][freq])
-        adj_pi = copy.deepcopy(FC[1][freq])
-        threshold_bin = 0.1
-        adj_ic_bin = utils.threshold_and_binarize_adj(adj_ic, t=threshold_bin)
-        adj_pi_bin = utils.threshold_and_binarize_adj(adj_pi, t=threshold_bin)
-        #utils.plot_adj_heatmap(adj_ic_bin)
-        #utils.plot_adj_heatmap(adj_pi_bin)
-
-        gm_to_wm_ic = utils.getAdjSubset(adj_ic_bin, GMindex, WMindex) # gm_to_wm_ic = utils.getAdjSubset(adj_ic, GMindex, WMindex) #utils.plot_adj_heatmap(gm_to_wm_ic);
-        gm_to_wm_pi = utils.getAdjSubset(adj_pi_bin, GMindex, WMindex)# gm_to_wm_pi = utils.getAdjSubset(adj_pi, GMindex, WMindex) #utils.plot_adj_heatmap(gm_to_wm_pi);
-        gm_to_wm_delta = gm_to_wm_ic - gm_to_wm_pi
-
-        gm_to_wm_delta_avg  = np.sum(gm_to_wm_delta, axis = 1) #gm_to_wm_delta_avg  = np.nanmedian(gm_to_wm_delta, axis = 1)
-
-        gm_to_wm_delta_avg_top_ind = np.argsort(gm_to_wm_delta_avg)
-        GMindex_top_correlated_to_wm = GMindex[gm_to_wm_delta_avg_top_ind]
-
-        intersect = np.intersect1d(  manual_resected_electrodes_index, GMindex_top_correlated_to_wm, return_indices=True )
-
-        print(f"\n{manual_resected_electrodes[intersect[1]]}")
-
-        percent_top_gm_to_wm = intersect[2]/len(GMindex_top_correlated_to_wm)
-        percent_top_gm_to_wm_all.append(percent_top_gm_to_wm)
-        print(f"{percent_top_gm_to_wm}\n")
-        iters = 100
-        percent_top_gm_to_wm_rand = np.zeros((iters, len(percent_top_gm_to_wm)))
-        for d in range(iters):
-            adj_ic_rand = copy.deepcopy(adj_ic)
-            adj_pi_rand = copy.deepcopy(adj_pi)
-            if func == 5: #if pearson
-                adj_ic_rand = bct.randmio_und_signed(adj_ic_rand, itr = 2)[0] #utils.plot_adj_heatmap(adj_ic_rand)
-                adj_pi_rand = bct.randmio_und_signed(adj_pi_rand, itr = 2)[0]#utils.plot_adj_heatmap(adj_ic_rand)
-            if func == 0 or func == 1 or func == 2: #if coherence
-                adj_ic_rand = bct.null_model_und_sign(adj_ic_rand)[0] #utils.plot_adj_heatmap(adj_ic_rand); utils.plot_adj_heatmap(adj_ic)
-                adj_pi_rand = bct.null_model_und_sign(adj_pi_rand)[0] #utils.plot_adj_heatmap(adj_pi_rand); utils.plot_adj_heatmap(adj_pi)
-
-            adj_ic_rand_bin = utils.threshold_and_binarize_adj(adj_ic_rand, t=threshold_bin) #utils.plot_adj_heatmap(adj_ic_rand_bin);
-            adj_pi_rand_bin = utils.threshold_and_binarize_adj(adj_pi_rand, t=threshold_bin) #utils.plot_adj_heatmap(adj_pi_rand_bin);
-
-            gm_to_wm_ic_rand = utils.getAdjSubset(adj_ic_rand_bin, GMindex, WMindex) #bin
-            gm_to_wm_pi_rand = utils.getAdjSubset(adj_pi_rand_bin, GMindex, WMindex) #bin
-            gm_to_wm_delta_rand = gm_to_wm_ic_rand - gm_to_wm_pi_rand
-
-            gm_to_wm_delta_avg_rand  = np.sum(gm_to_wm_delta_rand, axis = 1) #sum to meadian
-
-            gm_to_wm_delta_avg_top_ind_rand = np.argsort(gm_to_wm_delta_avg_rand)
-            GMindex_top_correlated_to_wm_rand = GMindex[gm_to_wm_delta_avg_top_ind_rand]
-
-            intersect = np.intersect1d(  manual_resected_electrodes_index, GMindex_top_correlated_to_wm_rand, return_indices=True )
-            percent_top_gm_to_wm_rand[d,:] = intersect[2]/len(GMindex_top_correlated_to_wm_rand)
-            utils.printProgressBar(d, iters)
-
-        zscores_ablated_contact_significantl_correlated_to_wm = []
-        for ch in range(len(percent_top_gm_to_wm)):
-            zz = stats.zscore( np.concatenate([[np.array(percent_top_gm_to_wm[ch])], percent_top_gm_to_wm_rand[:,ch] ]) )[0] #utils.plot_histplot( percent_top_gm_to_wm_rand[:,1]   )
-            zscores_ablated_contact_significantl_correlated_to_wm.append(zz)
-        zscores_ablated_contact_significantl_correlated_to_wm_all.append(  zscores_ablated_contact_significantl_correlated_to_wm )
-        print("\n\n")
-        print(zscores_ablated_contact_significantl_correlated_to_wm)
-        print("\n\n")
-
-
-    good_percent = percent_top_gm_to_wm_all[:len(patient_inds_good)]
-    poor_percent = percent_top_gm_to_wm_all[len(patient_inds_good):]
-
-    good_percent = [item for sublist in good_percent for item in sublist]
-    poor_percent = [item for sublist in poor_percent for item in sublist]
-
-    df_good = pd.DataFrame(dict(good = good_percent))
-    df_poor = pd.DataFrame(dict(poor = poor_percent))
-    df_patient = pd.concat([pd.melt(df_good), pd.melt(df_poor)]  )
-    print(stats.mannwhitneyu(good_percent,poor_percent)[1]    )
-    fig, axes = plt.subplots(1, 1, figsize=(4, 4), dpi=300)
-    sns.boxplot(data = df_patient, x= "variable", y = "value", ax = axes )
-    sns.swarmplot(data = df_patient, x= "variable", y = "value", ax = axes)
-    plt.show()
-    ##
-
-    good_fcavg = difference_in_gmwm_fc[:len(patient_inds_good)]
-    poor_fcavg = difference_in_gmwm_fc[len(patient_inds_good):]
-
-    df_good = pd.DataFrame(dict(good = good_fcavg))
-    df_poor = pd.DataFrame(dict(poor = poor_fcavg))
-
-    stats.mannwhitneyu(good_fcavg,poor_fcavg)[1]
-    stats.ttest_ind(good_fcavg,poor_fcavg)[1]
-    df_patient = pd.concat([pd.melt(df_good), pd.melt(df_poor)]  )
-    pvalues = stats.ttest_ind(good_fcavg,poor_fcavg)[1]
-    pvals2.append(pvalues)
-    print(f"{np.round(pvalues,2)}")
-
-
-
-
-    ictal = []
-    preictal = []
-    ictal_zscore = []
-    preictal_zscore = []
-
-    preictal_all_connectivity_per_channel = []
-    ictal_all_connectivity_per_channel = []
-
-
-
-
-    for s in [1,2]:
-        state = s
-
-
-        manual_resected_electrodes = metadata.get_manual_resected_electrodes(sub)
-        manual_resected_electrodes = np.array(echobase.channel2std(manual_resected_electrodes))
-        manual_resected_electrodes, _, manual_resected_electrodes_index = np.intersect1d(  manual_resected_electrodes, np.array(dist["channels"]), return_indices=True )
-        #print(manual_resected_electrodes)
-
-
-
-        """
-        adj = FC[state][freq]
-        if func == 0: #if perason
-            adj_scrambled = bct.randmio_und_signed(adj, itr = 2)[0]
-        if func == 0 or func == 1 or func == 2: #if coherence
-            adj_scrambled = bct.null_model_und_sign(adj)[0]
-        utils.plot_adj_heatmap(adj, vmin = np.min(adj), vmax = np.max(adj))
-        utils.plot_adj_heatmap(adj_scrambled, vmin = np.min(adj), vmax = np.max(adj))
-        ch = 0
-        ablated_ind = np.where(manual_resected_electrodes[ch] == channels)[0]
-        print(manual_resected_electrodes[ch])
-        dist[channels == manual_resected_electrodes[ch]]
-        ablated_wm_fc = utils.getAdjSubset(adj, ablated_ind, WMindex)[0]
-        print(np.nanmedian(ablated_wm_fc))
-        gm_to_wm = utils.getAdjSubset(adj, GMindex, WMindex)
-        gm_to_wm_average = np.nanmedian(gm_to_wm, axis = 1)
-        utils.plot_adj_heatmap(gm_to_wm, vmin = np.min(adj), vmax = np.max(adj))
-        sns.histplot(gm_to_wm[2,:], bins = 20)
-        sns.histplot(ablated_wm_fc.flatten(), bins = 20)
-        ablated_wm_fc = utils.getAdjSubset(adj_scrambled, ablated_ind, WMindex)
-        print(np.nanmedian(ablated_wm_fc))
-        gm_to_wm = utils.getAdjSubset(adj_scrambled, GMindex, WMindex)
-        gm_to_wm_average = np.nanmedian(gm_to_wm, axis = 1)
-        sns.histplot(gm_to_wm_average, bins = 20)
-        """
-
-
-
-        adj = FC[state][freq]
-        manual_resected_electrodes = metadata.get_manual_resected_electrodes(sub)
-        manual_resected_electrodes = np.array(echobase.channel2std(manual_resected_electrodes))
-        manual_resected_electrodes, _, manual_resected_electrodes_index = np.intersect1d(  manual_resected_electrodes, np.array(dist["channels"]), return_indices=True )
-
-        gm_to_wm = utils.getAdjSubset(adj, GMindex, WMindex)
-        gm_to_wm_average = np.nanmedian(gm_to_wm, axis = 1)
-        #sns.histplot(gm_to_wm_average, bins = 20)
-
-        for ch in range(len(manual_resected_electrodes)):
-            #ch = 1
-            #print(dist[channels == manual_resected_electrodes[ch]])
-            ablated_ind = np.where(manual_resected_electrodes[ch] == channels)[0]
-            ablated_wm_fc = utils.getAdjSubset(adj, ablated_ind, WMindex)[0]
-            gm_to_wm = utils.getAdjSubset(adj, GMindex, WMindex  )
-            gm_to_wm_average = np.nanmedian(gm_to_wm, axis = 1)
-            #sns.histplot(gm_to_wm_average, bins = 20)
-            #plt.show()
-            value = np.nanmedian(ablated_wm_fc)
-            #print(np.nanmedian(ablated_wm_fc))
-            zz = stats.zscore( np.concatenate([[np.array(value)], gm_to_wm_average]) )[0]
-
-            all_wm_connectivity = utils.getAdjSubset(adj, np.array(range(len(adj))), WMindex  )
-            all_wm_connectivity_average = np.nanmedian(all_wm_connectivity, axis = 1)
-            if s != 2:
-                preictal.append(np.nanmedian(ablated_wm_fc))
-                preictal_zscore.append(zz)
-                preictal_all_connectivity_per_channel = all_wm_connectivity_average
-
-            if s == 2:
-                ictal.append(np.nanmedian(ablated_wm_fc))
-                ictal_zscore.append(zz)
-                ictal_all_connectivity_per_channel = all_wm_connectivity_average
-        if s == 2:
-            dd = np.array(ictal) - np.array(preictal)
-            delta.append(dd)
-            delta_zscore.append(np.array(ictal_zscore) - np.array(preictal_zscore))
-            icccc.append(ictal)
-            piiii.append(preictal)
-
-            diff1 = ictal_all_connectivity_per_channel - preictal_all_connectivity_per_channel
-            #sns.histplot(diff1, bins = 20)
-            #sns.histplot(np.array(ictal) - np.array(preictal), bins = 20)
-            filler_zscore = []
-            for ablated_channel in range(len(dd)):
-                filler_zscore.append(stats.zscore( np.concatenate( [np.array([dd[ablated_channel]]), diff1]) )[0]    )
-            filler_zscore_all.append(filler_zscore)
-        """
-        z_scores_ablated = []
-        for ch in range(len(manual_resected_electrodes)):
-            ablated_ind = np.where(manual_resected_electrodes[ch] == channels)[0]
-            ablated_wm_fc = utils.getAdjSubset(adj, ablated_ind, WMindex)[0]
-            value = np.nanmedian(ablated_wm_fc)
-            distribution = [value]
-            iters = 50
-            for d in range(iters):
-                if func == 5: #if pearson
-                    adj_scrambled = bct.randmio_und_signed(adj, itr = 2)[0]
-                if func == 0 or func == 1 or func == 2: #if coherence
-                    adj_scrambled = bct.null_model_und_sign(adj)[0]
-                ablated_wm_fc = utils.getAdjSubset(adj_scrambled, ablated_ind, WMindex)
-                #gm_to_wm = utils.getAdjSubset(adj_scrambled, GMindex, WMindex)
-                #gm_to_wm_average = np.nanmedian(gm_to_wm, axis = 1)
-                #sns.histplot(gm_to_wm_average, bins = 20)
-                avg = np.nanmedian(ablated_wm_fc)
-                print(f"{d}: {sub}: {s}: {pt}/{len(patient_inds_bootstrap)}: {np.round(value,3)} ::: {np.round(avg,3)}")
-                distribution.append(avg)
-
-            #sns.histplot(  distribution, bins = 20)
-            #plt.show()
-            z_scores = stats.zscore( distribution )
-            z_scores_ablated.append(z_scores[0])
-            print(z_scores_ablated)
-        if s != 2:
-            patient_zscores_preictal.append(z_scores_ablated)
-        if s == 2:
-            patient_zscores_ictal.append(z_scores_ablated)
-
-
-
-
-good_preictal = np.concatenate(patient_zscores_preictal[:len(patient_inds_good)])
-poor_preictal = np.concatenate(patient_zscores_preictal[len(patient_inds_good):])
-
-
-good_ictal = np.concatenate(patient_zscores_ictal[:len(patient_inds_good)])
-poor_ictal = np.concatenate(patient_zscores_ictal[len(patient_inds_good):])
-
-np.nanmean(good_ictal - good_preictal)
-np.nanmean(poor_ictal - poor_preictal)
-
-df_good_delta = pd.DataFrame(dict(good = good_ictal - good_preictal))
-df_poor_delta = pd.DataFrame(dict(poor = poor_ictal - poor_preictal))
-
-
-
-df_patient = pd.concat([pd.melt(df_good_delta), pd.melt(df_poor_delta)]  )
-"""
-"""
-fig, axes = plt.subplots(1, 1, figsize=(4, 4), dpi=300)
-sns.boxplot(data = df_patient, x= "variable", y = "value", ax = axes )
-sns.swarmplot(data = df_patient, x= "variable", y = "value", ax = axes)
-
-stats.ttest_ind(good_ictal,poor_ictal)
-"""
-
-
+summaryStatsLong_bootstrap_good, summaryStatsLong_bootstrap_poor, seizure_number_bootstrap_good, seizure_number_bootstrap_poor, delta, gm_to_wm_all_ablated, gm_to_wm_all_ablated_closest_wm, gm_to_wm_all_ablated_closest_wm_gradient = helper.wm_vs_gm_good_vs_poor(summaryStatsLong, patient_outcomes_good, patient_outcomes_poor,
+                                  patientsWithseizures, metadata_iEEG, SESSION, USERNAME, PASSWORD, paths,
+                                  FREQUENCY_DOWN_SAMPLE, MONTAGE, FC_TYPES, TISSUE_DEFINITION_NAME, TISSUE_DEFINITION_GM, TISSUE_DEFINITION_WM,
+                                  ratio_patients = 2, max_seizures = 2, func = func, freq = freq,
+                                  closest_wm_threshold = 85)
+
+#delta is the change in FC of the ablated contacts to wm
+
+delta_mean = []
+delta_mean = np.zeros(len(delta))
+for x in range(len(delta)):
+    #delta_mean.append(sum(x)/len(x))
+    #delta_mean[x] = np.nanmedian(delta[x])
+    delta_mean[x] = np.nanmean(delta[x])
 
 
 
 #good = np.concatenate(delta[:7])
 #poor = np.concatenate(delta[8:])
-good = np.concatenate(delta[:len(patient_inds_good)])
-poor = np.concatenate(delta[len(patient_inds_good):])
+good = delta[:len(seizure_number_bootstrap_good)]
+poor = delta[len(seizure_number_bootstrap_good):]
+#good = delta_mean[:len(patient_inds_good)]
+#poor = delta_mean[len(patient_inds_good):]
+#df_good = pd.DataFrame(dict(good = good))
+#df_poor = pd.DataFrame(dict(poor = poor))
 
+good = delta_mean[:len(seizure_number_bootstrap_good)]
+poor = delta_mean[len(seizure_number_bootstrap_good):]
 df_good = pd.DataFrame(dict(good = good))
 df_poor = pd.DataFrame(dict(poor = poor))
 
+#test_statistic_array2[it] = stats.ttest_ind(good,poor)[0]
 
-
+##################################
+##################################
 df_patient = pd.concat([pd.melt(df_good), pd.melt(df_poor)]  )
-"""
+
 fig, axes = plt.subplots(1, 1, figsize=(4, 4), dpi=300)
-sns.boxplot(data = df_patient, x= "variable", y = "value", ax = axes )
-sns.swarmplot(data = df_patient, x= "variable", y = "value", ax = axes)
-plt.show()
-"""
-stats.mannwhitneyu(good,poor)[1]
-stats.ttest_ind(good,poor)[1]
-pvals.append(stats.mannwhitneyu(good,poor)[1])
+sns.boxplot(data = df_patient, x= "variable", y = "value", ax = axes, palette = plot.COLORS_GOOD_VS_POOR , showfliers = False)
+sns.swarmplot(data = df_patient, x= "variable", y = "value", ax = axes, palette = plot.COLORS_GOOD_VS_POOR,s = 3)
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_ABLATION_delta_morePatients3.pdf"), save_figure=False,
+              bbox_inches = "tight", pad_inches = 0.0)
+
+print(stats.mannwhitneyu(poor,good))
+print(stats.ttest_ind(poor,good))
+stats.ttest_ind(good,poor)
 
 
 
 
+#shows the distributions of all the ablated channels and their connectivity to WM
+difference_gm_to_wm_ablated = []
+for l in range(len(gm_to_wm_all_ablated)):
+    difference_gm_to_wm_ablated.append(np.array(gm_to_wm_all_ablated[l][1] )- np.array(gm_to_wm_all_ablated[l][0]))
 
-    #%
-fig, axes = plt.subplots(1, 2, figsize=(8, 4), dpi=300)
-sns.boxplot(np.array(pvals), ax = axes[0])
-sns.histplot(np.array(pvals), bins = 50, ax =axes[1])
-print(len(np.where(np.array(pvals) < 0.05)[0])/len(pvals))
+difference_gm_to_wm_good_ablated = difference_gm_to_wm_ablated[:len(seizure_number_bootstrap_good)]
+difference_gm_to_wm_poor_ablated = difference_gm_to_wm_ablated[len(seizure_number_bootstrap_good):]
+difference_gm_to_wm_good_ablated = [item for sublist in difference_gm_to_wm_good_ablated for item in sublist]
+difference_gm_to_wm_poor_ablated = [item for sublist in difference_gm_to_wm_poor_ablated for item in sublist]
+
+
+fig, axes = utils.plot_make()
+sns.ecdfplot(difference_gm_to_wm_good_ablated, ax = axes, color = plot.COLORS_GOOD_VS_POOR[0], lw = 5)
+sns.ecdfplot(difference_gm_to_wm_poor_ablated, ax = axes, color = plot.COLORS_GOOD_VS_POOR[1], lw = 5)
+axes.set_xlim([-0.1,0.5])
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_ABLATION_difference_all_connecions_morePatients3.pdf"), save_figure=False,
+                  bbox_inches = "tight", pad_inches = 0)
+
+#Closest gradient
+closest_wm_threshold_gradient = np.arange(15, 125,5 )
+difference_gm_to_wm_ablated_closest_gradient = []
+for l in range(len(gm_to_wm_all_ablated_closest_wm_gradient)):
+    grad_tmp = []
+    for gr in range(len(closest_wm_threshold_gradient)):
+        grad_tmp.append(np.array(gm_to_wm_all_ablated_closest_wm_gradient[l][1][gr] )- np.array(gm_to_wm_all_ablated_closest_wm_gradient[l][0][gr]))
+    difference_gm_to_wm_ablated_closest_gradient.append(grad_tmp)
+
+difference_gm_to_wm_good_ablated_closest_gradient = difference_gm_to_wm_ablated_closest_gradient[:len(seizure_number_bootstrap_good)]
+difference_gm_to_wm_poor_ablated_closest_gradient = difference_gm_to_wm_ablated_closest_gradient[len(seizure_number_bootstrap_good):]
+gradient_good = []
+for gr in range(len(closest_wm_threshold_gradient)):
+    grad_tmp = []
+    for l in range(len(difference_gm_to_wm_good_ablated_closest_gradient)):
+        grad_tmp.append(difference_gm_to_wm_good_ablated_closest_gradient[l][gr])
+    gradient_good.append( [item for sublist in grad_tmp for item in sublist])
+
+gradient_poor = []
+for gr in range(len(closest_wm_threshold_gradient)):
+    grad_tmp = []
+    for l in range(len(difference_gm_to_wm_poor_ablated_closest_gradient)):
+        grad_tmp.append(difference_gm_to_wm_poor_ablated_closest_gradient[l][gr])
+    gradient_poor.append( [item for sublist in grad_tmp for item in sublist])
+
+
+#[np.nanmean(i) for i in gradient_good]
+#[np.nanmean(i) for i in gradient_poor]
+
+df_good_gradient = pd.DataFrame(gradient_good).transpose()
+df_poor_gradient = pd.DataFrame(gradient_poor).transpose()
+df_good_gradient.columns = closest_wm_threshold_gradient
+df_poor_gradient.columns = closest_wm_threshold_gradient
+
+df_good_gradient_long = pd.melt(df_good_gradient, var_name = "distance", value_name = "FC")
+df_poor_gradient_long = pd.melt(df_poor_gradient, var_name = "distance", value_name = "FC")
+
+#fig, axes = utils.plot_make()
+#sns.regplot(data = df_good_gradient_long, x= "distance", y = "FC", ax = axes, color = "blue", ci=95,x_estimator=np.mean, scatter_kws={"s": 10})
+#sns.regplot(data = df_poor_gradient_long, x= "distance", y = "FC", ax = axes, color = "red", ci=95,x_estimator=np.mean, scatter_kws={"s": 10})
+
+fig, axes = utils.plot_make(size_length = 10)
+sns.lineplot(data = df_good_gradient_long, x= "distance", y = "FC", ax = axes, color = plot.COLORS_GOOD_VS_POOR[0], ci=None, err_style="bars")
+sns.lineplot(data = df_poor_gradient_long, x= "distance", y = "FC", ax = axes, color = plot.COLORS_GOOD_VS_POOR[1], ci=None, err_style="bars")
+
+sns.lineplot(data = df_good_gradient_long, x= "distance", y = "FC", ax = axes, color = plot.COLORS_GOOD_VS_POOR[0], ci=95)
+sns.lineplot(data = df_poor_gradient_long, x= "distance", y = "FC", ax = axes, color = plot.COLORS_GOOD_VS_POOR[1], ci=95)
+
+
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_ABLATION_gradient_morePatient18.pdf"), save_figure=False,
+                  bbox_inches = "tight", pad_inches = 0)
 
 
 
 #%%
-"""
-file_to_store = open("patient_zscores.pickle", "wb")
-pickle.dump(patient_zscores, file_to_store)
-file_to_store.close()
-abs((np.mean(distribution) - value ) / (np.std(distribution)))
 
-stats.norm.sf(abs(z_scores[0]))*2
+#REDONE
+pt = 0
+func = 2
+freq = 7
 
-
-file_to_read = open("patient_zscores.pickle", "rb")
-loaded_object = pickle.load(file_to_read)
-file_to_read.close()
+summaryStatsLong_mean = summaryStatsLong.groupby(by=["patient", 'state', "frequency", "FC_type", "outcome", "seizure_number"]).mean().reset_index()
+summaryStatsLong_outcome = summaryStatsLong_mean.query(f'outcome != "NA" and  FC_type == "{FC_TYPES[func]}"  and  frequency == "{FREQUENCY_NAMES[freq]}"    ')
 
 
+summaryStatsLong_outcome_seizures_not_combined = copy.deepcopy(summaryStatsLong_outcome)
+summaryStatsLong_outcome =  summaryStatsLong_outcome.groupby(by=["patient", 'state', "frequency", "FC_type", "outcome"]).mean().reset_index()
+
+
+fig, axes = utils.plot_make(  size_length = 4, size_height = 6.5)
+sns.pointplot(data=summaryStatsLong_outcome, x="state", y="FC_deltaT", hue = "outcome",
+              ax = axes, palette = plot.COLORS_GOOD_VS_POOR4, order = STATE_NAMES,join=False, dodge=0.4,  errwidth = 7,capsize = 0.3, linestyles = ["-","--"], scale = 1.1)
+plt.setp(axes.lines, zorder=100); plt.setp(axes.collections, zorder=100, label="")
+sns.stripplot(data=summaryStatsLong_outcome,  x="state", y="FC_deltaT", hue = "outcome", ax = axes, palette = plot.COLORS_GOOD_VS_POOR2, dodge=True,
+              size=7, order = STATE_NAMES, zorder=1, jitter = 0.25)
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+axes.legend([],[], frameon=False)
+
+T = helper.compute_T(summaryStatsLong_outcome, group  = False, i =0)
+print(T)
+print(p_val := helper.compute_T(summaryStatsLong_outcome, group  = False, i =1, alternative = "two-sided"))
+axes.set_title(f" {p_val}" )
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_ABLATION_delta_by_seizure.pdf"), save_figure=False,
+                  bbox_inches = "tight", pad_inches = 0)
+
+
+
+T_star_list = []
+
+cores = 16
+iterations = 16
+total = 1
+print(iterations*total)
+for i in range(total):
+    simulation = helper.mutilcore_permute_deltaT_wrapper(cores, iterations, summaryStatsLong_outcome)
+    T_star_list.extend(simulation)
+    utils.printProgressBar(i+1, total)
+
+
+
+T_star = np.array(T_star_list)
+binrange = [-8,10]
+binwidth = 0.25
+fig, axes = utils.plot_make()
+axes.axvline(x=T, color='black', linestyle='--', lw = 5)
+sns.histplot(T_star, kde = True, ax = axes, color = "#bbbbbbbb", binwidth = binwidth, binrange = binrange, edgecolor = None, line_kws=dict(linewidth = 10))
+for line in axes.get_lines():
+    line.set_color("#333333")
+axes.set_xlim([-3,3])
+print(T_nonabs := len(np.where(T_star > T)[0]) / len(T_star))
+print(T_abs := len(np.where(abs(T_star) > T)[0]) / len(T_star))
+print(len(T_star))
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+axes.set_title(f" {T_nonabs}, {T_abs}" )
+
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2_good_vs_poor_delta_perm_by_patient.pdf"), save_figure=False,
+                  bbox_inches = "tight", pad_inches = 0)
+
+
+##############################################
+
+
+df = pd.DataFrame(columns = ["iteration", "state", "outcome", "FC_deltaT"])
+
+cores = 17
+iterations = 17
+total = 1
+for i in range(total):
+    simulation = helper.mutilcore_deltaT_wrapper(cores, iterations, summaryStatsLong_outcome)
+    df = df.append(simulation)
+    utils.printProgressBar(i+1, total)
+
+
+df = df.query( f"state == 'ictal'")
+fig, axes = utils.plot_make()
+sns.histplot(data = df, x = "FC_deltaT",  hue = "outcome", binrange = [-0.005,0.05], binwidth = 0.001, kde = True, palette = plot.COLORS_GOOD_VS_POOR, line_kws=dict(linewidth = 10), edgecolor = None)
+axes.axvline(x=df.query(f"outcome == 'good' and state == 'ictal'  ")["FC_deltaT"].mean(), color='k', linestyle='--')
+axes.axvline(x=df.query(f"outcome == 'poor' and state == 'ictal'  ")["FC_deltaT"].mean(), color='k', linestyle='--')
+print(len(df)/2)
+print(helper.compute_T(df, state = "ictal", i = 0, equal_var=True,  group  = False))
+print(helper.compute_T(df, state = "ictal", i = 1, equal_var=True,  group  = False))
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+axes.legend([],[], frameon=False)
+
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2_good_vs_poor_delta_boot_by_patient.pdf"), save_figure=False,
+                  bbox_inches = "tight", pad_inches = 0)
+
+
+
+#%%
+
+
+#ablation
+
+
+
+
+delta, gm_to_wm_all , gm_to_wm_all_ablated, gm_to_wm_all_ablated_closest_wm, gm_to_wm_all_ablated_closest_wm_gradient= helper.wm_vs_gm_good_vs_poor_redone(summaryStatsLong,
+                          patientsWithseizures, metadata_iEEG, SESSION, USERNAME, PASSWORD, paths,
+                          FREQUENCY_DOWN_SAMPLE, MONTAGE, FC_TYPES, TISSUE_DEFINITION_NAME, TISSUE_DEFINITION_GM, TISSUE_DEFINITION_WM , func = 2, freq = 7,
+                          closest_wm_threshold = 40)
+
+
+
+
+
+#get the median ablated-wm connectivity for all ablated channels in a patient, then take the avg of those
+
+delta_mean = pd.DataFrame(columns = delta.columns)
+for x in range(len(delta)):
+    delta_mean = delta_mean.append(copy.deepcopy(delta.iloc[x]))
+
+    chans = delta.iloc[x]["delta"]
+    chans_means = np.nanmean(np.nanmedian(chans, axis = 1)) #take median FC values, and then take means of those channels
+    delta_mean.loc[ (delta_mean["patient"] ==  delta_mean.iloc[x]["patient"]) & (delta_mean["seizure_number"] ==  delta_mean.iloc[x]["seizure_number"] ) , "delta"]= chans_means
+delta_mean.delta = delta_mean.delta.astype(float)
+delta_means_patients =  delta_mean.groupby(by=["patient", "outcome"]).mean().reset_index()
+
+fig, axes = plt.subplots(1, 1, figsize=(4, 4.2), dpi=300)
+sns.pointplot(data = delta_mean, x= "outcome", y = "delta", ax = axes, palette = plot.COLORS_GOOD_VS_POOR4,
+              join=False, dodge=0.4,  errwidth = 7,capsize = 0.3, linestyles = ["-","--"], scale = 1.3)
+plt.setp(axes.lines, zorder=100); plt.setp(axes.collections, zorder=100, label="")
+sns.stripplot(data = delta_mean, x= "outcome", y = "delta",ax = axes, palette = plot.COLORS_GOOD_VS_POOR2,s = 8, zorder=1, jitter = 0.3)
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+pval = helper.compute_T_no_state(delta_mean, group = False, i = 1, var = "delta", alternative = "two-sided")
+axes.set_title(f"{pval}" )
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2_good_vs_poor_ABLATION_delta_by_patient.pdf"), save_figure=False,
+              bbox_inches = "tight", pad_inches = 0.0)
+
+
+
+###########################3
+
+good = []
+poor = []
+for x in range(len(gm_to_wm_all_ablated)):
+    outcome = gm_to_wm_all_ablated["outcome"][x]
+    if outcome == "good":
+        good.extend(list(np.array(gm_to_wm_all_ablated["gm_to_wm_all_ablated"][x][1]) -  np.array(gm_to_wm_all_ablated["gm_to_wm_all_ablated"][x][0])))
+    if outcome == "poor":
+        poor.extend(list(np.array(gm_to_wm_all_ablated["gm_to_wm_all_ablated"][x][1]) -  np.array(gm_to_wm_all_ablated["gm_to_wm_all_ablated"][x][0])))
+    if x+1 == len(gm_to_wm_all_ablated):
+        good = np.array(good)
+        poor = np.array(poor)
+
+
+fig, axes = utils.plot_make()
+sns.ecdfplot(good, ax = axes, color = plot.COLORS_GOOD_VS_POOR[0], lw = 5)
+sns.ecdfplot(poor, ax = axes, color = plot.COLORS_GOOD_VS_POOR[1], lw = 5)
+axes.set_xlim([-0.1,0.8])
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2_good_vs_poor_ABLATION_difference_all_connecions_morePatients.pdf"), save_figure=False,
+                  bbox_inches = "tight", pad_inches = 0)
+
+
+
+
+#% permute delta
+
+
+delta_mean
+
+T = helper.compute_T_no_state(delta_mean, group = True, i = 0, var = "delta")
+print(T)
+print(helper.compute_T_no_state(delta_mean, group = True, i = 1, var = "delta"))
+
+T_star_list = []
+
+cores = 16
+iterations = 16
+total = 1
+print(iterations*total)
+for i in range(total):
+    simulation = helper.mutilcore_permute_deltaT_wrapper(cores, iterations, delta_mean, state_bool = False, group = True, var = "FC_deltaT")
+    T_star_list.extend(simulation)
+    utils.printProgressBar(i+1, total)
+
+
+T_star = np.array(T_star_list)
+binrange = [-8,10]
+binwidth = 0.25
+fig, axes = utils.plot_make()
+axes.axvline(x=T, color='black', linestyle='--', lw = 5)
+sns.histplot(T_star, kde = True, ax = axes, color = "#bbbbbbbb", binwidth = binwidth, binrange = binrange, edgecolor = None, line_kws=dict(linewidth = 10))
+for line in axes.get_lines():
+    line.set_color("#333333")
+axes.set_xlim([-5,6])
+print(T_nonabs := len(np.where(T_star > T)[0]) / len(T_star))
+print(T_abs := len(np.where(abs(T_star) > T)[0]) / len(T_star))
+print(len(T_star))
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+axes.set_title(f" {T_nonabs}, {T_abs}" )
+
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2_good_vs_poor_ABLATION_perm_by_patient.pdf"), save_figure=False,
+                  bbox_inches = "tight", pad_inches = 0)
+
+
+
+##############################################
+#boostrap delta
+
+df = pd.DataFrame(columns = ["iteration","outcome", "delta"])
+
+
+cores = 16
+iterations = 16
+total = 1
+for i in range(total):
+    simulation = helper.mutilcore_delta_mean_wrapper(cores, iterations, delta_mean)
+    df = df.append(simulation)
+    utils.printProgressBar(i+1, total)
+
+
+binrange = [-0.005,1]
+binwidth = 0.01
+fig, axes = utils.plot_make()
+sns.histplot(data = df, x = "delta",  hue = "outcome", binrange =binrange, binwidth =binwidth, kde = True, palette = plot.COLORS_GOOD_VS_POOR, line_kws=dict(linewidth = 10), edgecolor = None)
+axes.axvline(x=df.query(f"outcome == 'good' ")["delta"].mean(), color='k', linestyle='--')
+axes.axvline(x=df.query(f"outcome == 'poor'  ")["delta"].mean(), color='k', linestyle='--')
+axes.set_xlim([-0.0005, 0.25])
+print(len(df)/2)
+print(helper.compute_T_no_state(df, i = 0, equal_var=True,  group  = False, var = "delta"))
+print(helper.compute_T_no_state(df, i = 1, equal_var=True,  group  = False, var = "delta"))
+axes.spines['top'].set_visible(False)
+axes.spines['right'].set_visible(False)
+axes.legend([],[], frameon=False)
+
+
+utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2_good_vs_poor_ABLATION_boot_by_patient.pdf"), save_figure=False,
+                  bbox_inches = "tight", pad_inches = 0)
 
 
 
@@ -2121,12 +1358,65 @@ file_to_read.close()
 
 
 
-[max(p) for p in loaded_object]
-"""
 
 
 
 
 
+
+
+
+
+######################################################
+######################################################
+######################################################
+
+
+seizure_number_good = summaryStatsLong.query(f"outcome == 'good'   ")["seizure_number"].unique()
+seizure_number_poor = summaryStatsLong.query(f"outcome == 'poor'   ")["seizure_number"].unique()
+
+FCtissueAll_ind_good = np.intersect1d(seizure_number_good, seizure_number, return_indices=True )[2]
+FCtissueAll_ind_poor = np.intersect1d(seizure_number_poor, seizure_number, return_indices=True )[2]
+FCtissueAll_good = [FCtissueAll[i] for i in FCtissueAll_ind_good]
+FCtissueAll_poor = [FCtissueAll[i] for i in FCtissueAll_ind_poor]
+FCtissueAll_outcomes = [FCtissueAll_good, FCtissueAll_poor]
+
+tissue_distribution = [None] * 2
+for o in range(2):
+    tissue_distribution[o] =  [None] * 4
+    for t in range(4):
+        tissue_distribution[o][t]  = [None] * 4
+
+
+OUTCOME_NAMES = ["good", "poor"]
+TISSUE_TYPE_NAMES = ["Full Network", "GM-only", "WM-only", "GM-WM"]
+
+
+for o in range(2):
+    for t in range(4):
+        for s in range(4):
+            FCtissueAll_outcomes_single = FCtissueAll_outcomes[o]
+            fc_patient = []
+            for i in range(len(FCtissueAll_outcomes_single)):
+                fc =  utils.getUpperTriangle(FCtissueAll_outcomes_single[i][func][freq][t][s])
+                fc_patient.append(fc)
+            tissue_distribution[o][t][s] = np.array([item for sublist in fc_patient for item in sublist])
+
+
+for s in [1,2]:
+    fig, axes = utils.plot_make(c = 2, r = 2, size_height = 5)
+    axes = axes.flatten()
+    for t in range(4):
+        sns.ecdfplot(data = tissue_distribution[0][t][s], ax = axes[t], color = plot.COLORS_GOOD_VS_POOR[0], lw = 6)
+        sns.ecdfplot(data = tissue_distribution[1][t][s], ax = axes[t], color =  plot.COLORS_GOOD_VS_POOR[1], lw = 6, ls = "-")
+        axes[t].set_title(f"{TISSUE_TYPE_NAMES[t]}, {STATE_NAMES[s]}   {stats.ks_2samp( tissue_distribution[0][t][s],  tissue_distribution[1][t][s] )[1]*16  }" )
+        axes[t].spines['top'].set_visible(False)
+        axes[t].spines['right'].set_visible(False)
+        axes[t].set_xlim([0,1])
+    utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_{STATE_NAMES[s]}.pdf"), save_figure=False,
+                      bbox_inches = "tight", pad_inches = 0.0)
+
+
+#good vs poor -- delta
 
 

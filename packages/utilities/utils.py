@@ -171,6 +171,15 @@ def channel2stdCSV(outputTissueCoordinates):
         df.at[e, "electrode_name" ] = electrode_name
     pd.DataFrame.to_csv(df, outputTissueCoordinates, header=True, index=False)
 
+
+def channel2std(channelsArr):
+    nchan = len(channelsArr)
+    for ch in range(nchan):
+        if len(channelsArr[ch]) < 4:
+            channelsArr[ch] = channelsArr[ch][0:2] + f"{int(channelsArr[ch][2:]):02d}"
+    return channelsArr
+
+
 def baseSplitextNiiGz(path):
     base = basename(path)
     split = splitext(splitext(path)[0])[0]
@@ -190,10 +199,10 @@ def getSubType(name):
     if "RID" in name:
         return "subjects"
 
-def save_figure(fname, save_figure = True):
+def save_figure(fname, save_figure = True, bbox_inches = None, pad_inches = 0.1):
     #allows option to not save figures when saveFigures == False
     if save_figure == True:
-        plt.savefig(fname)
+        plt.savefig(fname, bbox_inches=bbox_inches, pad_inches = pad_inches)
 
 def getUpperTriangle(data, k=1):
     return data[np.triu_indices_from(data, k)]
@@ -281,6 +290,7 @@ def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, save
             raise Exception("No file name was given to save figures")
         plt.savefig(saveFilename, transparent=True)
     plt.show()
+    plt.style.use('default')
 
 def expand_region_in_image(img_data, data_type = "data", iterations = 10):
     img_data = load_img_data(img_data, data_type = data_type )
@@ -423,12 +433,12 @@ def plot_histplot(data, bins = 20, kde=True):
     fig, axes = plt.subplots(1, 1, figsize=(4, 4), dpi=300)
     sns.histplot(data, bins = bins, kde=kde , ax = axes)
     plt.show()
-def plot_make(r = 1, c = 1, size_length = None, size_height = None, dpi = 300 ):
+def plot_make(r = 1, c = 1, size_length = None, size_height = None, dpi = 300, sharex = False, sharey = False , squeeze = True):
     if size_length == None:
        size_length = 4* c
     if size_height == None:
         size_height = 4 * r
-    fig, axes = plt.subplots(r, c, figsize=(size_length, size_height), dpi=dpi)
+    fig, axes = plt.subplots(r, c, figsize=(size_length, size_height), dpi=dpi, sharex =sharex, sharey = sharey, squeeze = squeeze)
     return fig, axes
 
 #%% Network Analysis

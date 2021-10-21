@@ -1248,8 +1248,14 @@ def plot_boxplot_tissue_power_differences(powerGMmean, powerWMmean, powerDistAvg
 # All FC and all Frequency Boxplot of FC values for ii, pi, ic, and po states
 def plot_boxplot_all_FC_deltaT(summaryStatsLong, FREQUENCY_NAMES, FC_TYPES, palette1, palette2):
     g = sns.FacetGrid(summaryStatsLong, col="frequency", row = "FC_type",sharey=False, col_order=FREQUENCY_NAMES, row_order = FC_TYPES)
-    g.map(sns.boxplot, "state","FC_deltaT", order=["interictal", "preictal", "ictal", "postictal"], showfliers=False, palette = palette1)
-    g.map(sns.stripplot, "state","FC_deltaT", order=["interictal", "preictal", "ictal", "postictal"], dodge=True, palette = palette2)
+    #g.map(sns.boxplot, "state","FC_deltaT", order=["interictal", "preictal", "ictal", "postictal"], showfliers=False, palette = palette1)
+
+    g.map(sns.pointplot, "state","FC_deltaT", order=["interictal", "preictal", "ictal", "postictal"], join= False, showfliers=False, color = "black", dodge=0.4, errwidth = 3,capsize = 0.3, linestyles = "--", scale = 0.9)
+    g.map(sns.stripplot, "state","FC_deltaT", order=["interictal", "preictal", "ictal", "postictal"], dodge=True, palette = palette1)
+    for x in range(g.axes.shape[0]):
+        for y in range(g.axes.shape[1]):
+            axes = g.axes[int(x)][int(y)]
+            plt.setp(axes.lines, zorder=100); plt.setp(axes.collections, zorder=100, label="")
     ylims = [ [-0.03, 0.1], [-0.005, 0.04] ,[-0.025, 0.125] ]
     bonferroniFactor = len(FC_TYPES)*len(FREQUENCY_NAMES)
     for func in range(len(FC_TYPES)):
@@ -1269,14 +1275,18 @@ def plot_boxplot_all_FC_deltaT(summaryStatsLong, FREQUENCY_NAMES, FC_TYPES, pale
             if func == len(FC_TYPES)-1: g.axes[func][f].set_xticklabels(["inter", "pre", "ictal", "post"])
 
 
-def plot_boxplot_single_FC_deltaT(summaryStatsLong_bootstrap, FREQUENCY_NAMES, FC_TYPES, func, freq, params_plot):
+def plot_boxplot_single_FC_deltaT(summaryStatsLong_bootstrap, FREQUENCY_NAMES, FC_TYPES, func, freq, params_plot, ylim = None):
     df = summaryStatsLong_bootstrap.loc[summaryStatsLong_bootstrap['FC_type'] == FC_TYPES[func]].loc[summaryStatsLong_bootstrap['frequency'] == FREQUENCY_NAMES[freq]]
-    fig, axes = plt.subplots(1,1,figsize=(7, 5), dpi = 600)
-    sns.boxplot( data= df, x = "state", y = "FC_deltaT", order=["interictal", "preictal", "ictal", "postictal"], showfliers=False, palette = params_plot.COLORS_STATE4[0], ax = axes)
-    sns.stripplot( data= df, x = "state", y = "FC_deltaT",order=["interictal", "preictal", "ictal", "postictal"], dodge=True, palette = params_plot.COLORS_STATE4[1], ax = axes)
+    fig, axes = plt.subplots(1,1,figsize=(5, 5), dpi = 600)
+    sns.pointplot( data= df, x = "state", y = "FC_deltaT", order=["interictal", "preictal", "ictal", "postictal"],
+                  color = "black", ax = axes, dodge=0.4, errwidth = 5,capsize = 0.2, linestyles = "--", scale = 0.9, join = False)
+    plt.setp(axes.lines, zorder=100); plt.setp(axes.collections, zorder=100, label="")
+    #sns.boxplot( data= df, x = "state", y = "FC_deltaT", order=["interictal", "preictal", "ictal", "postictal"], showfliers=False, palette = params_plot.COLORS_STATE4[0], ax = axes)
+    sns.stripplot( data= df, x = "state", y = "FC_deltaT",order=["interictal", "preictal", "ictal", "postictal"], dodge=True, palette = params_plot.COLORS_STATE4[1], ax = axes,  jitter = 0.3)
     axes.spines['top'].set_visible(False)
     axes.spines['right'].set_visible(False)
-    axes.set_ylim([-0.0125, 0.025]);
+    if not ylim == None:
+        axes.set_ylim(ylim);
     print("\ndeltaT for interictal is not zero:")
     print(stats.ttest_1samp(np.array(df.loc[df["state"] == "interictal"]["FC_deltaT"]), 0)[1])
     print("\ndeltaT for preictal is not zero:")
@@ -1304,19 +1314,44 @@ def plot_FC_example_patient_ADJ(sub, FC, channels, localization, localization_ch
     print(np.where(dist_order["distance"]> (TISSUE_DEFINITION_GM + TISSUE_DEFINITION_WM)/2)[0][0])
 
 
-def plot_FC_example_patient_GMWM(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index,
-                                                 dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state , func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, params_plot):
+def plot_FC_example_patient_GMWMall(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index,
+                                                 dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state , func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, params_plot,
+                                                 xlim = [0,0.1]):
     FC_type = FC_TYPES[func]
     wm = utils.getUpperTriangle(     utils.reorderAdj(FC[state][freq], WM_index)   )
     gm = utils.getUpperTriangle(     utils.reorderAdj(FC[state][freq], GM_index)  )
     gmwm = np.concatenate([wm, gm])
 
-    binwidth=0.005
-    xlim = [-0.0,0.1]
+    binwidth=0.025
+    xlim = xlim
 
     #plot FC distributions, plot entire distribution (GM + WM)
     fig, axes = plt.subplots(figsize=(3, 4), dpi = 600)
-    sns.histplot(gmwm, kde = True, color =(0.2, 0.2, 0.2) , ax = axes, binwidth =binwidth, line_kws=dict(lw=params_plot.LW_STD5));
+    sns.histplot(gmwm, kde = True, color =(0.2, 0.2, 0.2) , ax = axes, binwidth =binwidth, line_kws=dict(lw=params_plot.LW_STD2));
+    axes.set_xlim(xlim)
+    axes.title.set_text(f"{FC_type}, {FREQUENCY_NAMES[freq]}, {sub}")
+    axes.spines['top'].set_visible(False)
+    axes.spines['right'].set_visible(False)
+    axes.set_ylabel('Count')
+    axes.set_xlabel(f'{FC_type} {FREQUENCY_NAMES[freq]}')
+    #axes.set_yticks([200,400,600])
+
+def plot_FC_example_patient_GMWM(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index,
+                                                 dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state , func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, params_plot,
+                                                 xlim = [0,0.1]):
+    FC_type = FC_TYPES[func]
+    wm = utils.getUpperTriangle(     utils.reorderAdj(FC[state][freq], WM_index)   )
+    gm = utils.getUpperTriangle(     utils.reorderAdj(FC[state][freq], GM_index)  )
+    gmwm =  utils.getAdjSubset(FC[state][freq], GM_index, WM_index).flatten()
+
+    binwidth=0.025
+    xlim = xlim
+
+    #plot FC distributions, plot entire distribution (GM + WM)
+    fig, axes = plt.subplots(figsize=(3, 4), dpi = 600)
+    sns.histplot( wm, kde = True, color =(	0.463, 0.686, 0.875) , ax = axes, binwidth =binwidth, binrange = [-1,1], line_kws=dict(lw=params_plot.LW_STD2));
+    sns.histplot(  gm, kde = True, color = (0.545, 0.439, 0.345) , ax = axes,  binwidth =binwidth, binrange = [-1,1], line_kws=dict(lw=params_plot.LW_STD2));
+    sns.histplot(gmwm, kde = True, color =(0.608, 0.455, 0.816) , ax = axes, binwidth =binwidth, line_kws=dict(lw=params_plot.LW_STD2));
     axes.set_xlim(xlim)
     axes.title.set_text(f"{FC_type}, {FREQUENCY_NAMES[freq]}, {sub}")
     axes.spines['top'].set_visible(False)
@@ -1327,19 +1362,20 @@ def plot_FC_example_patient_GMWM(sub, FC, channels, localization, localization_c
 
 
 def plot_FC_example_patient_GMvsWM(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index,
-                                                 dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state , func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, params_plot):
+                                                 dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state , func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, params_plot,
+                                                 xlim = [0,0.1]):
     #plot FC distributions, WM vs GM
     FC_type = FC_TYPES[func]
     wm = utils.getUpperTriangle(     utils.reorderAdj(FC[state][freq], WM_index)   )
     gm = utils.getUpperTriangle(     utils.reorderAdj(FC[state][freq], GM_index)  )
 
 
-    binwidth=0.005
-    xlim = [-0.0,0.1]
+    binwidth=0.025
+    xlim = xlim
 
     fig, axes = plt.subplots(figsize=(3, 4), dpi = 600)
-    sns.histplot( wm, kde = True, color =(	0.463, 0.686, 0.875) , ax = axes, binwidth =binwidth, binrange = [-1,1], line_kws=dict(lw=params_plot.LW_STD5));
-    sns.histplot(  gm, kde = True, color = (0.545, 0.439, 0.345) , ax = axes,  binwidth =binwidth, binrange = [-1,1], line_kws=dict(lw=params_plot.LW_STD5));
+    sns.histplot( wm, kde = True, color =(	0.463, 0.686, 0.875) , ax = axes, binwidth =binwidth, binrange = [-1,1], line_kws=dict(lw=params_plot.LW_STD2));
+    sns.histplot(  gm, kde = True, color = (0.545, 0.439, 0.345) , ax = axes,  binwidth =binwidth, binrange = [-1,1], line_kws=dict(lw=params_plot.LW_STD2));
     axes.set_xlim(xlim); #axes.set_ylim([0, 200])
     axes.title.set_text(f"{FC_type}, {FREQUENCY_NAMES[freq]}, {sub}")
     axes.spines['top'].set_visible(False)
@@ -1365,13 +1401,31 @@ def plot_FC_example_patient_GMvsWM_ECDF(sub, FC, channels, localization, localiz
     axes.set_xlabel(f'{FC_type} {FREQUENCY_NAMES[freq]}' )
     #axes.set_xlim([-0.4, 0.4]);
     #axes.set_xticks([-0.4,-0.2,0,0.2,0.4])
+def plot_FC_example_patient_GMWM_ECDF(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index,
+                                                 dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state , func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, params_plot):
+    #ECDF Plots GM vs WM single patient
+    FC_type = FC_TYPES[func]
+    wm = utils.getUpperTriangle(     utils.reorderAdj(FC[state][freq], WM_index)   )
+    gm = utils.getUpperTriangle(     utils.reorderAdj(FC[state][freq], GM_index)  )
+    gmwm =  utils.getAdjSubset(FC[state][freq], GM_index, WM_index).flatten()
+    print(stats.ks_2samp(gm,wm))
+    xlim = [-0.0,0.6]
+    fig, axes = plt.subplots(figsize=(5, 5), dpi = 600)
+    sns.ecdfplot(data=wm, ax = axes, color = params_plot.COLORS_TISSUE_LIGHT_MED_DARK[1][1], lw = params_plot.LW_STD5)
+    sns.ecdfplot(data= gm , ax = axes, color = params_plot.COLORS_TISSUE_LIGHT_MED_DARK[1][0], lw = params_plot.LW_STD5)
+    sns.ecdfplot(data= gmwm , ax = axes, color =(0.608, 0.455, 0.816), lw = params_plot.LW_STD5)
+    axes.spines['top'].set_visible(False)
+    axes.spines['right'].set_visible(False)
+    axes.set_xlabel(f'{FC_type} {FREQUENCY_NAMES[freq]}' )
+    #axes.set_xlim([-0.4, 0.4]);
+    #axes.set_xticks([-0.4,-0.2,0,0.2,0.4])
 
 def plot_FC_all_patients_GMvsWM_ECDF(FCtissueAll_bootstrap_flatten, STATE_NUMBER , params_plot):
     xlim = [-0.0,0.6]
     fig, axes = plt.subplots(1,4,figsize=(8, 2.5), dpi = 600)
     for s in range(STATE_NUMBER):
-        sns.ecdfplot(data = FCtissueAll_bootstrap_flatten[0][s], ax = axes[s], color = params_plot.COLORS_TISSUE_LIGHT_MED_DARK[1][0], ls = "-", lw = params_plot.LW_STD3)
-        sns.ecdfplot(data = FCtissueAll_bootstrap_flatten[1][s] , ax = axes[s], color = params_plot.COLORS_TISSUE_LIGHT_MED_DARK[1][1], ls = "--", lw = params_plot.LW_STD3)
+        sns.ecdfplot(data = FCtissueAll_bootstrap_flatten[1][s], ax = axes[s], color = params_plot.COLORS_TISSUE_LIGHT_MED_DARK[1][0], ls = "-", lw = params_plot.LW_STD3)
+        sns.ecdfplot(data = FCtissueAll_bootstrap_flatten[2][s] , ax = axes[s], color = params_plot.COLORS_TISSUE_LIGHT_MED_DARK[1][1], ls = "--", lw = params_plot.LW_STD3)
         axes[s].spines['top'].set_visible(False)
         axes[s].spines['right'].set_visible(False)
         axes[s].set_xlim(xlim);
@@ -1427,6 +1481,9 @@ def plot_FC_vs_WM_cutoff_PVALUES(pvalues, binwidth, xlim, params_plot):
 
 def plot_FC_vs_contact_distance(summaryStats_Wm_FC_bootstrap_func_freq_long_state, xlim = [3,100], ylim = [0,0.6]):
     fig, axes = utils.plot_make()
+    x = summaryStats_Wm_FC_bootstrap_func_freq_long_state["WM_median_distance"]
+    y = summaryStats_Wm_FC_bootstrap_func_freq_long_state["FC"]
+    print(stats.spearmanr(x,y))
     sns.regplot(data=summaryStats_Wm_FC_bootstrap_func_freq_long_state, x = "WM_median_distance", y = "FC", scatter_kws = dict(s = 10), order = 1, logx = True)
     axes.set_ylim(ylim)
     axes.set_xlim(xlim)

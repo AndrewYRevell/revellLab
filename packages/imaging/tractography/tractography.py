@@ -7,10 +7,10 @@ Created on Tue Mar  2 11:01:56 2021
 """
 
 import os
-from os.path import join,  splitext, basename
-import numpy as np
-from revellLab.packages.utilities import utils
 import glob
+import numpy as np
+from os.path import join,  splitext, basename
+from revellLab.packages.utilities import utils
 
 
 

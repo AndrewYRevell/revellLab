@@ -29,3 +29,9 @@ SESSION_IMPLANT = "implant01"
 SESSION_RESEARCH3T = "research3Tv[0-9][0-9]"
 ACQUISITION_RESEARCH3T_T1_MPRAGE = "3D"
 IEEG_SPACE = ["T00"]
+
+
+
+OUTCOME_NAMES = ["good", "poor"]
+TISSUE_TYPE_NAMES = ["Full Network", "GM-only", "WM-only", "GM-WM"]
+TISSUE_TYPE_NAMES2 = ["Full Network", "GM", "WM", "GM-WM"]

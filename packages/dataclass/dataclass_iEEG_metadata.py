@@ -233,7 +233,7 @@ class dataclass_iEEG_metadata:
         for c in range(len(annotations)):
             annElec = annotations["electrode"][c]
             #convert name to standard channel name:
-            annElec = echobase.channel2std(    np.array([annElec]  ).astype("object")   )
+            annElec = utils.channel2std(    np.array([annElec]  ).astype("object")   )
             annStr = annotations["start"][c]
             annStp = annotations["stop"][c]
 
