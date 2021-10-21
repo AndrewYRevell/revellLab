@@ -35,10 +35,10 @@ from pathos.multiprocessing import ProcessingPool as Pool
 #revellLab
 #utilities, constants/parameters, and thesis helper functions
 from revellLab.packages.utilities import utils
-from revellLab.MDPHD_THESIS import constants_parameters as params
-from revellLab.MDPHD_THESIS import constants_plotting as plot
+from revellLab.papers.white_matter_iEEG import constants_parameters as params
+from revellLab.papers.white_matter_iEEG import constants_plotting as plot
 from revellLab.paths import constants_paths as paths
-from revellLab.MDPHD_THESIS.helpers import thesis_helpers as helper
+from revellLab.papers.white_matter_iEEG.helpers import thesis_helpers as helper
 
 #package functions
 from revellLab.packages.dataclass import dataclass_atlases, dataclass_iEEG_metadata

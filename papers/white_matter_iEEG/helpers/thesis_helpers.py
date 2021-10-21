@@ -36,7 +36,7 @@ from revellLab.packages.atlasLocalization import atlasLocalizationFunctions as a
 from revellLab.packages.eeg.echobase import echobase
 from revellLab.packages.imaging.tractography import tractography
 
-from revellLab.MDPHD_THESIS.plotting import plot_GMvsWM
+from revellLab.papers.white_matter_iEEG.plotting import plot_GMvsWM
 #%% Power analysis
 
 def power_analysis(patientsWithseizures, indexes, metadata_iEEG, USERNAME, PASSWORD, SESSION, FREQUENCY_DOWN_SAMPLE, MONTAGE, paths, TISSUE_DEFINITION_NAME , TISSUE_DEFINITION_GM, TISSUE_DEFINITION_WM):
