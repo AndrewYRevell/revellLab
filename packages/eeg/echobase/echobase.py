@@ -908,7 +908,7 @@ def automaticBipolarMontageSEEG(data, data_columns):
 
     nchan = len(channels)
     #naming to standard 4 character channel Name: (Letter)(Letter)(Number)(Number)
-    channels = utils.channel2std(channels)
+    channels = channel2std(channels)
     count = 0
     for ch in range(nchan-1):
         ch1Ind = ch
@@ -1208,7 +1208,7 @@ def preprocess(df, fs, fsds, montage = "bipolar", prewhiten = True):
     if montage == "car":
         data_ref = common_avg_ref(data)
         channels = data_columns
-        channels = utils.channel2std(channels)
+        channels = channel2std(channels)
     if montage == "bipolar":
         data_ref, channels = automaticBipolarMontageSEEG(data, data_columns)
     if prewhiten == True: data_ar = ar_one(data_ref)
@@ -1297,6 +1297,12 @@ def power_interpolate(data, dataInterictal, ictalStartIndex, ictalEndIndex, leng
 C. Utilities:
 """
 
+def channel2std(channelsArr):
+    nchan = len(channelsArr)
+    for ch in range(nchan):
+        if len(channelsArr[ch]) < 4:
+            channelsArr[ch] = channelsArr[ch][0:2] + f"{int(channelsArr[ch][2:]):02d}"
+    return channelsArr
 
 
 

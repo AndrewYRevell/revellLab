@@ -36,7 +36,7 @@ import matplotlib.pyplot as plt
 from revellLab.packages.eeg.echobase import echobase
 from revellLab.packages.seizureSpread import echomodel
 from revellLab.packages.eeg.ieegOrg import downloadiEEGorg
-from revellLab.packages.dataClass import DataClassSfc, DataClassJson
+from revellLab.packages.dataclass import dataclass_SFC, dataclass_iEEG_metadata
 from revellLab.packages.atlasLocalization import atlasLocalizationFunctions as atl
 
 physical_devices = tf.config.list_physical_devices('GPU')
@@ -51,7 +51,7 @@ BIDS = join("/media","arevell","sharedSSD","linux", "data", "BIDS")
 BIDSpenn = join(BIDS, "PIER")
 BIDSmusc = join(BIDS, "MIER")
 deepLearningModelsPath = "/media/arevell/sharedSSD/linux/data/deepLearningModels/seizureSpread"
-datasetiEEG = "derivatives/iEEGorgDownload"
+datasetiEEG = "derivatives/seizure_spread/iEEG_data"
 session = "implant01"
 
 
@@ -78,7 +78,7 @@ password = usernameAndpassword["password"]
 # Get files and relevant patient information to train model
 
 #turning jsonFile to a @dataclass to make easier to extract info and data from it
-DataJson = DataClassJson.DataClassJson(jsonFile)
+DataJson = dataclass_iEEG_metadata.dataclass_iEEG_metadata(jsonFile)
 #Get patients who have seizure annotations by channels (individual channels have seizure markings on ieeg.org)
 patientsWithAnnotations = DataJson.get_patientsWithSeizureChannelAnnotations()
 #Split Training and Testing sets BY PATIENT
@@ -90,10 +90,10 @@ train, test = echomodel.splitDataframeTrainTest(patientsWithAnnotations, "subjec
 fsds = 128 #"sampling frequency, down sampled"
 annotationLayerName = "seizureChannelBipolar"
 #annotationLayerName = "seizure_spread"
-secondsBefore = 20
-secondsAfter = 5
+secondsBefore = 180
+secondsAfter = 180
 window = 10 #window of eeg for training/testing. In seconds
-skipWindow = 0.25 #Next window is skipped over in seconds 
+skipWindow = 0.25 #Next window is skipped over in seconds
 time_step, skip = int(window*fsds), int(skipWindow*fsds)
 montage = "bipolar"
 prewhiten = True
@@ -117,7 +117,7 @@ input_shape = (time_step,  n_features)
 #May not need to run - mainly used to help annotate EEG and know what electrode contacts are where
 
 #atl.atlasLocalizationBIDSwrapper(["RID0380"], atlasLocalizationFunctionDirectory, atlasLocaliztionDir, atlasPath, atlasLabelsPath, MNItemplatePath, MNItemplateBrainPath, atlasLocaliztionDir, rerun = True)
-atl.atlasLocalizationFromBIDS(BIDS, "PIER", "RID0380", "preop3T", "3D", join(atlasLocaliztionDir, "sub-RID0380", "electrodenames_coordinates_native_and_T1.csv") , atlasLocalizationFunctionDirectory, 
+atl.atlasLocalizationFromBIDS(BIDS, "PIER", "RID0380", "preop3T", "3D", join(atlasLocaliztionDir, "sub-RID0380", "electrodenames_coordinates_native_and_T1.csv") , atlasLocalizationFunctionDirectory,
                               MNItemplatePath , MNItemplateBrainPath, atlasPath, atlasLabelsPath, atlasLocaliztionDir, rerun = True )
 
 atl.atlasLocalizationBIDSwrapper(["RID0267", "RID0259", "RID0250", "RID0241", "RID0240", "RID0238", "RID0230"], atlasLocalizationFunctionDirectory, atlasLocaliztionDir, atlasPath, atlasLabelsPath, MNItemplatePath, MNItemplateBrainPath, atlasLocaliztionDir, multiprocess = True)
@@ -141,7 +141,7 @@ i=0
 sub = list(jsonFile["SUBJECTS"].keys() )[i]
 fname_iEEG =  jsonFile["SUBJECTS"][sub]["Events"]["Ictal"]["1"]["FILE"]
 
-fname_iEEG = "HUP213_phaseII_D02"
+fname_iEEG = "HUP214_phaseII_D01"
 annotations, annotationsSeizure, annotationsUEOEEC = downloadiEEGorg.get_natus(username, password, fname_iEEG = fname_iEEG, annotationLayerName = "Imported Natus ENT annotations")
 
 #%% Get data
@@ -155,16 +155,16 @@ for i in range(len(train)):
     idKey = np.array(train["idKey"])[i]
     AssociatedInterictal = np.array(train["AssociatedInterictal"])[i]
     if i ==0: #intialize
-        X_train, y_train, data, dataII, dataAnnotations = DataJson.get_dataXY(sub, idKey, 
-                                                                              AssociatedInterictal, username, password, 
-                                                                              annotationLayerName, BIDS = BIDS, dataset= datasetiEEG, session = session, 
-                                                                              secondsBefore = secondsBefore, 
+        X_train, y_train, data, dataII, dataAnnotations = DataJson.get_dataXY(sub, idKey,
+                                                                              AssociatedInterictal, username, password,
+                                                                              annotationLayerName, BIDS = BIDS, dataset= datasetiEEG, session = session,
+                                                                              secondsBefore = secondsBefore,
                                                                               secondsAfter = secondsAfter, montage = montage, prewhiten = prewhiten)
     else:
-        X, y, data, dataII, dataAnnotations = DataJson.get_dataXY(sub, idKey, 
-                                                                  AssociatedInterictal, username, password, 
-                                                                  annotationLayerName, BIDS = BIDS, dataset= datasetiEEG, session = session, 
-                                                                  secondsBefore = secondsBefore, 
+        X, y, data, dataII, dataAnnotations = DataJson.get_dataXY(sub, idKey,
+                                                                  AssociatedInterictal, username, password,
+                                                                  annotationLayerName, BIDS = BIDS, dataset= datasetiEEG, session = session,
+                                                                  secondsBefore = secondsBefore,
                                                                   secondsAfter = secondsAfter, montage = montage, prewhiten = prewhiten)
         X_train = np.concatenate([X_train, X], axis = 0)
         y_train = np.concatenate([y_train, y], axis = 0)
@@ -175,15 +175,15 @@ for i in range(len(test)):
     idKey = np.array(test["idKey"])[i]
     AssociatedInterictal = np.array(test["AssociatedInterictal"])[i]
     if i ==0: #intialize
-        X_test, y_test, data, dataII, dataAnnotations = DataJson.get_dataXY(sub, idKey, 
-                                                                            AssociatedInterictal, username, password, 
-                                                                            annotationLayerName, BIDS = BIDS, dataset= datasetiEEG, session = session, 
-                                                                            secondsBefore = secondsBefore, 
+        X_test, y_test, data, dataII, dataAnnotations = DataJson.get_dataXY(sub, idKey,
+                                                                            AssociatedInterictal, username, password,
+                                                                            annotationLayerName, BIDS = BIDS, dataset= datasetiEEG, session = session,
+                                                                            secondsBefore = secondsBefore,
                                                                             secondsAfter = secondsAfter, montage = montage, prewhiten = prewhiten)
     else:
-        X, y, data, dataII, dataAnnotations = DataJson.get_dataXY(sub, idKey, 
-                                                                  AssociatedInterictal, username, password, 
-                                                                  annotationLayerName, BIDS = BIDS, dataset= datasetiEEG, session = session, secondsBefore = secondsBefore, 
+        X, y, data, dataII, dataAnnotations = DataJson.get_dataXY(sub, idKey,
+                                                                  AssociatedInterictal, username, password,
+                                                                  annotationLayerName, BIDS = BIDS, dataset= datasetiEEG, session = session, secondsBefore = secondsBefore,
                                                                   secondsAfter = secondsAfter, montage = montage, prewhiten = prewhiten)
         X_train = np.concatenate([X_test, X], axis = 0)
         y_train = np.concatenate([y_test, y], axis = 0)
@@ -224,23 +224,22 @@ score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_lis
 #%% Evaluate model
 version = 1
 fpath_model = join(deepLearningModelsPath, f"wavenet/v{version:03d}.hdf5")
-yPredictProbability = echomodel.modelPredict(fpath_model, X_test) 
-echomodel.modelEvaluate(yPredictProbability, X_test, y_test, title = "Wavenet Performance") 
+yPredictProbability = echomodel.modelPredict(fpath_model, X_test)
+echomodel.modelEvaluate(yPredictProbability, X_test, y_test, title = "Wavenet Performance")
 
 
 
 fpath_model = join(deepLearningModelsPath,f"1dCNN/v{version:03d}.hdf5")
-yPredictProbability = echomodel.modelPredict(fpath_model, X_test) 
-echomodel.modelEvaluate(yPredictProbability, X_test, y_test, title = "1dCNN Performance") 
+yPredictProbability = echomodel.modelPredict(fpath_model, X_test)
+echomodel.modelEvaluate(yPredictProbability, X_test, y_test, title = "1dCNN Performance")
 
 
 
 fpath_model = join(deepLearningModelsPath,f"lstm/v{version:03d}.hdf5")
-yPredictProbability = echomodel.modelPredict(fpath_model, X_test) 
-echomodel.modelEvaluate(yPredictProbability, X_test, y_test, title = "LSTM Performance") 
+yPredictProbability = echomodel.modelPredict(fpath_model, X_test)
+echomodel.modelEvaluate(yPredictProbability, X_test, y_test, title = "LSTM Performance")
 
 
 #%%
 
 
-    

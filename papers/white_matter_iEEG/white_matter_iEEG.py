@@ -113,11 +113,11 @@ iEEGpatientList = ["sub-" + s for s in iEEGpatientList]
 #%% Graphing summary statistics of seizures and patient population
 #plot distribution of seizures per patient
 plot_seizure_distributions.plot_distribution_seizures_per_patient(patientsWithseizures)
-utils.save_figure(f"{paths.FIGURES}/seizureSummaryStats/seizureCounts2.pdf", save_figure = True)
+utils.save_figure(f"{paths.FIGURES}/seizureSummaryStats/seizureCounts2.pdf", save_figure = False)
 
 #plot distribution of seizure lengths
 plot_seizure_distributions.plot_distribution_seizure_length(patientsWithseizures)
-utils.save_figure(f"{paths.FIGURES}/seizureSummaryStats/seizureLengthDistribution2.pdf", save_figure = True)
+utils.save_figure(f"{paths.FIGURES}/seizureSummaryStats/seizureLengthDistribution2.pdf", save_figure = False)
 
 #%% Electrode and atlas localization
 atl.atlasLocalizationBIDSwrapper(iEEGpatientList,  paths.BIDS, "PIER", SESSION, IEEG_SPACE, ACQ,  paths.BIDS_DERIVATIVES_RECONALL,  paths.BIDS_DERIVATIVES_ATLAS_LOCALIZATION,
