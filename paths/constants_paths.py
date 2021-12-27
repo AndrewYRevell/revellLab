@@ -9,7 +9,7 @@ DATA = "/media/arevell/sharedSSD/linux/data"
 
 #METADATA
 METADATA = "/media/arevell/sharedSSD/linux/data/metadata"
-METADATA_IEEG_DATA = "/media/arevell/sharedSSD/linux/data/metadata/iEEGdataRevell.json"
+
 
 FIGURES = "/media/arevell/sharedSSD/linux/figures"
 
@@ -28,11 +28,14 @@ MNI_TEMPLATE_BRAIN = "/media/arevell/sharedSSD/linux/revellLab//tools/templates/
 #BIDS and DERIVATIVES
 BIDS = "/media/arevell/sharedSSD/linux/data/BIDS"
 BIDS_DERIVATIVES_ATLAS_LOCALIZATION = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/atlasLocalization"
-BIDS_DERIVATIVES_QSIPREP = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/qsiprep"
+BIDS_DERIVATIVES_QSIPREP = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/qsiprep_v0.12.2"
 BIDS_DERIVATIVES_RECONALL = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/freesurferReconAll"
-BIDS_DERIVATIVES_FUNCTIONAL_CONNECTIVITY = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/functionalConnectivity"
-BIDS_DERIVATIVES_FUNCTIONAL_CONNECTIVITY_IEEG = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/functionalConnectivity/iEEG"
-BIDS_DERIVATIVES_TRACTOGRAPHY = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/tractography"
 
 
-
+#White matter iEEG paper
+BIDS_DERIVATIVES_WM_IEEG = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/white_matter_iEEG"
+BIDS_DERIVATIVES_WM_IEEG_METADATA = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/white_matter_iEEG/iEEGdata_WM_iEEG.json"
+BIDS_DERIVATIVES_WM_IEEG_IEEG = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/white_matter_iEEG/iEEG"
+BIDS_DERIVATIVES_WM_IEEG_FUNCTIONAL_CONNECTIVITY = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/white_matter_iEEG/functionalConnectivity"
+BIDS_DERIVATIVES_WM_IEEG_FUNCTIONAL_CONNECTIVITY_IEEG = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/white_matter_iEEG/functionalConnectivity/iEEG"
+BIDS_DERIVATIVES_WM_IEEG_TRACTOGRAPHY = "/media/arevell/sharedSSD/linux/data/BIDS/derivatives/white_matter_iEEG/tractography"

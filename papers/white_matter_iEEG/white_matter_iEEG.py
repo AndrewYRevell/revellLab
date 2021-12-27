@@ -49,12 +49,12 @@ from revellLab.packages.imaging.tractography import tractography
 from revellLab.packages.imaging.makeSphericalRegions import make_spherical_regions
 
 #plotting
-from revellLab.MDPHD_THESIS.plotting import plot_GMvsWM
-from revellLab.MDPHD_THESIS.plotting import plot_seizure_distributions
+from revellLab.papers.white_matter_iEEG.plotting import plot_GMvsWM
+from revellLab.papers.white_matter_iEEG.plotting import plot_seizure_distributions
 #% 2/4 Paths and File names
 
 
-with open(paths.METADATA_IEEG_DATA) as f: JSON_iEEG_metadata = json.load(f)
+with open(paths.BIDS_DERIVATIVES_WM_IEEG_METADATA) as f: JSON_iEEG_metadata = json.load(f)
 with open(paths.ATLAS_FILES_PATH) as f: JSON_atlas_files = json.load(f)
 with open(paths.IEEG_USERNAME_PASSWORD) as f: IEEG_USERNAME_PASSWORD = json.load(f)
 
@@ -113,11 +113,11 @@ iEEGpatientList = ["sub-" + s for s in iEEGpatientList]
 #%% Graphing summary statistics of seizures and patient population
 #plot distribution of seizures per patient
 plot_seizure_distributions.plot_distribution_seizures_per_patient(patientsWithseizures)
-utils.save_figure(f"{paths.FIGURES}/seizureSummaryStats/seizureCounts2.pdf", save_figure = False)
+utils.save_figure(f"{paths.FIGURES}/seizureSummaryStats/seizureCounts.pdf", save_figure = False)
 
 #plot distribution of seizure lengths
 plot_seizure_distributions.plot_distribution_seizure_length(patientsWithseizures)
-utils.save_figure(f"{paths.FIGURES}/seizureSummaryStats/seizureLengthDistribution2.pdf", save_figure = False)
+utils.save_figure(f"{paths.FIGURES}/seizureSummaryStats/seizureLengthDistribution.pdf", save_figure = False)
 
 #%% Electrode and atlas localization
 atl.atlasLocalizationBIDSwrapper(iEEGpatientList,  paths.BIDS, "PIER", SESSION, IEEG_SPACE, ACQ,  paths.BIDS_DERIVATIVES_RECONALL,  paths.BIDS_DERIVATIVES_ATLAS_LOCALIZATION,
@@ -127,18 +127,18 @@ atl.atlasLocalizationBIDSwrapper(iEEGpatientList,  paths.BIDS, "PIER", SESSION, 
 #%% EEG download and preprocessing of electrodes
 for i in range(len(patientsWithseizures)):
     metadata_iEEG.get_precitalIctalPostictal(patientsWithseizures["subject"][i], "Ictal", patientsWithseizures["idKey"][i], USERNAME, PASSWORD,
-                                        BIDS=paths.BIDS, dataset="derivatives/iEEGorgDownload", session = SESSION, secondsBefore=180, secondsAfter=180, load=False)
+                                        BIDS=paths.BIDS, dataset = paths.BIDS_DERIVATIVES_WM_IEEG_IEEG, session = SESSION, secondsBefore=180, secondsAfter=180, load=False)
     # get intertical
     associatedInterictal = metadata_iEEG.get_associatedInterictal(patientsWithseizures["subject"][i],  patientsWithseizures["idKey"][i])
     metadata_iEEG.get_iEEGData(patientsWithseizures["subject"][i], "Interictal", associatedInterictal, USERNAME, PASSWORD,
-                          BIDS=paths.BIDS, dataset="derivatives/iEEGorgDownload", session= SESSION, startKey="Start", load=False)
+                          BIDS=paths.BIDS, dataset = paths.BIDS_DERIVATIVES_WM_IEEG_IEEG, session= SESSION, startKey="Start", load=False)
 
 
 #%% Power analysis
 
 ###################################
 #WM power as a function of distance
-fname = join(paths.DATA, "GMvsWM",f"power_{MONTAGE}_{params.TISSUE_DEFINITION_DISTANCE[0]}_GM_{params.TISSUE_DEFINITION_DISTANCE[1]}_WM_{params.TISSUE_DEFINITION_DISTANCE[2]}.pickle")
+fname = join(paths.DATA, "white_matter_iEEG",f"power_{MONTAGE}_{params.TISSUE_DEFINITION_DISTANCE[0]}_GM_{params.TISSUE_DEFINITION_DISTANCE[1]}_WM_{params.TISSUE_DEFINITION_DISTANCE[2]}.pickle")
 if utils.checkIfFileDoesNotExist(fname): #if power analysis already computed, then don't run
     powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, powerWM = helper.power_analysis(patientsWithseizures, np.array(range(3, N)), metadata_iEEG, USERNAME, PASSWORD, SESSION, FREQUENCY_DOWN_SAMPLE, MONTAGE, paths, params.TISSUE_DEFINITION_DISTANCE[0] , params.TISSUE_DEFINITION_DISTANCE[1], params.TISSUE_DEFINITION_DISTANCE[2] )
     utils.save_pickle( [powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, powerWM], fname)
@@ -146,19 +146,23 @@ powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, po
 #Plots
 #show figure for paper: Power vs Distance and SNR
 plot_GMvsWM.plot_power_vs_distance_and_SNR(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, powerWM)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"heatmap_pwr_vs_Distance_and_SNR_{MONTAGE}_{params.TISSUE_DEFINITION_DISTANCE[0]}_GM_{params.TISSUE_DEFINITION_DISTANCE[1]}_WM_{params.TISSUE_DEFINITION_DISTANCE[2]}.png"), save_figure= SAVE_FIGURES)
+
+
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"heatmap_pwr_vs_Distance_and_SNR_{MONTAGE}_{params.TISSUE_DEFINITION_DISTANCE[0]}_GM_{params.TISSUE_DEFINITION_DISTANCE[1]}_WM_{params.TISSUE_DEFINITION_DISTANCE[2]}.pdf"), save_figure= True)
 #Show summary figure
 plot_GMvsWM.plotUnivariate(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, powerWM)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"summary_DEPTH_and_SNR_{MONTAGE}_{params.TISSUE_DEFINITION_DISTANCE[0]}_GM_{params.TISSUE_DEFINITION_DISTANCE[1]}_WM_{params.TISSUE_DEFINITION_DISTANCE[2]}.pdf"), save_figure= True)
+
 #boxplot comparing GM vs WM for the different seizure states (interictal, preictal, ictal, postictal)
 plot_GMvsWM.plot_boxplot_tissue_power_differences(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, powerWM, plot.COLORS_TISSUE_LIGHT_MED_DARK[1], plot.COLORS_TISSUE_LIGHT_MED_DARK[2])
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"boxplot_GM_vs_WM_seizure_state_{MONTAGE}_{params.TISSUE_DEFINITION_DISTANCE[0]}_GM_{params.TISSUE_DEFINITION_DISTANCE[1]}_WM_{params.TISSUE_DEFINITION_DISTANCE[2]}.pdf"), save_figure= SAVE_FIGURES)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"boxplot_GM_vs_WM_seizure_state_{MONTAGE}_{params.TISSUE_DEFINITION_DISTANCE[0]}_GM_{params.TISSUE_DEFINITION_DISTANCE[1]}_WM_{params.TISSUE_DEFINITION_DISTANCE[2]}.pdf"), save_figure= SAVE_FIGURES)
 #statistics
 helper.power_analysis_stats(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, powerWM)
 
 
 ####################################
 #WM power as a function of WM percent
-fname = join(paths.DATA, "GMvsWM",f"power_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pickle")
+fname = join(paths.DATA, "white_matter_iEEG",f"power_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pickle")
 if utils.checkIfFileDoesNotExist(fname): #if power analysis already computed, then don't run
     powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, powerWM = helper.power_analysis(patientsWithseizures, np.array(range(3, N)), metadata_iEEG, USERNAME, PASSWORD, SESSION, FREQUENCY_DOWN_SAMPLE, MONTAGE, paths, params.TISSUE_DEFINITION_PERCENT[0] , params.TISSUE_DEFINITION_PERCENT[1],params.TISSUE_DEFINITION_PERCENT[2] )
     utils.save_pickle( [powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, powerWM], fname)
@@ -166,9 +170,11 @@ powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, po
 #Plots
 #Show summary figure
 plot_GMvsWM.plotUnivariatePercent(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, powerWM)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"summary_DEPTH_and_SNR_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"), save_figure= True)
+
 #boxplot comparing GM vs WM for the different seizure states (interictal, preictal, ictal, postictal)
 plot_GMvsWM.plot_boxplot_tissue_power_differences(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, powerWM, plot.COLORS_TISSUE_LIGHT_MED_DARK[1], plot.COLORS_TISSUE_LIGHT_MED_DARK[2])
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"boxplot_GM_vs_WM_seizure_state_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"), save_figure= SAVE_FIGURES)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"boxplot_GM_vs_WM_seizure_state_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"), save_figure= True)
 #statistics
 helper.power_analysis_stats(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paientList, powerGM, powerWM)
 
@@ -180,7 +186,7 @@ for fc in range(len(FC_TYPES)):
         functionalConnectivityPath = join(paths.BIDS_DERIVATIVES_FUNCTIONAL_CONNECTIVITY_IEEG, f"sub-{sub}")
         utils.checkPathAndMake(functionalConnectivityPath, functionalConnectivityPath)
         metadata_iEEG.get_FunctionalConnectivity(patientsWithseizures["subject"][i], idKey = patientsWithseizures["idKey"][i], username = USERNAME, password = PASSWORD,
-                                            BIDS =paths.BIDS, dataset ="derivatives/iEEGorgDownload", session = SESSION,
+                                            BIDS =paths.BIDS, dataset ="derivatives/white_matter_iEEG", session = SESSION,
                                             functionalConnectivityPath = functionalConnectivityPath,
                                             secondsBefore=180, secondsAfter=180, startKey = "EEC",
                                             fsds = FREQUENCY_DOWN_SAMPLE, montage = MONTAGE, FCtype = FC_TYPES[fc])
@@ -241,7 +247,7 @@ for x in range(STATE_NUMBER):
     pvalue = stats.wilcoxon(data["gm"], data["wm"])[1]
     axes[x].set_title(pvalue)
     #print(stats.mannwhitneyu(data["gm"], data["wm"])[1])
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM",
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG",
                   f"22boot_ECDF_all_patients_GMvsWM_ECDF2_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
                   save_figure=False)
 
@@ -259,28 +265,28 @@ axes.set_title(f"{stats.wilcoxon(data['preictal'], data['ictal'])[1]} {stats.tte
 for k in range(len(data.mean())):
     axes.axvline(x=data.mean()[k], color = plot.COLORS_STATE4[1][k], linestyle='--')
 axes.legend([],[], frameon=False)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM",
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG",
                   f"22BOOTSTRAP_all_patients_GMvsWM_ECDF2_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
                   save_figure=False)
 
 
 FCtissueAll_bootstrap_flatten,_ = helper.FCtissueAll_flatten(FCtissueAll, STATE_NUMBER, func = 2 ,freq = 7, max_connections = 50)
 plot_GMvsWM.plot_FC_all_patients_GMvsWM_ECDF(FCtissueAll_bootstrap_flatten, STATE_NUMBER , plot)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM",
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG",
                   f"2ECDF_all_patients_GMvsWM_ECDF2_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
                   save_figure=False)
 
 
 
 plot_GMvsWM.plot_boxplot_single_FC_deltaT(summaryStatsLong, FREQUENCY_NAMES, FC_TYPES, 2, 5, plot)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM",
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG",
                   f"boxplot2_single_FC_deltaT_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
                   save_figure=False)
 
 
 
 plot_GMvsWM.plot_boxplot_all_FC_deltaT(summaryStatsLong, FREQUENCY_NAMES, FC_TYPES, plot.COLORS_STATE4[0], plot.COLORS_STATE4[1])
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM",
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG",
                   f"boxplot2_all_FC_deltaT_Supplement_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
                   save_figure=False)
 
@@ -307,23 +313,23 @@ plot_GMvsWM.plot_FC_example_patient_ADJ(sub, FC, channels, localization, localiz
 plot_GMvsWM.plot_FC_example_patient_GMWMall(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order,
                                          FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot,
                                          xlim = [0,0.6])
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"hist_GM_vs_WM_distribution_of_FC_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"hist_GM_vs_WM_distribution_of_FC_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
 plot_GMvsWM.plot_FC_example_patient_GMvsWM(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order,
                                            FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot,
                                            xlim = [0,0.6])
 
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"hist_GM_vs_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"hist_GM_vs_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
 
 plot_GMvsWM.plot_FC_example_patient_GMvsWM_ECDF(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"ECDF_GM_vs_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"ECDF_GM_vs_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
 
 #GM-to-WM connections
 plot_GMvsWM.plot_FC_example_patient_GMWM(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order,
                                          FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot,
                                          xlim = [0,0.6])
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"hist_GM_to_WM_distribution_of_FC_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"hist_GM_to_WM_distribution_of_FC_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
 plot_GMvsWM.plot_FC_example_patient_GMWM_ECDF(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"ECDF_GM_to_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"ECDF_GM_to_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
 
 
 #%% Calculate FC as a function of purity
@@ -451,7 +457,7 @@ for line in axes.get_lines():
 axes.spines['top'].set_visible(False)
 axes.spines['right'].set_visible(False)
 
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2SFC_bootstrap_10000.pdf"), save_figure=True)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"2SFC_bootstrap_10000.pdf"), save_figure=True)
 
 confidence_intervals = pd.DataFrame(columns = ["tissue", "state", "ci_lower", "ci_upper"])
 for t in range(len(params.TISSUE_TYPE_NAMES)):
@@ -483,7 +489,7 @@ axes.legend([],[], frameon=False)
 for l in range(len(axes.lines)):
     axes.lines[l].set_color(palette3_reorder[l])
 
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2SFC_bootstrap_delta_histogram_10000bootstrap.pdf"), save_figure=False)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"2SFC_bootstrap_delta_histogram_10000bootstrap.pdf"), save_figure=False)
 
 stats.t.interval(alpha=0.95, df=len(df)-1, loc=np.mean(df), scale=stats.sem(df))
 
@@ -535,7 +541,7 @@ for line in axes.get_lines():
         line.set_ls("-")
         line.set_lw(2.5)
 
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"SFC_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"SFC_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
 #%%
 
 
@@ -580,58 +586,58 @@ cmap_structural = sns.cubehelix_palette(start=2.8, rot=-0.1, dark=.2, light=0.95
 
 
 plot_adj_heatmap(SC_order, cmap = cmap_structural, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_SC_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_SC_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
 plot_adj_heatmap(SC_order_gm, cmap = cmap_structural, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_SC_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_SC_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
 plot_adj_heatmap(SC_order_wm, cmap = cmap_structural, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_SC_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_SC_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
 plot_adj_heatmap(SC_order_gmwm, cmap = cmap_structural, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_SC_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_SC_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = 0)
 
 pad = 0.015
 cmap_functional = sns.cubehelix_palette(start=0.7, rot=-0.1, dark=0, light=0.95, hue = 0.8, gamma = 0.8, reverse=True, as_cmap=True)
 t = 4
 plot_adj_heatmap(interictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_0_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_0_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 plot_adj_heatmap(preictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_1_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_1_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 plot_adj_heatmap(ictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_2_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_2_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 plot_adj_heatmap(postictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_3_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_3_FULL_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 
 t = 5
 plot_adj_heatmap(interictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_0_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_0_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 plot_adj_heatmap(preictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_1_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_1_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 plot_adj_heatmap(ictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_2_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_2_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 plot_adj_heatmap(postictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_3_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_3_GM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 
 
 t = 6
 plot_adj_heatmap(interictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_0_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_0_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 plot_adj_heatmap(preictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_1_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_1_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 plot_adj_heatmap(ictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_2_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_2_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 plot_adj_heatmap(postictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_3_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_3_WM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 
 
 
 t = 7
 plot_adj_heatmap(interictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_0_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_0_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 plot_adj_heatmap(preictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_1_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_1_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 plot_adj_heatmap(ictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_2_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_2_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 plot_adj_heatmap(postictal[t], cmap = cmap_functional, center = 0.5)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"adj_FC_3_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"adj_FC_3_GMWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.png"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 
 
 
@@ -659,7 +665,7 @@ for s in range(STATE_NUMBER):
     axes[s].spines['right'].set_visible(False)
 
 
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"GLM_SFC_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"GLM_SFC_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES, bbox_inches = "tight", pad_inches = pad)
 
 
 
@@ -742,7 +748,7 @@ axes.set_title(f"{Tstat.mean()} {pvalue}" )
 
 
 
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_FC_deltaT_PVALUES_PERMUTATION_morePatients3.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"good_vs_poor_FC_deltaT_PVALUES_PERMUTATION_morePatients3.pdf"), save_figure=False,
                       bbox_inches = "tight", pad_inches = 0.1)
 ###############################################################
 ###############################################################
@@ -767,7 +773,7 @@ axes.set_title(f" {stats.mannwhitneyu(v1, v2)[1] }" )
 #axes.set_title(f" {stats.ttest_ind(v1, v2, equal_var=False)[1] }" )
 print(f" {stats.ttest_ind(v1, v2, equal_var=True)[1] }" )
 
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_FC_deltaT_morePatient2.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"good_vs_poor_FC_deltaT_morePatient2.pdf"), save_figure=False,
                       bbox_inches = "tight", pad_inches = 0.1)
 
 ######################################################
@@ -809,7 +815,7 @@ for s in [1,2]:
         axes[t].set_title(f"{TISSUE_TYPE_NAMES[t]}, {STATE_NAMES[s]}   {stats.ks_2samp( tissue_distribution[0][t][s],  tissue_distribution[1][t][s] )[1]*16  }" )
         axes[t].spines['top'].set_visible(False)
         axes[t].spines['right'].set_visible(False)
-    utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_{STATE_NAMES[s]}.pdf"), save_figure=False,
+    utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"good_vs_poor_{STATE_NAMES[s]}.pdf"), save_figure=False,
                       bbox_inches = "tight", pad_inches = 0.0)
 
 
@@ -957,7 +963,7 @@ axes.spines['right'].set_visible(False)
 pvalue = len( np.where(permute >= Tstat.mean()) [0]) / len(Tstat)
 axes.set_title(f"{Tstat.mean()} {pvalue}" )
 
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_PERMUTE_delta_morePatients5_19.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"good_vs_poor_PERMUTE_delta_morePatients5_19.pdf"), save_figure=False,
                       bbox_inches = "tight", pad_inches = 0.0)
 
 
@@ -974,7 +980,7 @@ axes.spines['right'].set_visible(False)
 pvalue = len( np.where(test_statistic_array_ablated_permutation  <= np.mean(test_statistic_array_ablated ) )[0]) / iterations
 pvalue = len( np.where( abs(test_statistic_array_ablated_permutation ) >= np.mean(abs(test_statistic_array_ablated )) )[0]) / iterations
 axes.set_title(f" {np.mean(abs(test_statistic_array_ablated) )}, {pvalue}" )
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_FC_ABLATION_PVALUES_PERMUTATION2.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"good_vs_poor_FC_ABLATION_PVALUES_PERMUTATION2.pdf"), save_figure=False,
                       bbox_inches = "tight", pad_inches = 0.1)
 
 
@@ -1023,7 +1029,7 @@ sns.boxplot(data = df_patient, x= "variable", y = "value", ax = axes, palette = 
 sns.swarmplot(data = df_patient, x= "variable", y = "value", ax = axes, palette = plot.COLORS_GOOD_VS_POOR,s = 3)
 axes.spines['top'].set_visible(False)
 axes.spines['right'].set_visible(False)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_ABLATION_delta_morePatients3.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"good_vs_poor_ABLATION_delta_morePatients3.pdf"), save_figure=False,
               bbox_inches = "tight", pad_inches = 0.0)
 
 print(stats.mannwhitneyu(poor,good))
@@ -1050,7 +1056,7 @@ sns.ecdfplot(difference_gm_to_wm_poor_ablated, ax = axes, color = plot.COLORS_GO
 axes.set_xlim([-0.1,0.5])
 axes.spines['top'].set_visible(False)
 axes.spines['right'].set_visible(False)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_ABLATION_difference_all_connecions_morePatients3.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"good_vs_poor_ABLATION_difference_all_connecions_morePatients3.pdf"), save_figure=False,
                   bbox_inches = "tight", pad_inches = 0)
 
 #Closest gradient
@@ -1104,7 +1110,7 @@ sns.lineplot(data = df_poor_gradient_long, x= "distance", y = "FC", ax = axes, c
 
 axes.spines['top'].set_visible(False)
 axes.spines['right'].set_visible(False)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_ABLATION_gradient_morePatient18.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"good_vs_poor_ABLATION_gradient_morePatient18.pdf"), save_figure=False,
                   bbox_inches = "tight", pad_inches = 0)
 
 
@@ -1138,7 +1144,7 @@ T = helper.compute_T(summaryStatsLong_outcome, group  = False, i =0)
 print(T)
 print(p_val := helper.compute_T(summaryStatsLong_outcome, group  = False, i =1, alternative = "two-sided"))
 axes.set_title(f" {p_val}" )
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_ABLATION_delta_by_seizure.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"good_vs_poor_ABLATION_delta_by_seizure.pdf"), save_figure=False,
                   bbox_inches = "tight", pad_inches = 0)
 
 
@@ -1172,7 +1178,7 @@ axes.spines['top'].set_visible(False)
 axes.spines['right'].set_visible(False)
 axes.set_title(f" {T_nonabs}, {T_abs}" )
 
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2_good_vs_poor_delta_perm_by_patient.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"2_good_vs_poor_delta_perm_by_patient.pdf"), save_figure=False,
                   bbox_inches = "tight", pad_inches = 0)
 
 
@@ -1202,7 +1208,7 @@ axes.spines['top'].set_visible(False)
 axes.spines['right'].set_visible(False)
 axes.legend([],[], frameon=False)
 
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2_good_vs_poor_delta_boot_by_patient.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"2_good_vs_poor_delta_boot_by_patient.pdf"), save_figure=False,
                   bbox_inches = "tight", pad_inches = 0)
 
 
@@ -1245,7 +1251,7 @@ axes.spines['top'].set_visible(False)
 axes.spines['right'].set_visible(False)
 pval = helper.compute_T_no_state(delta_mean, group = False, i = 1, var = "delta", alternative = "two-sided")
 axes.set_title(f"{pval}" )
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2_good_vs_poor_ABLATION_delta_by_patient.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"2_good_vs_poor_ABLATION_delta_by_patient.pdf"), save_figure=False,
               bbox_inches = "tight", pad_inches = 0.0)
 
 
@@ -1271,7 +1277,7 @@ sns.ecdfplot(poor, ax = axes, color = plot.COLORS_GOOD_VS_POOR[1], lw = 5)
 axes.set_xlim([-0.1,0.8])
 axes.spines['top'].set_visible(False)
 axes.spines['right'].set_visible(False)
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2_good_vs_poor_ABLATION_difference_all_connecions_morePatients.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"2_good_vs_poor_ABLATION_difference_all_connecions_morePatients.pdf"), save_figure=False,
                   bbox_inches = "tight", pad_inches = 0)
 
 
@@ -1314,7 +1320,7 @@ axes.spines['top'].set_visible(False)
 axes.spines['right'].set_visible(False)
 axes.set_title(f" {T_nonabs}, {T_abs}" )
 
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2_good_vs_poor_ABLATION_perm_by_patient.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"2_good_vs_poor_ABLATION_perm_by_patient.pdf"), save_figure=False,
                   bbox_inches = "tight", pad_inches = 0)
 
 
@@ -1349,7 +1355,7 @@ axes.spines['right'].set_visible(False)
 axes.legend([],[], frameon=False)
 
 
-utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"2_good_vs_poor_ABLATION_boot_by_patient.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"2_good_vs_poor_ABLATION_boot_by_patient.pdf"), save_figure=False,
                   bbox_inches = "tight", pad_inches = 0)
 
 
@@ -1413,7 +1419,7 @@ for s in [1,2]:
         axes[t].spines['top'].set_visible(False)
         axes[t].spines['right'].set_visible(False)
         axes[t].set_xlim([0,1])
-    utils.save_figure(join(paths.FIGURES, "GM_vs_WM", f"good_vs_poor_{STATE_NAMES[s]}.pdf"), save_figure=False,
+    utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"good_vs_poor_{STATE_NAMES[s]}.pdf"), save_figure=False,
                       bbox_inches = "tight", pad_inches = 0.0)
 
 

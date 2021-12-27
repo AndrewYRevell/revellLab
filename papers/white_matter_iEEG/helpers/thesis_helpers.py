@@ -46,9 +46,9 @@ def power_analysis(patientsWithseizures, indexes, metadata_iEEG, USERNAME, PASSW
         paientList = paientList.append(dict(patient=patientsWithseizures["subject"][i]), ignore_index = True)
         # get data
         seizure, fs, ictalStartIndex, ictalStopIndex = metadata_iEEG.get_precitalIctalPostictal(patientsWithseizures["subject"][i], "Ictal", patientsWithseizures["idKey"][i], USERNAME, PASSWORD,
-                                                                                           BIDS=paths.BIDS, dataset="derivatives/iEEGorgDownload", session=SESSION, secondsBefore=180, secondsAfter=180, load=True)
+                                                                                           BIDS=paths.BIDS, dataset= paths.BIDS_DERIVATIVES_WM_IEEG_IEEG, session=SESSION, secondsBefore=180, secondsAfter=180, load=True)
         interictal, fs = metadata_iEEG.get_iEEGData(patientsWithseizures["subject"][i], "Interictal", patientsWithseizures["AssociatedInterictal"][i], USERNAME, PASSWORD,
-                                               BIDS=paths.BIDS, dataset="derivatives/iEEGorgDownload", session= SESSION, startKey="Start", load = True)
+                                               BIDS=paths.BIDS, dataset= paths.BIDS_DERIVATIVES_WM_IEEG_IEEG, session= SESSION, startKey="Start", load = True)
 
         ###filtering and downsampling
         ictalStartIndexDS = int(ictalStartIndex * (FREQUENCY_DOWN_SAMPLE/fs))
