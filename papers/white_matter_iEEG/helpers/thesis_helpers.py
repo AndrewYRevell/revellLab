@@ -482,8 +482,8 @@ def get_functional_connectivity_and_tissue_subnetworks_for_single_patient(patien
     FC_type = FC_TYPES[FC_TYPES_ind]
 
     channels, FC = metadata_iEEG.get_FunctionalConnectivity(sub, idKey = patientsWithseizures["idKey"][index], username = USERNAME, password = PASSWORD,
-                                        BIDS = paths.BIDS, dataset ="derivatives/iEEGorgDownload", session = SESSION,
-                                        functionalConnectivityPath = join(paths.BIDS_DERIVATIVES_FUNCTIONAL_CONNECTIVITY_IEEG, f"sub-{sub}"),
+                                        BIDS = paths.BIDS, dataset ="derivatives/white_matter_iEEG", session = SESSION,
+                                        functionalConnectivityPath = join(paths.BIDS_DERIVATIVES_WM_IEEG_FUNCTIONAL_CONNECTIVITY_IEEG, f"sub-{sub}"),
                                         secondsBefore=180, secondsAfter=180, startKey = "EEC",
                                         fsds = FREQUENCY_DOWN_SAMPLE, montage = MONTAGE, FCtype = FC_type)
 
@@ -840,7 +840,7 @@ def get_tissue_SFC(patientsWithseizures, sfc_patient_list, paths,
         i = index_number_bootstrap[b]
         sub = patientsWithseizures["subject"][i]
         #print(f"{sub}: {i}")
-        path_SC = join(paths.BIDS_DERIVATIVES_TRACTOGRAPHY, f"sub-{sub}", "connectivity", "electrodeContactAtlas")
+        path_SC = join(paths.BIDS_DERIVATIVES_WM_IEEG_TRACTOGRAPHY, f"sub-{sub}", "connectivity", "electrodeContactAtlas")
 
         path_SC_contacts = glob.glob(join(path_SC, "*.txt"))[0]
         SC = utils.read_DSI_studio_Txt_files_SC(path_SC_contacts)
@@ -958,7 +958,7 @@ def get_SC_and_FC_adj(patientsWithseizures, index, metadata_iEEG, SESSION, USERN
     i = index
     sub = patientsWithseizures["subject"][i]
     print(f"{sub}: {i}")
-    path_SC = join(paths.BIDS_DERIVATIVES_TRACTOGRAPHY, f"sub-{sub}", "connectivity", "electrodeContactAtlas")
+    path_SC = join(paths.BIDS_DERIVATIVES_WM_IEEG_TRACTOGRAPHY, f"sub-{sub}", "connectivity", "electrodeContactAtlas")
 
     path_SC_contacts = glob.glob(join(path_SC, "*.txt"))[0]
     SC = utils.read_DSI_studio_Txt_files_SC(path_SC_contacts)
@@ -1512,8 +1512,8 @@ def permute_resampling_pvalues(summaryStatsLong, FCtissueAll, seizure_number, pa
                     fc = np.nanmedian(  utils.getUpperTriangle(FCtissueAll_bootstrap_outcomes_single[i][func][freq][t][s]))
                     df = df.append( dict( outcome = OUTCOME_NAMES[o], tissue =  TISSUE_TYPE_NAMES[t], state = STATE_NAMES[s] , FC = fc  ), ignore_index=True )
 
-    summaryStatsLong_bootstrap_good.insert(0, 'outcome', 'good')
-    summaryStatsLong_bootstrap_poor.insert(0, 'outcome', 'poor')
+    #summaryStatsLong_bootstrap_good.insert(0, 'outcome', 'good')
+    #summaryStatsLong_bootstrap_poor.insert(0, 'outcome', 'poor')
 
     summaryStatsLong_bootstrap_outcome = pd.concat( [ summaryStatsLong_bootstrap_good, summaryStatsLong_bootstrap_poor])
     tmp = summaryStatsLong_bootstrap_outcome[summaryStatsLong_bootstrap_outcome["frequency"] == FREQUENCY_NAMES[freq]]

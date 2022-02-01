@@ -1257,7 +1257,7 @@ def plot_boxplot_all_FC_deltaT(summaryStatsLong, FREQUENCY_NAMES, FC_TYPES, pale
         for y in range(g.axes.shape[1]):
             axes = g.axes[int(x)][int(y)]
             plt.setp(axes.lines, zorder=100); plt.setp(axes.collections, zorder=100, label="")
-    ylims = [ [-0.03, 0.1], [-0.005, 0.04] ,[-0.025, 0.125] ]
+    ylims =[  [-0.03, 0.6], [-0.005, 0.5] ,[-0.055, 0.6] ] #[ [-0.03, 0.1], [-0.005, 0.04] ,[-0.025, 0.125] ]
     bonferroniFactor = len(FC_TYPES)*len(FREQUENCY_NAMES)
     for func in range(len(FC_TYPES)):
         for f in range(len(FREQUENCY_NAMES)):
