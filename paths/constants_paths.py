@@ -15,7 +15,7 @@ FIGURES = "/media/arevell/data/linux/figures"
 
 #GITHUB REVELLLAB
 REVELLLAB = "/media/arevell/sharedSSD/linux/revellLab/"
-TOOLS = "/media/arevell/sharedSSD/linux/revellLab//tools"
+TOOLS = "/media/arevell/sharedSSD/linux/revellLab/tools"
 
 #ATLASES and TEMPLATES
 ATLASES = "/media/arevell/sharedSSD/linux/revellLab//tools/atlases/atlases"
@@ -39,6 +39,10 @@ BIDS_DERIVATIVES_WM_IEEG_IEEG = "/media/arevell/data/linux/data/BIDS/derivatives
 BIDS_DERIVATIVES_WM_IEEG_FUNCTIONAL_CONNECTIVITY = "/media/arevell/data/linux/data/BIDS/derivatives/white_matter_iEEG/functionalConnectivity"
 BIDS_DERIVATIVES_WM_IEEG_FUNCTIONAL_CONNECTIVITY_IEEG = "/media/arevell/data/linux/data/BIDS/derivatives/white_matter_iEEG/functionalConnectivity/iEEG"
 BIDS_DERIVATIVES_WM_IEEG_TRACTOGRAPHY = "/media/arevell/data/linux/data/BIDS/derivatives/white_matter_iEEG/tractography"
+
+#Seizure Spread paper
+BIDS_DERIVATIVES_WM_IEEG_METADATA = "/media/arevell/data/linux/data/BIDS/derivatives/white_matter_iEEG/iEEGdata_WM_iEEG.json"
+DEEP_LEARNING_MODELS = "/media/arevell/data/linux/data/deepLearningModels/seizureSpread"
 """
 #COMPUTER
 HOME = "/Users/arevell"

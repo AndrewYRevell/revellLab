@@ -437,6 +437,9 @@ def get_channel_distances_from_WM(localization, localization_channels, channels,
 
     GM_index = np.where(dist["distance"] <= TISSUE_DEFINITION_GM)[0]
     WM_index = np.where(dist["distance"] > TISSUE_DEFINITION_WM)[0]
+    if TISSUE_DEFINITION_NAME == "percent_GM":
+        GM_index = np.where(dist["distance"] >= TISSUE_DEFINITION_GM)[0]
+        WM_index = np.where(dist["distance"] < TISSUE_DEFINITION_WM)[0]
     dist_order_ind = np.array(np.argsort(dist["distance"]))
     dist_order = dist.iloc[dist_order_ind].reset_index()
     return dist, GM_index, WM_index, dist_order
@@ -1920,7 +1923,7 @@ def wm_vs_gm_good_vs_poor_redone(summaryStatsLong,
             if s == 2:
                 dd = np.array(ictal) - np.array(preictal)
                 delta = delta.append( dict( patient = sub, outcome = outcome, seizure_number = i, delta = dd), ignore_index=True)
-                diff1 = ictal_all_connectivity_per_channel - preictal_all_connectivity_per_channel
+                #diff1 = ictal_all_connectivity_per_channel - preictal_all_connectivity_per_channel
 
 
         gm_to_wm_all_ablated = gm_to_wm_all_ablated.append( dict( patient = sub, outcome = outcome, seizure_number = i, gm_to_wm_all_ablated = gm_to_wm_per_patient_ablated), ignore_index=True)

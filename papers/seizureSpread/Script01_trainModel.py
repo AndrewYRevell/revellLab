@@ -38,19 +38,20 @@ from revellLab.packages.seizureSpread import echomodel
 from revellLab.packages.eeg.ieegOrg import downloadiEEGorg
 from revellLab.packages.dataclass import dataclass_SFC, dataclass_iEEG_metadata
 from revellLab.packages.atlasLocalization import atlasLocalizationFunctions as atl
+from revellLab.paths import constants_paths as paths
+
 
 physical_devices = tf.config.list_physical_devices('GPU')
 tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
 
+#%%
 #% 02 Paths and files
-fnameiEEGusernamePassword = join("/media","arevell","sharedSSD","linux", "ieegorg.json")
-metadataDir =  join("/media","arevell","sharedSSD","linux", "data", "metadata")
+fnameiEEGusernamePassword = paths.IEEG_USERNAME_PASSWORD
+metadataDir =  paths.METADATA
 fnameJSON = join(metadataDir, "iEEGdataRevell.json")
-BIDS = join("/media","arevell","sharedSSD","linux", "data", "BIDS")
-BIDSpenn = join(BIDS, "PIER")
-BIDSmusc = join(BIDS, "MIER")
-deepLearningModelsPath = "/media/arevell/sharedSSD/linux/data/deepLearningModels/seizureSpread"
+BIDS = paths.BIDS
+deepLearningModelsPath = paths.DEEP_LEARNING_MODELS
 datasetiEEG = "derivatives/seizure_spread/iEEG_data"
 session = "implant01"
 
@@ -82,7 +83,7 @@ DataJson = dataclass_iEEG_metadata.dataclass_iEEG_metadata(jsonFile)
 #Get patients who have seizure annotations by channels (individual channels have seizure markings on ieeg.org)
 patientsWithAnnotations = DataJson.get_patientsWithSeizureChannelAnnotations()
 #Split Training and Testing sets BY PATIENT
-train,  = echomodel.splitDataframeTrainTest(patientsWithAnnotations, "subject", trainSize = 0.66)
+train,  test = echomodel.splitDataframeTrainTest(patientsWithAnnotations, "subject", trainSize = 0.66)
 
 
 
@@ -194,7 +195,7 @@ for i in range(len(test)):
 
 #%% Model training
 
-version = 4
+version = 5
 # Wavenet
 filepath = join(deepLearningModelsPath, f"wavenet/v{version:03d}.hdf5")
 checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
@@ -222,7 +223,7 @@ score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_lis
 
 
 #%% Evaluate model
-version = 4
+version = 5
 fpath_model = join(deepLearningModelsPath, f"wavenet/v{version:03d}.hdf5")
 yPredictProbability = echomodel.modelPredict(fpath_model, X_test)
 echomodel.modelEvaluate(yPredictProbability, X_test, y_test, title = "Wavenet Performance")

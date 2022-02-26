@@ -198,8 +198,27 @@ summaryStatsLong, FCtissueAll, seizure_number = helper.combine_functional_connec
                                                                    STATE_NUMBER, FREQUENCY_NAMES, USERNAME, PASSWORD, FREQUENCY_DOWN_SAMPLE,
                                                                    paths, SESSION,  params.TISSUE_DEFINITION_PERCENT[0], params.TISSUE_DEFINITION_PERCENT[1], params.TISSUE_DEFINITION_PERCENT[2])
 
+#all outcomes
+patient_outcomes_good = ["RID0238", "RID0267", "RID0279", "RID0294", "RID0307", "RID0309", "RID0320", "RID0365", "RID0440", "RID0424", "RID0194", "RID0508", "RID0595", "RID0596"]
+patient_outcomes_poor = ["RID0274", "RID0278", "RID0371", "RID0382", "RID0405", "RID0442", "RID0322", "RID0648", "RID0572"]
+
+#>2 year outcomes
+patient_outcomes_good = ["RID0238", "RID0267", "RID0279", "RID0294", "RID0307", "RID0309", "RID0320", "RID0365", "RID0440", "RID0424", "RID0194"]
+patient_outcomes_poor = ["RID0274", "RID0278", "RID0371", "RID0382", "RID0405", "RID0442", "RID0322"]
+
+
+#all outcomes without RID0194
+patient_outcomes_good = ["RID0238", "RID0267", "RID0279", "RID0294", "RID0307", "RID0309", "RID0320", "RID0365", "RID0440", "RID0424", "RID0508", "RID0595", "RID0596"]
+patient_outcomes_poor = ["RID0274", "RID0278", "RID0371", "RID0382", "RID0405", "RID0442", "RID0322", "RID0648", "RID0572"]
+
+#>2 year outcomes without RID0194
 patient_outcomes_good = ["RID0238", "RID0267", "RID0279", "RID0294", "RID0307", "RID0309", "RID0320", "RID0365", "RID0440", "RID0424"]
 patient_outcomes_poor = ["RID0274", "RID0278", "RID0371", "RID0382", "RID0405", "RID0442", "RID0322"]
+
+
+patient_outcomes_good = ["RID0238", "RID0267", "RID0279", "RID0294", "RID0307", "RID0309", "RID0320", "RID0365", "RID0440", "RID0424"]
+patient_outcomes_poor = ["RID0274", "RID0278", "RID0371", "RID0382", "RID0405", "RID0442", "RID0322" ,"RID0648"]
+
 patients = patient_outcomes_good + patient_outcomes_poor
 
 summaryStatsLong = helper.add_outcomes_to_summaryStatsLong(summaryStatsLong, patient_outcomes_good, patient_outcomes_poor)
@@ -249,7 +268,7 @@ for x in range(STATE_NUMBER):
     #print(stats.mannwhitneyu(data["gm"], data["wm"])[1])
 utils.save_figure(join(paths.FIGURES, "white_matter_iEEG",
                   f"{freq}_22boot_ECDF_all_patients_GMvsWM_ECDF2_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
-                  save_figure=True)
+                  save_figure=False)
 
 binwidth = 0.001 #0.01 #
 binrange = [-0.002,0.025] #[0.05,0.25] #
@@ -269,48 +288,41 @@ axes.legend([],[], frameon=False)
 
 utils.save_figure(join(paths.FIGURES, "white_matter_iEEG",
                   f"freq{freq}_22BOOTSTRAP_all_patients_GMvsWM_ECDF2_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
-                  save_figure=True)
+                  save_figure=False)
 
 
 FCtissueAll_bootstrap_flatten,_ = helper.FCtissueAll_flatten(FCtissueAll, STATE_NUMBER, func = 2 ,freq = 7, max_connections = 50)
 plot_GMvsWM.plot_FC_all_patients_GMvsWM_ECDF(FCtissueAll_bootstrap_flatten, STATE_NUMBER , plot)
 utils.save_figure(join(paths.FIGURES, "white_matter_iEEG",
                   f"freq{freq}_2ECDF_all_patients_GMvsWM_ECDF2_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
-                  save_figure=True)
+                  save_figure=False)
 
 
 
 plot_GMvsWM.plot_boxplot_single_FC_deltaT(summaryStatsLong, FREQUENCY_NAMES, FC_TYPES, 2, 5, plot)
 utils.save_figure(join(paths.FIGURES, "white_matter_iEEG",
                   f"freq{freq}_boxplot2_single_FC_deltaT_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
-                  save_figure=True)
+                  save_figure=False)
 
 
 
 plot_GMvsWM.plot_boxplot_all_FC_deltaT(summaryStatsLong, FREQUENCY_NAMES, FC_TYPES, plot.COLORS_STATE4[0], plot.COLORS_STATE4[1])
 utils.save_figure(join(paths.FIGURES, "white_matter_iEEG",
                   f"boxplot2_all_FC_deltaT_Supplement_{MONTAGE}_{params.TISSUE_DEFINITION_PERCENT[0]}_GM_{params.TISSUE_DEFINITION_PERCENT[1]}_WM_{params.TISSUE_DEFINITION_PERCENT[2]}.pdf"),
-                  save_figure=True)
+                  save_figure=False)
 
 
 #%%
 #% Plot FC distributions for example patient
 #for i in range(3,N):
-i=41 #43
+i=43 #43
 func = 2
 freq = 7
 state = 2
 sub = patientsWithseizures["subject"][i]
 FC_type = FC_TYPES[func]
 
-FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue = helper.get_functional_connectivity_and_tissue_subnetworks_for_single_patient(patientsWithseizures,
-                                                 i, metadata_iEEG, SESSION, USERNAME, PASSWORD, paths,
-                                                 FREQUENCY_DOWN_SAMPLE, MONTAGE, FC_TYPES,
-                                                 params.TISSUE_DEFINITION_PERCENT[0], params.TISSUE_DEFINITION_PERCENT[1], params.TISSUE_DEFINITION_PERCENT[2],
-                                                 func, freq)
-
-plot_GMvsWM.plot_FC_example_patient_ADJ(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot)
-
+FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue = helper.get_functional_connectivity_and_tissue_subnetworks_for_single_patient(patientsWithseizures, i, metadata_iEEG, SESSION, USERNAME, PASSWORD, paths, FREQUENCY_DOWN_SAMPLE, MONTAGE, FC_TYPES, params.TISSUE_DEFINITION_PERCENT[0], params.TISSUE_DEFINITION_PERCENT[1], params.TISSUE_DEFINITION_PERCENT[2], func, freq)
 
 plot_GMvsWM.plot_FC_example_patient_GMWMall(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order,
                                          FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot,
@@ -320,10 +332,12 @@ plot_GMvsWM.plot_FC_example_patient_GMvsWM(sub, FC, channels, localization, loca
                                            FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot,
                                            xlim = [0,1])
 
-utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"{MONTAGE}_hist_GM_vs_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=True)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"{MONTAGE}_hist_GM_vs_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=False)
+
+
 
 plot_GMvsWM.plot_FC_example_patient_GMvsWM_ECDF(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot)
-utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"{MONTAGE}_ECDF_GM_vs_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=True)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"{MONTAGE}_ECDF_GM_vs_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=False)
 
 #GM-to-WM connections
 plot_GMvsWM.plot_FC_example_patient_GMWM(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order,
@@ -333,6 +347,18 @@ utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"{MONTAGE}_hist_GM_t
 plot_GMvsWM.plot_FC_example_patient_GMWM_ECDF(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot)
 utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"{MONTAGE}_ECDF_GM_to_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=SAVE_FIGURES)
 
+
+
+
+#for GM_percent definition
+
+NAME_GM = "percent_GM"
+NAME_GM_per = 0.75
+NAME_GM_WM_per = 0.25
+FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue = helper.get_functional_connectivity_and_tissue_subnetworks_for_single_patient(patientsWithseizures, i, metadata_iEEG, SESSION, USERNAME, PASSWORD, paths, FREQUENCY_DOWN_SAMPLE, MONTAGE, FC_TYPES, NAME_GM, NAME_GM_per, NAME_GM_WM_per, func, freq)
+
+plot_GMvsWM.plot_FC_example_patient_GMvsWM_ECDF(sub, FC, channels, localization, localization_channels, dist, GM_index, WM_index, dist_order, FC_tissue, FC_TYPES, FREQUENCY_NAMES, state ,func, freq, TISSUE_DEFINITION_GM,  TISSUE_DEFINITION_WM, plot)
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"GM_percent_{NAME_GM_per}_{NAME_GM_WM_per}_{MONTAGE}_ECDF_GM_vs_WM_distribution_of_FC_GMvsWM_{sub}_{FC_type}_{FREQUENCY_NAMES[freq]}.pdf"), save_figure=True)
 
 #%% Calculate FC as a function of purity
 
@@ -1119,10 +1145,14 @@ utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"good_vs_poor_ABLATI
 
 #%%
 
+#patient_outcomes_good = ["RID0238", "RID0267", "RID0279", "RID0294", "RID0307", "RID0309", "RID0320", "RID0365", "RID0440", "RID0424"]
+#patient_outcomes_poor = ["RID0274", "RID0278", "RID0371", "RID0382", "RID0405", "RID0442", "RID0322"]
+
+
 #REDONE
 pt = 0
 func = 2
-freq = 6
+freq = 7
 
 summaryStatsLong_mean = summaryStatsLong.groupby(by=["patient", 'state', "frequency", "FC_type", "outcome", "seizure_number"]).mean().reset_index()
 summaryStatsLong_outcome = summaryStatsLong_mean.query(f'outcome != "NA" and  FC_type == "{FC_TYPES[func]}"  and  frequency == "{FREQUENCY_NAMES[freq]}"    ')
@@ -1133,20 +1163,20 @@ summaryStatsLong_outcome =  summaryStatsLong_outcome.groupby(by=["patient", 'sta
 
 
 fig, axes = utils.plot_make(  size_length = 4, size_height = 6.5)
-sns.pointplot(data=summaryStatsLong_outcome, x="state", y="FC_deltaT", hue = "outcome",
+sns.pointplot(data=summaryStatsLong_outcome_seizures_not_combined, x="state", y="FC_deltaT", hue = "outcome",
               ax = axes, palette = plot.COLORS_GOOD_VS_POOR4, order = STATE_NAMES,join=False, dodge=0.4,  errwidth = 7,capsize = 0.3, linestyles = ["-","--"], scale = 1.1)
 plt.setp(axes.lines, zorder=100); plt.setp(axes.collections, zorder=100, label="")
-sns.stripplot(data=summaryStatsLong_outcome,  x="state", y="FC_deltaT", hue = "outcome", ax = axes, palette = plot.COLORS_GOOD_VS_POOR2, dodge=True,
+sns.stripplot(data=summaryStatsLong_outcome_seizures_not_combined,  x="state", y="FC_deltaT", hue = "outcome", ax = axes, palette = plot.COLORS_GOOD_VS_POOR2, dodge=True,
               size=7, order = STATE_NAMES, zorder=1, jitter = 0.25)
 axes.spines['top'].set_visible(False)
 axes.spines['right'].set_visible(False)
 axes.legend([],[], frameon=False)
 
-T = helper.compute_T(summaryStatsLong_outcome, group  = False, i =0)
+T = helper.compute_T(summaryStatsLong_outcome_seizures_not_combined, group  = False, i =0)
 print(T)
-print(p_val := helper.compute_T(summaryStatsLong_outcome, group  = False, i =1, alternative = "two-sided"))
+print(p_val := helper.compute_T(summaryStatsLong_outcome_seizures_not_combined, group  = False, i =1, alternative = "two-sided"))
 axes.set_title(f" {p_val}" )
-utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"freq{freq}_good_vs_poor_ABLATION_delta_by_seizure.pdf"), save_figure=False,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"all_patients_2year_freq{freq}_good_vs_poor_ABLATION_delta_by_seizure.pdf"), save_figure=True,
                   bbox_inches = "tight", pad_inches = 0)
 
 
@@ -1189,8 +1219,8 @@ utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"2_good_vs_poor_delt
 
 df = pd.DataFrame(columns = ["iteration", "state", "outcome", "FC_deltaT"])
 
-cores = 17
-iterations = 17
+cores = 16
+iterations = 16
 total = 10
 for i in range(total):
     simulation = helper.mutilcore_deltaT_wrapper(cores, iterations, summaryStatsLong_outcome)
@@ -1211,7 +1241,7 @@ axes.spines['top'].set_visible(False)
 axes.spines['right'].set_visible(False)
 axes.legend([],[], frameon=False)
 
-utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"freq{freq}_2_good_vs_poor_delta_boot_by_patient.pdf"), save_figure=True,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"freq{freq}_2_good_vs_poor_delta_boot_by_patient.pdf"), save_figure=False,
                   bbox_inches = "tight", pad_inches = 0)
 
 
@@ -1242,6 +1272,7 @@ for x in range(len(delta)):
     chans = delta.iloc[x]["delta"]
     chans_means = np.nanmean(np.nanmedian(chans, axis = 1)) #take median FC values, and then take means of those channels
     delta_mean.loc[ (delta_mean["patient"] ==  delta_mean.iloc[x]["patient"]) & (delta_mean["seizure_number"] ==  delta_mean.iloc[x]["seizure_number"] ) , "delta"]= chans_means
+    
 delta_mean.delta = delta_mean.delta.astype(float)
 delta_means_patients =  delta_mean.groupby(by=["patient", "outcome"]).mean().reset_index()
 
@@ -1254,7 +1285,7 @@ axes.spines['top'].set_visible(False)
 axes.spines['right'].set_visible(False)
 pval = helper.compute_T_no_state(delta_mean, group = False, i = 1, var = "delta", alternative = "two-sided")
 axes.set_title(f"{pval}" )
-utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"freq{freq}_{MONTAGE}_2_good_vs_poor_ABLATION_delta_by_patient.pdf"), save_figure=True,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"freq{freq}_{MONTAGE}_2_good_vs_poor_ABLATION_delta_by_patient.pdf"), save_figure=False,
               bbox_inches = "tight", pad_inches = 0.0)
 
 
@@ -1280,7 +1311,7 @@ sns.ecdfplot(poor, ax = axes, color = plot.COLORS_GOOD_VS_POOR[1], lw = 5)
 axes.set_xlim([-0.1,0.8])
 axes.spines['top'].set_visible(False)
 axes.spines['right'].set_visible(False)
-utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"freq{freq}_{MONTAGE}_2_good_vs_poor_ABLATION_difference_all_connecions_morePatients.pdf"), save_figure=True,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"freq{freq}_{MONTAGE}_2_good_vs_poor_ABLATION_difference_all_connecions_morePatients.pdf"), save_figure=False,
                   bbox_inches = "tight", pad_inches = 0)
 
 
@@ -1358,7 +1389,7 @@ axes.spines['right'].set_visible(False)
 axes.legend([],[], frameon=False)
 
 
-utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"freq{freq}_{MONTAGE}_2_good_vs_poor_ABLATION_boot_by_patient.pdf"), save_figure=True,
+utils.save_figure(join(paths.FIGURES, "white_matter_iEEG", f"freq{freq}_{MONTAGE}_2_good_vs_poor_ABLATION_boot_by_patient.pdf"), save_figure=False,
                   bbox_inches = "tight", pad_inches = 0)
 
 
