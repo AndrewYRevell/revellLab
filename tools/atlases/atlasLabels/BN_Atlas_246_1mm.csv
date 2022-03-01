@@ -1,5 +1,5 @@
-"BN_Atlas_246_1mm","https://atlas.brainnetome.org/ https://pubmed.ncbi.nlm.nih.gov/27230218/"
-"region","label"
+BN_Atlas_246_1mm,https://atlas.brainnetome.org/ https://pubmed.ncbi.nlm.nih.gov/27230218/
+region,label
 1,"SFG_L_7_1 A8m, medial area 8"
 2,"SFG_R_7_1 A8m, medial area 8"
 3,"SFG_L_7_2 A8dl, dorsolateral area 8"
@@ -72,8 +72,8 @@
 70,"STG_R_6_1 A38m, medial area 38"
 71,"STG_L_6_2 A41/42, area 41/42"
 72,"STG_R_6_2 A41/42, area 41/42"
-73,"STG_L_6_3 TE1.0 and TE1.2"
-74,"STG_R_6_3 TE1.0 and TE1.2"
+73,STG_L_6_3 TE1.0 and TE1.2
+74,STG_R_6_3 TE1.0 and TE1.2
 75,"STG_L_6_4 A22c, caudal area 22"
 76,"STG_R_6_4 A22c, caudal area 22"
 77,"STG_L_6_5 A38l, lateral area 38"

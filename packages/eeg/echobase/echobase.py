@@ -1250,6 +1250,18 @@ def lineLengthOfArray(data):
         lineLengthNorm[:,c] = lineLength_arr[:,c]/np.max(lineLength_arr[:,c])
     return lineLength_arr, lineLengthNorm
 
+def line_length_x_train(X_train):
+    nchan, nsamp, windows = X_train.shape
+    lineLength_arr = np.zeros(shape = (nchan))
+    for c in range(nchan):
+        print(f"\r{np.round((c+1)/nchan*100,2)}%   ", end = "\r")
+        lineLength_arr[c] = lineLength(X_train[c, :, 0])
+
+    lineLengthNorm = copy.deepcopy(lineLength_arr)
+    for c in range(nchan):
+        lineLengthNorm[c] = lineLength_arr[c]/np.max(lineLength_arr[c])
+    return lineLength_arr, lineLengthNorm
+
 
 #%% signal analysis
 
@@ -1290,6 +1302,23 @@ def power_interpolate(data, dataInterictal, ictalStartIndex, ictalEndIndex, leng
         powerInterp[:,length*3:length*4,ch]= interpPO(np.linspace(1,100,length))
     return powerInterp
 
+def get_power_x_train(X_train, fs):
+    nchan = X_train.shape[0]
+    #calculate over entire segment. else, calculate in one second windows
+    power = np.zeros(shape = (nchan, len(signal.welch(X_train[0,:,0], fs, nperseg=1 * fs)[1])     )   )
+    for ch in range(nchan):
+        print(f"\r{np.round((ch+1)/nchan*100,2)}%   ", end = "\r")
+        _, power[ch,:] = signal.welch(X_train[ch,:,0], fs, nperseg=1 * fs)
+    return power
+
+def get_varaince_x_train(X_train):
+    nchan = X_train.shape[0]
+    #calculate over entire segment. else, calculate in one second windows
+    variance = np.zeros(shape = nchan)
+    for ch in range(nchan):
+        print(f"\r{np.round((ch+1)/nchan*100,2)}%   ", end = "\r")
+        variance[ch] = np.var(X_train[ch,:,0])
+    return variance
 
 
 #%%

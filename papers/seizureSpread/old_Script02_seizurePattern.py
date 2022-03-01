@@ -17,13 +17,12 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import scipy.signal as signal
-from os.path import join
 from dataclasses import dataclass
+from os.path import join
 from sklearn.preprocessing import RobustScaler, OneHotEncoder
 from sklearn.model_selection import train_test_split
 from scipy.stats import pearsonr, spearmanr
 import bct
-import pkg_resources
 
 import tensorflow as tf
 from tensorflow.keras.models import load_model
@@ -32,67 +31,25 @@ import sklearn.metrics as metrics
 import matplotlib.pyplot as plt
 
 #import custom
+
 from revellLab.packages.eeg.echobase import echobase
 from revellLab.packages.seizureSpread import echomodel
 from revellLab.packages.eeg.ieegOrg import downloadiEEGorg
-from revellLab.packages.dataclass import dataclass_SFC, dataclass_iEEG_metadata
-from revellLab.packages.atlasLocalization import atlasLocalizationFunctions as atl
-from revellLab.paths import constants_paths as paths
-from revellLab.packages.utilities import utils
-from revellLab.papers.seizureSpread import seizurePattern
-from revellLab.packages.diffusionModels import diffusionModels as DM
+from revellLab.packages.dataClass import DataClassSfc, DataClassJson
+from revellLab.packages.seizureSpread import seizurePattern
+
 
 physical_devices = tf.config.list_physical_devices('GPU')
 tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
+#%%
 
-#% 02 Paths and files
-fnameiEEGusernamePassword = paths.IEEG_USERNAME_PASSWORD
-metadataDir =  paths.METADATA
-fnameJSON = join(metadataDir, "iEEGdataRevell.json")
-BIDS = paths.BIDS
-deepLearningModelsPath = paths.DEEP_LEARNING_MODELS
-datasetiEEG = "derivatives/seizure_spread/iEEG_data"
+fnameiEEGusernamePassword = join("/media","arevell","sharedSSD","linux", "ieegorg.json")
+fnameJSON = join("/media","arevell","sharedSSD","linux", "data", "metadata", "iEEGdataRevell.json")
+BIDS = join("/media","arevell","sharedSSD","linux", "data", "BIDS")
+deepLearningModelsPath = "/media/arevell/sharedSSD/linux/data/deepLearningModels/seizureSpread"
+dataset = "PIER"
 session = "implant01"
-
-
-revellLabPath = pkg_resources.resource_filename("revellLab", "/")
-tools = pkg_resources.resource_filename("revellLab", "tools")
-atlasPath = join(tools, "atlases", "atlases" )
-atlasLabelsPath = join(tools, "atlases", "atlasLabels" )
-atlasfilesPath = join(tools, "atlases", "atlasMetadata.json")
-MNItemplatePath = join( tools, "mniTemplate", "mni_icbm152_t1_tal_nlin_asym_09c_182x218x182.nii.gz")
-MNItemplateBrainPath = join( tools, "mniTemplate", "mni_icbm152_t1_tal_nlin_asym_09c_182x218x182_brain.nii.gz")
-
-
-atlasLocaliztionDir = join(BIDS, "derivatives", "atlasLocalization")
-atlasLocalizationFunctionDirectory = join(revellLabPath, "packages", "atlasLocalization")
-
-
-#% 03 Project parameters
-fsds = 128 #"sampling frequency, down sampled"
-annotationLayerName = "seizureChannelBipolar"
-#annotationLayerName = "seizure_spread"
-secondsBefore = 180
-secondsAfter = 180
-window = 1 #window of eeg for training/testing. In seconds
-skipWindow = 0.25#Next window is skipped over in seconds
-time_step, skip = int(window*fsds), int(skipWindow*fsds)
-montage = "bipolar"
-prewhiten = True
-
-
-verbose = 1
-training_epochs = 10
-batch_size = 2**10
-optimizer_n = 'adam'
-learn_rate = 0.01
-beta_1 = 0.9
-beta_2=0.999
-amsgrad=False
-dropout=0.3
-n_features = 1
-input_shape = (time_step,  n_features)
 
 #opening files
 with open(fnameiEEGusernamePassword) as f: usernameAndpassword = json.load(f)
@@ -101,15 +58,32 @@ username = usernameAndpassword["username"]
 password = usernameAndpassword["password"]
 
 
+
+#%% Model parameters
+fsds = 128 #"sampling frequency, down sampled"
+window = 10 #window of eeg for training/testing. In seconds
+skipWindow = 0.25 #Next window is skipped over in seconds 
+time_step, skip = int(window*fsds), int(skipWindow*fsds)
+verbose = 1
+secondsBeforeSpread = 60
+secondsAfterSpread = 60
+
 #plotting parameters
 aspect = 50
 
 #%% Get files and relevant patient information to train model
 
 #turning jsonFile to a @dataclass to make easier to extract info and data from it
-DataJson = dataclass_iEEG_metadata.dataclass_iEEG_metadata(jsonFile)
+DataJson = DataClassJson.DataClassJson(jsonFile)
 
+fpath_wavenet = join(path,"data/processed/model_checkpoints/wavenet/v035.hdf5") #version 7 of wavenet is good
+fpath_1dCNN = join(path,"data/processed/model_checkpoints/1dCNN/v035.hdf5") #version 7 of wavenet is good
+fpath_lstm = join(path,"data/processed/model_checkpoints/lstm/v035.hdf5") #version 7 of wavenet is good
+modelWN = load_model(fpath_wavenet)
+modelCNN= load_model(fpath_1dCNN)
+modelLSTM = load_model(fpath_lstm)
 
+#%%Meaure seizure spread
 
 
 #%%Get data
@@ -117,40 +91,23 @@ DataJson = dataclass_iEEG_metadata.dataclass_iEEG_metadata(jsonFile)
 patientsWithseizures = DataJson.get_patientsWithSeizuresAndInterictal()
 
 
-i = 33 #RID0309: 33-43 ; RID0278:19
+i = 0
 RID = np.array(patientsWithseizures["subject"])[i]
 idKey = np.array(patientsWithseizures["idKey"])[i]
 AssociatedInterictal = np.array(patientsWithseizures["AssociatedInterictal"])[i]
-df, fs, ictalStartIndex, ictalStopIndex = DataJson.get_precitalIctalPostictal(RID, "Ictal", idKey, username, password,BIDS = BIDS, dataset= datasetiEEG, session = session, secondsBefore = secondsBefore, secondsAfter = secondsAfter)
-df_interictal, _ = DataJson.get_iEEGData(RID, "Interictal", AssociatedInterictal, username, password, BIDS = BIDS, dataset= datasetiEEG, session = session, startKey = "Start")
 
-                   
+df, fs, ictalStartIndex, ictalStopIndex = DataJson.get_precitalIctalPostictal(RID, "Ictal", idKey, username, password, fpath = fpath_EEG, secondsBefore = secondsBeforeSpread, secondsAfter = secondsAfterSpread)
+df_interictal, _ = DataJson.get_iEEGData(RID, "Interictal", AssociatedInterictal, username, password, fpath = fpath_EEG, startKey = "Start")
 print("preprocessing")
-dataII_scaler, data_scaler, dataII_scalerDS, data_scalerDS, channels = DataJson.preprocessNormalizeDownsample(df, df_interictal, fs, fsds)
-
-
-data, data_avgref, data_ar, data_filt, channels = echobase.preprocess(df, fs, fsds)
+dataII_scaler, data_scaler, dataII_scalerDS, data_scalerDS = DataJson.preprocessNormalizeDownsample(df, df_interictal, fs, fsds)
+data, data_avgref, data_ar, data_filt = echobase.preprocess(df, fs, fsds)
 data_scalerDSDS = DataJson.downsample(data_scaler, fs, 16)
 data_arDSDS = DataJson.downsample(data_ar, fs, 16)
 
-nsamp, nchan = data_filt.shape
+nsamp, nchan = df.shape
 
+DataJson.plot_eeg(data_scalerDSDS, 16, markers = [secondsBeforeSpread*16], nchan = nchan, dpi = 25, aspect=aspect*2, height=nchan/aspect/2)  
 
-DataJson.plot_eeg(data_scalerDSDS, 16, markers = [secondsBefore*16], dpi = 25, aspect=aspect*2, height=nchan/aspect/2)  
-
-
-# %%
-
-#%%Meaure seizure spread
-version = 11
-fpath_wavenet = join(deepLearningModelsPath, f"wavenet/v{version:03d}.hdf5")
-fpath_1dCNN = join(deepLearningModelsPath, f"1dCNN/v{version:03d}.hdf5")
-fpath_lstm = join(deepLearningModelsPath, f"lstm/v{version:03d}.hdf5")
-
-
-modelWN = load_model(fpath_wavenet)
-modelCNN= load_model(fpath_1dCNN)
-modelLSTM = load_model(fpath_lstm)
 
 #%%window to fit model
 data_scalerDS_X = echomodel.overlapping_windows(data_scalerDS, time_step, skip)
@@ -167,63 +124,32 @@ probLSTM = np.zeros(shape = (windows, nchan))
 
 
 for c in range(nchan):
-    print(f"\r{np.round((c+1)/nchan*100,2)}%     ", end = "\r")
     ch_pred =     data_scalerDS_X[:,:,c].reshape(windows, time_step, 1    )
-    probWN[:,c] =  modelWN.predict(ch_pred, verbose=0)[:,1]
-    probCNN[:,c] =  modelCNN.predict(ch_pred, verbose=0)[:,1]
-    probLSTM[:,c] =  modelLSTM.predict(ch_pred, verbose=0)[:,1]
+    probWN[:,c] =  modelWN.predict(ch_pred, verbose=1)[:,1]
+    probCNN[:,c] =  modelCNN.predict(ch_pred, verbose=1)[:,1]
+    probLSTM[:,c] =  modelLSTM.predict(ch_pred, verbose=1)[:,1]
         
 
 
 #%%
 
-seizurePattern.plot_probheatmaps(probWN, fsds, skip, threshold=0.9)
-seizurePattern.plot_probheatmaps(probCNN, fsds, skip, threshold=0.9)
-seizurePattern.plot_probheatmaps(probLSTM, fsds, skip, threshold=0.7)
-
-#%%
-
-    
-
-def prob_threshold_moving_avg(prob_array, fsds, skip, threshold = 0.9, smoothing = 20):
-    nchan = prob_array.shape[1]
-    w = int(smoothing*fsds/skip)
-    probability_arr_movingAvg = np.zeros(shape = (windows - w + 1, nchan))
-    
-    for c in range(nchan):
-        probability_arr_movingAvg[:,c] =  echobase.movingaverage(prob_array[:,c], w)
-        
-    probability_arr_threshold = copy.deepcopy(probability_arr_movingAvg)
-    probability_arr_threshold[probability_arr_threshold > threshold] = 1
-    probability_arr_threshold[probability_arr_threshold <= threshold] = 0
-        
-    return probability_arr_movingAvg, probability_arr_threshold
-
-# %%
-THRESHOLD = 0.6
-SMOOTHING = 20 #in seconds
-prob_array= probLSTM
+seizurePattern.plot_probheatmaps(probWN, fsds, skip, threshold=0.99)
+seizurePattern.plot_probheatmaps(probCNN, fsds, skip, threshold=0.99)
+seizurePattern.plot_probheatmaps(probLSTM, fsds, skip, threshold=0.9)
 
 
-probability_arr_movingAvg, probability_arr_threshold = prob_threshold_moving_avg(probWN, fsds, skip, threshold = THRESHOLD, smoothing = SMOOTHING)
-sns.heatmap( probability_arr_movingAvg.T )      
-sns.heatmap( probability_arr_threshold.T )    
-    
-    
-    
 #%% Ridgeline
 
-###
 DataJson.plot_eeg(probability_arr_movingAvg, fsds, nchan = nchan, dpi = 300, fill=True, aspect=200, height=0.05)    
-DataJson.plot_eeg(probability_arr_threshold, fsds, nchan = nchan, dpi = 300, fill=True, aspect=200, height=0.05)    
-###
+DataJson.plot_eeg(probability_arr_movingAvg_threshold, fsds, nchan = nchan, dpi = 300, fill=True, aspect=200, height=0.05)    
+
 
 #%%getting start times
 
-seizure_start =int((secondsBefore-20)/skipWindow)
-seizure_stop = int((secondsBefore + 20)/skipWindow)
+seizure_start =int((secondsBeforeSpread-20)/skipWindow)
+seizure_stop = int((secondsBeforeSpread + 20)/skipWindow)
 
-probability_arr_movingAvg_threshold_seizure = probability_arr_threshold[seizure_start:,:]
+probability_arr_movingAvg_threshold_seizure = probability_arr_movingAvg_threshold[seizure_start:,:]
 spread_start = np.argmax(probability_arr_movingAvg_threshold_seizure == 1, axis = 0)
 
 for c in range(nchan): #if the channel never starts seizing, then np.argmax returns the index as 0. This is obviously wrong, so fixing this
@@ -238,12 +164,12 @@ channel_order = np.argsort(spread_start)
 print(np.array(df.columns)[channel_order])
 #%%
 
-DataJson.plot_eeg(probability_arr_threshold[:,channel_order], fsds, nchan = 50, dpi = 300, fill=True, aspect=200, height=0.05)    
+DataJson.plot_eeg(probability_arr_movingAvg_threshold[:,channel_order], fsds, nchan = 50, dpi = 300, fill=True, aspect=200, height=0.05)    
 #%%
 DataJson.plot_eeg(data_scalerDS, fsds, markers = spread_start_loc, nchan = 10, dpi = 300, aspect=200, height=0.1)    
 
 
-#DataJson.plot_eeg(data_scalerDS[:,channel_order], fsds, markers = spread_start_loc[channel_order], nchan = nchan, dpi = 300, aspect=200, height=0.05)    
+DataJson.plot_eeg(data_scalerDS[:,channel_order], fsds, markers = spread_start_loc[channel_order], nchan = nchan, dpi = 300, aspect=200, height=0.05)    
 
 
  
@@ -257,8 +183,9 @@ DataJson.plot_eeg(probability_arr_movingAvg, fsds, nchan = 5, dpi = 300, fill=Tr
 DataJson.plot_eeg(data, fs, nchan = 5, dpi = 300, aspect=35)    
 DataJson.plot_eeg(data_scalerDS, fsds, nchan = 5, dpi = 300, aspect=35)    
 
+echobase.show_eeg_compare(data, data, int(fsds), channel=2)  
 
-
+    
 
     
 #%%diffusion model
@@ -268,33 +195,30 @@ DataJson.plot_eeg(data_scalerDS, fsds, nchan = 5, dpi = 300, aspect=35)
 
 
 
-sfc_datapath = "/media/arevell/sharedSSD/linux/papers/brain_atlases/data/data_processed/aggregated_data"
-RID ="RID0278"
-iEEG_filename =   "HUP138_phaseII"
+sfc_datapath = os.path.join("/media","arevell","sharedSSD","linux","papers","paper005", "data", "data_processed", "aggregated_data")
+RID = "RID0278"
+iEEG_filename = "HUP138_phaseII"
 
 start_time_usec = 416023190000
 stop_time_usec = 416112890000 
 fname = os.path.join(sfc_datapath,   f"sub-{RID}_{iEEG_filename}_{start_time_usec}_{stop_time_usec}_data.pickle" )
-fname = os.path.join(sfc_datapath,   f"sub-RID0320_HUP140_phaseII_D02_331979921071_332335094986_data.pickle" )
-
 
 os.path.exists(fname)
 
 if (os.path.exists(fname)):
     with open(fname, 'rb') as f: all_data = pickle.load(f)
 
-sfc_data = dataclass_SFC.dataclass_sfc( **all_data  ) 
-
-
-
-#%%
+sfc_data = DataClassSfc.sfc( **all_data  ) 
 atlas = sfc_data.get_atlas_names()[1]   
-st =int((secondsBefore-10)/skipWindow)
-stp = int((secondsBefore +20)/skipWindow)
+
+
+
+st =int((secondsBeforeSpread-10)/skipWindow)
+stp = int((secondsBeforeSpread +20)/skipWindow)
 
 SC, SC_regions = sfc_data.get_structure(atlas)
 spread = copy.deepcopy(probability_arr_movingAvg[st:stp,:])
-spread_regions = copy.deepcopy(channels)  
+spread_regions = np.array(df.columns )   
 electrodeLocalization = sfc_data.get_electrodeLocalization(atlas)
 
 #SC= SC_distInv
@@ -309,7 +233,9 @@ electrodeLocalization = sfc_data.get_electrodeLocalization(atlas)
 #SC = SC_null
 #%%
 
+import diffusionModels as DM
 dm_data = DM.diffusionModels(SC, SC_regions, spread, spread_regions, electrodeLocalization)    
+
 SC_hat = dm_data.preprocess_SC(SC, 0.4)    
     
 def get_LTM(SC, threshold=0.1, time_steps = 6):
@@ -345,24 +271,20 @@ def get_LTM(SC, threshold=0.1, time_steps = 6):
             corrs[r] = 0
         else:
             corrs[r] = spearmanr(node_state_mod_resample.flatten(), spreadMod_state.flatten())[0]
-        print(f"\rtop: {SC_regions[np.where(corrs == np.max(corrs))[0][0]]}; {np.round( np.max(corrs),2)}; {np.round((r+1)/len(corrs)*100,2)}%  ", end = "\r")
-        
-        SC_regions[np.where(corrs == np.max(corrs))[0][0]]
+        print (corrs[r])
     return corrs
-
 
 corrs = get_LTM(SC_hat)
 Nnull = 2
 corrs_null = np.zeros(shape = (Nnull, len(corrs)))
-"""
 for nu in range(Nnull):
-    print(f"\r{np.round((nu+1)/Nnull*100,2)}", end = "\r")
+    print(nu)
     SC_null = bct.randmio_und(SC, 30)[0]
     dm_data = DM.diffusionModels(SC, SC_regions, spread, spread_regions, electrodeLocalization) 
     SC_hat = dm_data.preprocess_SC(SC_null, 0.4)  
     corrs_null[nu,:] = get_LTM(SC_hat)
 
-"""
+
 
 
 ind = np.argsort(corrs)[::-1]
@@ -381,7 +303,6 @@ ax.set_title("LTM: Brain regions most correlated to measured seizure pattern")
 print(SC_regions[ind][0:5])
 print(corrs_order[0:5])
 
-aaaa = np.vstack([SC_regions[ind],corrs_order ]).T
 
 
 #%%
@@ -402,7 +323,14 @@ aaaa = np.vstack([SC_regions[ind],corrs_order ]).T
 
 data_scalerDS_X.shape
 
+
+
+
 vector = data_scalerDS_X[0,:,0]
+
+
+
+
 def distance(p1, p2):
     return math.sqrt((p1[0]-p2[0])**2 + (p1[1]-p2[1])**2)
 
@@ -417,6 +345,9 @@ def lineLength(vector):
     return lineLen
 
 ll = lineLength(vector)
+
+
+
 
 lineLength_arr = np.zeros(shape = (windows, nchan))  
 for c in range(nchan):
@@ -468,8 +399,17 @@ lineLength_arr_movingAvg_threshold[lineLength_arr_movingAvg_threshold<=THRESHOLD
 sns.heatmap( lineLength_arr_movingAvg_threshold.T,  ax = ax[2,1] )      
     
     
+
+
+
+
+
+
+
 #sns.heatmap(SC, square=True)   
 #sns.heatmap(SC_hat, square=True)   
+    
+    
     
     
 #%% effect of distance
