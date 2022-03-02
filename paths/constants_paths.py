@@ -14,15 +14,15 @@ METADATA = "/media/arevell/data/linux/data/metadata"
 FIGURES = "/media/arevell/data/linux/figures"
 
 #GITHUB REVELLLAB
-REVELLLAB = "/media/arevell/sharedSSD/linux/revellLab/"
-TOOLS = "/media/arevell/sharedSSD/linux/revellLab/tools"
+REVELLLAB = "/home/arevell/Documents/revellLab"
+TOOLS = "/home/arevell/Documents/revellLab/tools"
 
 #ATLASES and TEMPLATES
-ATLASES = "/media/arevell/sharedSSD/linux/revellLab//tools/atlases/atlases"
-ATLAS_LABELS = "/media/arevell/sharedSSD/linux/revellLab//tools/atlases/atlasLabels"
-ATLAS_FILES_PATH =  "/media/arevell/sharedSSD/linux/revellLab//tools/atlases/atlasMetadata.json"
-MNI_TEMPLATE = "/media/arevell/sharedSSD/linux/revellLab//tools/templates/MNI/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182.nii.gz"
-MNI_TEMPLATE_BRAIN = "/media/arevell/sharedSSD/linux/revellLab//tools/templates/MNI/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182_brain.nii.gz"
+ATLASES = "/home/arevell/Documents/revellLab/tools/atlases/atlases"
+ATLAS_LABELS = "/home/arevell/Documents/revellLab/tools/atlases/atlasLabels"
+ATLAS_FILES_PATH =  "/home/arevell/Documents/revellLab/tools/atlases/atlasMetadata.json"
+MNI_TEMPLATE = "/home/arevell/Documents/revellLab/tools/templates/MNI/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182.nii.gz"
+MNI_TEMPLATE_BRAIN = "/home/arevell/Documents/revellLab/tools/templates/MNI/mni_icbm152_t1_tal_nlin_asym_09c_182x218x182_brain.nii.gz"
 
 
 #BIDS and DERIVATIVES
@@ -31,6 +31,13 @@ BIDS_DERIVATIVES_ATLAS_LOCALIZATION = "/media/arevell/data/linux/data/BIDS/deriv
 BIDS_DERIVATIVES_QSIPREP = "/media/arevell/data/linux/data/BIDS/derivatives/qsiprep_v0.12.2"
 BIDS_DERIVATIVES_RECONALL = "/media/arevell/data/linux/data/BIDS/derivatives/freesurferReconAll"
 
+#General Data
+#Tractography and structural connectivity
+BIDS_DERIVATIVES_TRACTOGRAPHY = "/media/arevell/data/linux/data/BIDS/derivatives/structural_connectivity/tractography"
+BIDS_DERIVATIVES_STRUCTURAL_MATRICES = "/media/arevell/data/linux/data/BIDS/derivatives/structural_connectivity/structural_matrices"
+
+
+#Papers
 
 #White matter iEEG paper
 BIDS_DERIVATIVES_WM_IEEG = "/media/arevell/data/linux/data/BIDS/derivatives/white_matter_iEEG"
@@ -43,6 +50,9 @@ BIDS_DERIVATIVES_WM_IEEG_TRACTOGRAPHY = "/media/arevell/data/linux/data/BIDS/der
 #Seizure Spread paper
 BIDS_DERIVATIVES_WM_IEEG_METADATA = "/media/arevell/data/linux/data/BIDS/derivatives/white_matter_iEEG/iEEGdata_WM_iEEG.json"
 DEEP_LEARNING_MODELS = "/media/arevell/data/linux/data/deepLearningModels/seizureSpread"
+
+
+
 """
 #COMPUTER
 HOME = "/Users/arevell"

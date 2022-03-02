@@ -117,7 +117,7 @@ DataJson = dataclass_iEEG_metadata.dataclass_iEEG_metadata(jsonFile)
 patientsWithseizures = DataJson.get_patientsWithSeizuresAndInterictal()
 
 
-i = 33 #RID0309: 33-43 ; RID0278:19
+i = 19 #RID0309: 33-43 ; RID0278:19
 RID = np.array(patientsWithseizures["subject"])[i]
 idKey = np.array(patientsWithseizures["idKey"])[i]
 AssociatedInterictal = np.array(patientsWithseizures["AssociatedInterictal"])[i]
@@ -200,9 +200,9 @@ def prob_threshold_moving_avg(prob_array, fsds, skip, threshold = 0.9, smoothing
     return probability_arr_movingAvg, probability_arr_threshold
 
 # %%
-THRESHOLD = 0.6
+THRESHOLD = 0.65
 SMOOTHING = 20 #in seconds
-prob_array= probLSTM
+prob_array= probCNN
 
 
 probability_arr_movingAvg, probability_arr_threshold = prob_threshold_moving_avg(probWN, fsds, skip, threshold = THRESHOLD, smoothing = SMOOTHING)
@@ -288,7 +288,7 @@ sfc_data = dataclass_SFC.dataclass_sfc( **all_data  )
 
 
 #%%
-atlas = sfc_data.get_atlas_names()[1]   
+atlas = sfc_data.get_atlas_names()[6]   
 st =int((secondsBefore-10)/skipWindow)
 stp = int((secondsBefore +20)/skipWindow)
 
@@ -298,7 +298,23 @@ spread_regions = copy.deepcopy(channels)
 electrodeLocalization = sfc_data.get_electrodeLocalization(atlas)
 
 #SC= SC_distInv
+"""
+tmp_sc = "/media/arevell/data/linux/data/BIDS/derivatives/structural_connectivity/structural_matrices/sub-RID0278/ses-research3Tv01/matrices/sub-RID0278.AAL2.count.pass.connectogram.txt"
+tmp_sc = "/media/arevell/data/linux/data/BIDS/derivatives/structural_connectivity/structural_matrices/sub-RID0278/ses-research3Tv01/matrices/sub-RID0278.BN_Atlas_246_1mm.count.pass.connectogram.txt"
+SC2 = utils.read_DSI_studio_Txt_files_SC(tmp_sc)
 
+sns.heatmap(SC, square=True)
+sns.heatmap(SC2, square=True)
+
+
+pearsonr(utils.getUpperTriangle(SC), utils.getUpperTriangle(SC2))
+
+#SC = utils.log_normalize_adj(SC)
+#SC2= utils.log_normalize_adj(SC2)
+sns.scatterplot(x =  utils.getUpperTriangle(SC),y =  utils.getUpperTriangle(SC2))
+
+SC2= utils.read_DSI_studio_Txt_files_SC(tmp_sc)
+"""
 #%%
 #null
 #SC_null = bct.randmio_und(SC, 30)[0]
