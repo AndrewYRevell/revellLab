@@ -94,8 +94,8 @@ annotationLayerName = "seizureChannelBipolar"
 #annotationLayerName = "seizure_spread"
 secondsBefore = 180
 secondsAfter = 180
-window = 1 #window of eeg for training/testing. In seconds
-skipWindow = 1#Next window is skipped over in seconds
+window = 0.5 #window of eeg for training/testing. In seconds
+skipWindow = 0.1#Next window is skipped over in seconds
 time_step, skip = int(window*fsds), int(skipWindow*fsds)
 montage = "bipolar"
 prewhiten = True
@@ -152,7 +152,7 @@ annotations, annotationsSeizure, annotationsUEOEEC = downloadiEEGorg.get_natus(u
 
 
 #get training data
-for i in range(2):
+for i in range(len(train)):
     sub = np.array(train["subject"])[i]
     idKey = np.array(train["idKey"])[i]
     AssociatedInterictal = np.array(train["AssociatedInterictal"])[i]
@@ -172,7 +172,7 @@ for i in range(2):
         y_train = np.concatenate([y_train, y], axis = 0)
 
 #get testing data
-for i in range(2):
+for i in range(len(test)):
     sub = np.array(test["subject"])[i]
     idKey = np.array(test["idKey"])[i]
     AssociatedInterictal = np.array(test["AssociatedInterictal"])[i]
@@ -196,26 +196,26 @@ for i in range(2):
 
 #%% Model training
 
-version = 11
+version = 13
 # Wavenet
 filepath = join(deepLearningModelsPath, f"wavenet/v{version:03d}.hdf5")
 checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
-score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_list, modelName = "wavenet", training_epochs = 10, batch_size=2**10, learn_rate = 0.001)
+score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_list, modelName = "wavenet", training_epochs = 2, batch_size=2**11, learn_rate = 0.001)
 
 
 # 1dCNN
 filepath = join(deepLearningModelsPath,f"1dCNN/v{version:03d}.hdf5")
 checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
-score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_list, modelName = "1dCNN", training_epochs = 10, batch_size=2**10, learn_rate = 0.001)
+score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_list, modelName = "1dCNN", training_epochs = 2, batch_size=2**11, learn_rate = 0.001)
 
 
 # lstm
 filepath = join(deepLearningModelsPath,f"lstm/v{version:03d}.hdf5")
 checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
-score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_list, modelName = "lstm", training_epochs = 10, batch_size=2**10, learn_rate = 0.001)
+score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_list, modelName = "lstm", training_epochs = 10, batch_size=2**11, learn_rate = 0.001)
 
 
 
@@ -224,7 +224,7 @@ score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_lis
 
 
 #%% Evaluate model
-version = 11
+version = 13
 fpath_model = join(deepLearningModelsPath, f"wavenet/v{version:03d}.hdf5")
 yPredictProbability = echomodel.modelPredict(fpath_model, X_test)
 echomodel.modelEvaluate(yPredictProbability, X_test, y_test, title = "Wavenet Performance")

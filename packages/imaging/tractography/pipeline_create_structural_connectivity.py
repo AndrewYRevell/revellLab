@@ -54,7 +54,27 @@ tractography.get_tracts_loop_through_patient_list(subs_wtih_qsiprep, paths, SESS
 
 
 #%% Get structural connectivity from atlases 
-tractography.batch_get_structural_connectivity_with_mni_registration(subs_wtih_qsiprep, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = 3, stop = 4)
+N = len(subs_wtih_qsiprep)
+print(subs_wtih_qsiprep)
+tmp= np.array(subs_wtih_qsiprep)
+
+tractography.batch_get_structural_connectivity_with_mni_registration(subs_wtih_qsiprep, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = 0, stop = 10)
+tractography.batch_get_structural_connectivity_with_mni_registration(subs_wtih_qsiprep, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = 10, stop = 20)
+tractography.batch_get_structural_connectivity_with_mni_registration(subs_wtih_qsiprep, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = 20, stop = 30)
+tractography.batch_get_structural_connectivity_with_mni_registration(subs_wtih_qsiprep, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = 30, stop = 40)
+tractography.batch_get_structural_connectivity_with_mni_registration(subs_wtih_qsiprep, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = 40, stop = 50)
+
+tractography.batch_get_structural_connectivity_with_mni_registration(subs_wtih_qsiprep, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = 50, stop = 60)
+tractography.batch_get_structural_connectivity_with_mni_registration(subs_wtih_qsiprep, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = 60, stop = 70)
+tractography.batch_get_structural_connectivity_with_mni_registration(subs_wtih_qsiprep, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = 70, stop = 75)
+tractography.batch_get_structural_connectivity_with_mni_registration(subs_wtih_qsiprep, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = 75, stop = 80)
+tractography.batch_get_structural_connectivity_with_mni_registration(subs_wtih_qsiprep, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = 80, stop = 95)
+tractography.batch_get_structural_connectivity_with_mni_registration(subs_wtih_qsiprep, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = 95, stop = 100)
+tractography.batch_get_structural_connectivity_with_mni_registration(subs_wtih_qsiprep, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = 100, stop = 105)
+
+
+tractography.batch_get_structural_connectivity_with_mni_registration(subs_wtih_qsiprep, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = 105)
+
 
 
 

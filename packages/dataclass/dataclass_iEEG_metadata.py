@@ -441,7 +441,7 @@ class dataclass_iEEG_metadata:
         return X, Y, data_scalerDS, dataII_scalerDS, dataAnnotationDS
 """
     ##Plotting functions
-    def plot_eeg(self, data, fs, startSec = None, stopSec = None, nchan = None, markers = [], aspect = 20, height = 0.3, hspace = -0.3, dpi = 300, lw=1, fill = False, savefig = False, pathFig = None):
+    def plot_eeg(self, data, fs, startSec = None, stopSec = None, nchan = None, markers = [], aspect = 20, height = 0.3, hspace = -0.3, dpi = 300, lw=1, fill = False, savefig = False, pathFig = None, color = "w"):
         if stopSec == None:
             stopSec = len(data)/fs
         if startSec == None:

@@ -1241,8 +1241,8 @@ def lineLengthOfArray(data):
     windows, nsamp, nchan = data.shape
     lineLength_arr = np.zeros(shape = (windows, nchan))
     for c in range(nchan):
-        print(c)
         for win in range(windows):
+            print(f"\r{c}/{nchan}:  {np.round((c+1)/nchan*100,2)}%     {int(np.round((win+1)/windows*100,0))}% ", end = "\r")
             lineLength_arr[win, c] = lineLength(data[win, :, c])
 
     lineLengthNorm = copy.deepcopy(lineLength_arr)
@@ -1261,6 +1261,15 @@ def line_length_x_train(X_train):
     for c in range(nchan):
         lineLengthNorm[c] = lineLength_arr[c]/np.max(lineLength_arr[c])
     return lineLength_arr, lineLengthNorm
+
+def line_length_array_2d(data):
+    nsamp, nchan = data.shape
+    lineLength_arr = np.zeros(shape = (nchan))
+    for c in range(nchan):
+        print(f"\r{np.round((c+1)/nchan*100,2)}%   ", end = "\r")
+        lineLength_arr[c] = lineLength(data[:, c])
+
+    return lineLength_arr
 
 
 #%% signal analysis

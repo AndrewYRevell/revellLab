@@ -200,7 +200,9 @@ def parse_get_structural_connectivity(sub, atlas_paths, paths, path_fib, path_tr
         atlas = join(atlas_registration, atlasName + ".nii.gz")
         
         structural_matrices_output = join(structural_matrices, f"sub-{sub}")
-        get_structural_connectivity(paths.BIDS, paths.DSI_STUDIO_SINGULARITY, path_fib, path_trk, preop_T1, atlas, structural_matrices_output )
+        
+        if len(glob.glob(f"{structural_matrices_output}.{atlasName}.count.pass.connectogram.txt*"))==0:
+            get_structural_connectivity(paths.BIDS, paths.DSI_STUDIO_SINGULARITY, path_fib, path_trk, preop_T1, atlas, structural_matrices_output )
     print("\n\n\nDone\n\n\n")
 
 
@@ -261,25 +263,25 @@ def get_tracts_loop_through_patient_list(patient_list, paths, singularity_bind_p
 
 
 
-
+#%%
 def batch_get_structural_connectivity_with_mni_registration(patient_list, atlas_metadata_json, paths, SESSION_RESEARCH3T, start = None, stop = None):
-    # %% MNI registration of patient's T1
+    # % MNI registration of patient's T1
     if start == None:
         start = 0
     if stop == None:
         stop = len(patient_list)
     for i in range(start, stop):
         sub = patient_list[i]
-        print(f"Part 1/3: MNI registration \n{(i+1-start)}/{stop-start}; {np.round((i+1)/(stop-start)*100,2)}% \n\n\n\n\n")
+        print(f"Part 1/3: MNI registration \n{(i+1-start)}/{stop-start}; {np.round((i+1-start)/(stop-start)*100,2)}% \n\n\n\n\n")
         mni_registration_to_T1(sub, paths, SESSION_RESEARCH3T = SESSION_RESEARCH3T)
         # Atlas registration
-        print(f"Part 2/3: Atlas registration (Apply warps)\n{sub}:  {(i+1-start)}/{stop-start}; {np.round((i+1)/(stop-start)*100,2)}% \n\n\n\n\n")
+        print(f"Part 2/3: Atlas registration (Apply warps)\n{sub}:  {(i+1-start)}/{stop-start}; {np.round((i+1-start)/(stop-start)*100,2)}% \n\n\n\n\n")
         # Get relevant paths
         atlas_paths =  get_atlases_from_priority(atlas_metadata_json, priority_type = "structure", priority_level_max = 2)
         atlas_registration, structural_matrices, mni_images, mni_warp, ses, preop_T1, preop_T1_std, path_fib, path_trk = get_atlas_registration_and_tractography_paths(sub = sub, paths = paths, SESSION_RESEARCH3T = SESSION_RESEARCH3T)
         #Apply warp to atlases
         applywarp_to_atlas(atlas_directory = paths.REVELLLAB, atlas_paths = atlas_paths, preop_T1_std = preop_T1_std, mni_warp = mni_warp, atlas_registration = atlas_registration)
-        print(f"Part 3/3: Calculate Structural Connectivity\ n{sub}:  {(i+1-start)}/{stop-start}; {np.round((i+1)/(stop-start)*100,2)}% \n\n\n\n\n")
+        print(f"Part 3/3: Calculate Structural Connectivity\ n{sub}:  {(i+1-start)}/{stop-start}; {np.round((i+1-start)/(stop-start)*100,2)}% \n\n\n\n\n")
         # Calculate structural connectivity
         parse_get_structural_connectivity(sub, atlas_paths, paths, path_fib, path_trk, preop_T1, atlas_registration, structural_matrices)
-        print(f"Done\n{sub}:  {(i+1)}/{stop-start}; {np.round((i+1-start)/(stop-start)*100,2)}% \n\n\n\n\n")
+        print(f"Done\n{sub}:  {(i+1-start)}/{stop-start}; {np.round((i+1-start)/(stop-start)*100,2)}% \n\n\n\n\n")

@@ -35,7 +35,7 @@ from revellLab.packages.eeg.echobase import echobase
 
 #%%
 
-def plot_probheatmaps(probabilityArray, fsds, skip, threshold = 0.5, smoothing = 20, channel1 = 0, channel2 = 1):
+def plot_probheatmaps(probabilityArray, fsds, skip, threshold = 0.5, smoothing = 20, channel1 = 0, channel2 = 1, vmin = 0, vmax = 1, center=0.5):
     fig, ax = plt.subplots(3,2, figsize=(10,10), dpi =300)
     windows, nchan = probabilityArray.shape
     thresholded = copy.deepcopy(probabilityArray)
@@ -50,9 +50,9 @@ def plot_probheatmaps(probabilityArray, fsds, skip, threshold = 0.5, smoothing =
 
     sns.lineplot( x = range(windows),  y= probabilityArray[:,channel1],    ci=None, ax = ax[0,0])
     sns.lineplot( x = range(windows),  y= probabilityArray[:,channel2],    ci=None, ax = ax[0,1])
-    sns.heatmap( probabilityArray.T , ax = ax[1,0])
+    sns.heatmap( probabilityArray.T , ax = ax[1,0], vmin = vmin, vmax = vmax, center=center)
     sns.heatmap( thresholded.T,  ax = ax[1,1] )
-    sns.heatmap( mvgAvg.T , ax = ax[2,0] )
+    sns.heatmap( mvgAvg.T , ax = ax[2,0] , vmin = vmin, vmax = vmax, center=center)
     sns.heatmap( mvgAvgThreshold.T,  ax = ax[2,1] )
 
 
