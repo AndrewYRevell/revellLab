@@ -162,6 +162,12 @@ def baseSplitext(path):
     base = basename(path)
     split = splitext(base)[0]
     return split
+
+
+# function to calculate Cohen's d for independent samples
+def cohend(d1, d2):
+    cohens_d = (np.mean(d2) - np.mean(d1)) / (np.sqrt((np.std(d2) ** 2 + np.std(d1) ** 2) / 2))
+    return cohens_d
 #%%
 def channel2stdCSV(outputTissueCoordinates):
     df = pd.read_csv(outputTissueCoordinates, sep=",", header=0)
@@ -329,8 +335,9 @@ def make_sphere_from_point(img_data, x0, y0, z0, radius):
 
 
 def load_img_data(file, data_type = "path" ):
+    #gets just the imaging data numpy array
     if data_type == "path":
-        if checkIfFileExistsGlob(file):
+        if checkIfFileExistsGlob(file, printBOOL=False):
             file = glob.glob(file)[0]
             img = nib.load(file)
             img_data = img.get_fdata()
@@ -341,6 +348,23 @@ def load_img_data(file, data_type = "path" ):
     if data_type == "img":
         img_data = file.get_fdata()
     return img_data
+
+def load_img_and_data(file):
+    #gets both the imaging data numpy array
+    if checkIfFileExistsGlob(file, printBOOL=False):
+        file = glob.glob(file)[0]
+        img = nib.load(file)
+        img_data = img.get_fdata()
+    else:
+        return print(f"File does not exist: \n{file}")
+
+    return img, img_data
+
+def save_nib_img_data(new_img_data, old_img, path):
+    new_img = nib.Nifti1Image(new_img_data, old_img.affine, old_img.header)
+    nib.save(new_img, path)
+
+
 
 def transform_coordinates_to_voxel(coordinates, affine):
     """
@@ -377,6 +401,16 @@ def read_DSI_studio_Txt_files_SC(path):
     C = C.iloc[:, :-1]
     C = np.array(C.iloc[1:, :]).astype('float64')
     return C
+
+def read_DSI_studio_Txt_files_SC_return_regions(path, atlas_name):
+    C = pd.read_table(path, header=None, dtype=object)
+    #cleaning up structural data
+    C = C.drop([0,1], axis=1)
+    C = C.drop([0], axis=0)
+    C = C.iloc[:, :-1]
+    region_labels = np.array(C.iloc[0])
+    region_labels = np.array([w.replace(f'{atlas_name}_', '') for w in region_labels])
+    return region_labels
 
 
 def get_DSIstudio_TXT_file_ROI_names_for_spheres(path):

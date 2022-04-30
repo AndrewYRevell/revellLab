@@ -294,7 +294,7 @@ class dataclass_iEEG_metadata:
         return dataII_scaler, data_scaler, dataII_scalerDS, data_scalerDS, channels
 
 
-
+    
     def get_dataXY(self, sub, idKey, AssociatedInterictal, username, password, annotationLayerName, BIDS = None, dataset= None, session = None, fsds = 128, window = 10 , skipWindow = 0.25, secondsBefore = 60, secondsAfter = 60, montage = "bipolar", prewhiten = True):
         print("\nGetting ictal data")
         df, fs, _, _ = self.get_precitalIctalPostictal(sub, "Ictal", idKey, username, password, BIDS = BIDS, dataset= dataset, session = session, secondsBefore = secondsBefore, secondsAfter = secondsAfter)
@@ -344,9 +344,104 @@ class dataclass_iEEG_metadata:
         X = X[shuffle,:,:]
         Y = Y[shuffle,:]
         return X, Y, data_scalerDS, dataII_scalerDS, dataAnnotationDS
+    """
+    # FOR POWER
+    def preprocessNormalizeDownsample_power(self, df, df_interictal, fs, fsds, montage = "bipolar", prewhiten = False):
+        #% Preprocessing
+        data, data_ref, _, data_filt, channels = echobase.preprocess(df, fs, fsds, montage=montage, prewhiten = prewhiten)
+        dataII, _, _, dataII_filt, channels = echobase.preprocess(df_interictal, fs, fsds, montage=montage, prewhiten = prewhiten)
+        
+        #sns.lineplot(x = range(len(data_filt[:,1])), y =  data_filt[:,1])
+        #sns.lineplot(x = range(len(dataII_filt[:,1])), y =  dataII_filt[:,1])
+        #normalize
+        dataII_scaler = echomodel.scaleData(dataII_filt, dataII_filt)
+        data_scaler = echomodel.scaleData(data_filt, dataII_filt)
+        
+        #sns.lineplot(x = range(len(data_scaler[:,1])), y =  data_scaler[:,1])
+        #sns.lineplot(x = range(len(dataII_scaler[:,1])), y =  dataII_scaler[:,1])
+        #get annotated segments of preprocessed data
+        #alter annotations to include time_step seconds beforehand
+        #downsample
+        dataII_scalerDS = self.downsample(dataII_scaler, fs, fsds)
+        data_scalerDS = self.downsample(data_scaler, fs, fsds)
+        return dataII_scaler, data_scaler, dataII_scalerDS, data_scalerDS, channels
 
+
+
+    def get_dataXY_power(self, sub, idKey, AssociatedInterictal, username, password, annotationLayerName, BIDS = None, dataset= None, session = None, fsds = 128, window = 10 , skipWindow = 0.25, secondsBefore = 60, secondsAfter = 60, montage = "bipolar", prewhiten = True):
+        print("\nGetting ictal data")
+        df, fs, _, _ = DataJson.get_precitalIctalPostictal(sub, "Ictal", idKey, username, password, BIDS = BIDS, dataset= dataset, session = session, secondsBefore = secondsBefore, secondsAfter = secondsAfter)
+        print("\nGetting interictal data")
+        df_interictal, _ = DataJson.get_iEEGData(sub, "Interictal", AssociatedInterictal, username, password, BIDS = BIDS, dataset= dataset, session = session, startKey = "Start")
+        
+        
+        print(f"\nPreprocessing data\nMontage: {montage}\nPrewhiten: {prewhiten}")
+        dataII_scaler, data_scaler, dataII_scalerDS, data_scalerDS, channels = DataJson.preprocessNormalizeDownsample_power(df, df_interictal, fs, fsds, montage = montage, prewhiten = prewhiten)
+        
+        
+        time_step, skip = int(window*fsds), int(skipWindow*fsds)
+        annotations = DataJson.get_annotations(sub, "Ictal", idKey, annotationLayerName, username, password)
+        print("\nAnnotations")
+        #get annotated segments of preprocessed data
+        #alter annotations to include time_step seconds beforehand
+        annotations_altered = copy.deepcopy(annotations)
+        annotations_altered["start"] = annotations_altered["start"] - int(window*1e6)
+        index = np.array(df.index)
+        dataAnnotation, dataAnnotationChannels = DataJson.get_annotations_iEEG(annotations_altered, data_scaler, channels, index[range(len(data_scaler))])
+        #downsample
+        dataAnnotationDS = copy.deepcopy(dataAnnotation)
+        for i in range(len(dataAnnotationDS)):
+            dataAnnotationDS[i] = DataJson.downsample(dataAnnotationDS[i], fs, fsds)
+     
+        s#ns.lineplot(x = range(65), y = signal.welch(dataAnnotationDS[0][0:1280,0], fsds, nperseg=1 * fsds)[1])
+        
+        #DataJson.plot_eeg(dataAnnotationDS[0], fsds, nchan = 1, dpi = 300)
+        #DataJson.plot_eeg(data_scalerDS, fsds, nchan = 1, dpi = 300)
+        print("Constructing classes")
+        #% Classes
+        #generate classes. class 0 = not seizing (interictal). class 1 = seizing annotations
+        CLASS0all = echomodel.overlapping_windows(dataII_scalerDS, time_step, skip)
+        CLASS0all = CLASS0all.reshape( CLASS0all.shape[0] * CLASS0all.shape[2], CLASS0all.shape[1] , 1  )
+        for i in range(len(dataAnnotationDS)):
+            if i == 0:
+                CLASS1 = echomodel.overlapping_windows(dataAnnotationDS[i], time_step, skip)
+            else:
+                CLASS1 = np.concatenate(  [CLASS1, echomodel.overlapping_windows(dataAnnotationDS[i], time_step, skip) ]   )
+        #pick same number of class0 as class1
+        CLASS0 = CLASS0all[np.random.choice(len(CLASS0all), size=len(CLASS1), replace=False),:]
+        print("Preprocessing classes")
+        #% Preproccess classes
+        #generate X vectors
+        X = np.concatenate( [ CLASS0, CLASS1 ])
+        #generate class Y values
+        Y = np.concatenate( [ np.repeat(0, len(CLASS1)), np.repeat(1, len(CLASS1)) ])
+        Y = Y.reshape(Y.shape[0], 1)
+        #One hot encoding
+        ohe = OneHotEncoder(sparse=False)
+        Y = ohe.fit_transform(Y)
+        #Suffle
+        shuffle = np.random.permutation(X.shape[0])
+        X = X[shuffle,:,:]
+        Y = Y[shuffle,:]
+        
+        ch = 7
+        print(Y[ch,1])
+        sns.lineplot(x = range(65), y = signal.welch(X[ch,:,0], fsds, nperseg=1 * fsds)[1])
+        iii = []
+        sss = []
+        for ch in range(len(X)):
+            if Y[ch,1] == 0:
+                iii.append( echomodel.integrate(range(65), signal.welch(X[ch,:,0], fsds, nperseg=1 * fsds)[1])    )
+            else:
+                sss.append( echomodel.integrate(range(65), signal.welch(X[ch,:,0], fsds, nperseg=1 * fsds)[1])    )
+                
+        
+        
+        
+        return X, Y, data_scalerDS, dataII_scalerDS, dataAnnotationDS
+"""
     ##Plotting functions
-    def plot_eeg(self, data, fs, startSec = None, stopSec = None, nchan = None, markers = [], aspect = 20, height = 0.3, hspace = -0.3, dpi = 300, lw=1, fill = False, savefig = False, pathFig = None):
+    def plot_eeg(self, data, fs, startSec = None, stopSec = None, nchan = None, markers = [], aspect = 20, height = 0.3, hspace = -0.3, dpi = 300, lw=1, fill = False, savefig = False, pathFig = None, color = "w"):
         if stopSec == None:
             stopSec = len(data)/fs
         if startSec == None:

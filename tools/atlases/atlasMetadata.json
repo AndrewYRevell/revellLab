@@ -6,254 +6,550 @@
     "STANDARD":{
         "AAL1":{
             "name": "AAL.nii.gz",
-            "label": "AAL.csv"
+            "label": "AAL.csv",
+            "shortname": "AAL1",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "AAL2":{
             "name": "AAL2.nii.gz",
-            "label": "AAL2.csv"
+            "label": "AAL2.csv",
+            "shortname": "AAL2",
+            "priority_level":{
+            	"structure": 2,
+            	"function": 3
+        	}
         },
         "AAL3":{
             "name": "AAL3v1_1mm.nii.gz",
-            "label": "AAL3v1_1mm.csv"
+            "label": "AAL3v1_1mm.csv",
+            "shortname": "AAL3",
+            "priority_level":{
+            	"structure": 1,
+            	"function": 3
+        	}
         },
         "AAL600":{
             "name": "AAL600.nii.gz",
-            "label": "AAL600.csv"
+            "label": "AAL600.csv",
+            "shortname": "AAL600",
+            "priority_level":{
+            	"structure": 2,
+            	"function": 3
+        	}
         },
         "AAL_JHU_combined":{
             "name": "AAL_JHU_combined.nii.gz",
-            "label": "AAL_JHU_combined.csv"
+            "label": "AAL_JHU_combined.csv",
+            "shortname": "AAL-JHU",
+            "priority_level":{
+            	"structure": 2,
+            	"function": 3
+        	}
         },
         "AICHA":{
             "name": "AICHA.nii.gz",
-            "label": "AICHA.csv"
+            "label": "AICHA.csv",
+            "shortname": "AICHA",
+            "priority_level":{
+            	"structure": 2,
+            	"function": 3
+        	}
         },
         "BNA":{
             "name": "BN_Atlas_246_1mm.nii.gz",
-            "label": "BN_Atlas_246_1mm.csv"
+            "label": "BN_Atlas_246_1mm.csv",
+            "shortname": "BNA",
+            "priority_level":{
+            	"structure": 1,
+            	"function": 1
+        	}
         },
         "brodmann":{
             "name": "brodmann.nii.gz",
-            "label": "brodmann.csv"
+            "label": "brodmann.csv",
+            "shortname": "Brodmann",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Craddock200":{
             "name": "cc200_roi_atlas.nii.gz",
-            "label": "cc200_roi_atlas.csv"
+            "label": "cc200_roi_atlas.csv",
+            "shortname": "Craddock200",
+            "priority_level":{
+            	"structure": 2,
+            	"function": 3
+        	}
         },
         "Craddock400":{
             "name": "cc400_roi_atlas.nii.gz",
-            "label": "cc400_roi_atlas.csv"
+            "label": "cc400_roi_atlas.csv",
+            "shortname": "Craddock400",
+            "priority_level":{
+            	"structure": 2,
+            	"function": 3
+        	}
         },
         "Gordon_Petersen":{
             "name": "Gordon_Petersen_2016_MNI.nii.gz",
-            "label": "Gordon_Petersen_2016_MNI.csv"
+            "label": "Gordon_Petersen_2016_MNI.csv",
+            "shortname": "GP",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Hammersmith":{
             "name": "Hammersmith_atlas_n30r83_SPM5.nii.gz",
-            "label": "Hammersmith_atlas_n30r83_SPM5.csv"
+            "label": "Hammersmith_atlas_n30r83_SPM5.csv",
+            "shortname": "Hammersmith",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "HO_corticalSubcortical":{
             "name": "HarvardOxford-combined.nii.gz",
-            "label": "HarvardOxford-combined.csv"
+            "label": "HarvardOxford-combined.csv",
+            "shortname": "HO combined",
+            "priority_level":{
+            	"structure": 1,
+            	"function": 2
+        	}
         },
         "HO_corticalSymmetric":{
             "name": "HarvardOxford-cort-maxprob-thr25-1mm.nii.gz",
-            "label": "HarvardOxford-cort-maxprob-thr25-1mm.csv"
+            "label": "HarvardOxford-cort-maxprob-thr25-1mm.csv",
+            "shortname": "HO cort only symm",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "HO_cortical":{
             "name": "HarvardOxford-cort-NONSYMMETRIC-maxprob-thr25-1mm.nii.gz",
-            "label": "HarvardOxford-cort-NONSYMMETRIC-maxprob-thr25-1mm.csv"
+            "label": "HarvardOxford-cort-NONSYMMETRIC-maxprob-thr25-1mm.csv",
+            "shortname": "HO cort only nonsymm",
+            "priority_level":{
+            	"structure": 2,
+            	"function": 3
+        	}
         },
         "HO_subcorticalOnly":{
             "name": "HarvardOxford-sub-ONLY_maxprob-thr25-1mm.nii.gz",
-            "label": "HarvardOxford-sub-ONLY_maxprob-thr25-1mm.csv"
+            "label": "HarvardOxford-sub-ONLY_maxprob-thr25-1mm.csv",
+            "shortname": "HO subcort only",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "JHUlabels":{
             "name": "JHU-ICBM-labels-1mm.nii.gz",
-            "label": "JHU-ICBM-labels-1mm.csv"
+            "label": "JHU-ICBM-labels-1mm.csv",
+            "shortname": "JHU labels",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "JHUtracts-":{
             "name": "JHU-ICBM-tracts-maxprob-thr25-1mm.nii.gz",
-            "label": "JHU-ICBM-tracts-maxprob-thr25-1mm.csv"
+            "label": "JHU-ICBM-tracts-maxprob-thr25-1mm.csv",
+            "shortname": "JHU tracts",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Julich-maxprob-thr25-1mm":{
             "name": "Julich-maxprob-thr25-1mm.nii.gz",
-            "label": "Julich-maxprob-thr25-1mm.csv"
+            "label": "Julich-maxprob-thr25-1mm.csv",
+            "shortname": "Julich",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "MMP":{
             "name": "MMP_in_MNI_resliced.nii.gz",
-            "label": "MMP_in_MNI_resliced.csv"
+            "label": "MMP_in_MNI_resliced.csv",
+            "shortname": "MMP",
+            "priority_level":{
+            	"structure": 1,
+            	"function": 3
+        	}
         },
         "CerebrA":{
             "name": "mni_icbm152_CerebrA_tal_nlin_sym_09c.nii.gz",
-            "label": "mni_icbm152_CerebrA_tal_nlin_sym_09c.csv"
+            "label": "mni_icbm152_CerebrA_tal_nlin_sym_09c.csv",
+            "shortname": "CerebrA",
+            "priority_level":{
+            	"structure": 1,
+            	"function": 3
+        	}
         },
         "MNIstructural":{
             "name": "MNI-maxprob-thr25-1mm.nii.gz",
-            "label": "MNI-maxprob-thr25-1mm.csv"
+            "label": "MNI-maxprob-thr25-1mm.csv",
+            "shortname": "MNI",
+            "priority_level":{
+            	"structure": 2,
+            	"function": 3
+        	}
         },
         "DKT":{
             "name": "OASIS-TRT-20_jointfusion_DKT31_CMA_labels_in_MNI152_v2.nii.gz",
-            "label": "OASIS-TRT-20_jointfusion_DKT31_CMA_labels_in_MNI152_v2.csv"
+            "label": "OASIS-TRT-20_jointfusion_DKT31_CMA_labels_in_MNI152_v2.csv",
+            "shortname": "DKT vol",
+            "priority_level":{
+            	"structure": 1,
+            	"function": 1
+        	}
         },
         "Schaefer07_100":{
             "name": "Schaefer2018_100Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_100Parcels_7Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_100Parcels_7Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer100 7N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Schaefer17_100":{
             "name": "Schaefer2018_100Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_100Parcels_17Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_100Parcels_17Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer100 17N",
+            "priority_level":{
+            	"structure": 1,
+            	"function": 1
+        	}
         },
         "Schaefer07_200":{
             "name": "Schaefer2018_200Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_200Parcels_7Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_200Parcels_7Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer200 7N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Schaefer17_200":{
             "name": "Schaefer2018_200Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_200Parcels_17Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_200Parcels_17Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer200 17N",
+            "priority_level":{
+            	"structure": 1,
+            	"function": 1
+        	}
         },
         "Schaefer07_300":{
             "name": "Schaefer2018_300Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_300Parcels_7Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_300Parcels_7Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer300 7N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Schaefer17_300":{
             "name": "Schaefer2018_300Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_300Parcels_17Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_300Parcels_17Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer300 17N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 2
+        	}
         },
         "Schaefer07_400":{
             "name": "Schaefer2018_400Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_400Parcels_7Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_400Parcels_7Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer400 7N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Schaefer17_400":{
             "name": "Schaefer2018_400Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_400Parcels_17Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_400Parcels_17Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer400 17N",
+            "priority_level":{
+            	"structure": 1,
+            	"function": 1
+        	}
         },
         "Schaefer07_500":{
             "name": "Schaefer2018_500Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_500Parcels_7Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_500Parcels_7Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer500 7N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Schaefer17_500":{
             "name": "Schaefer2018_500Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_500Parcels_17Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_500Parcels_17Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer500 17N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 2
+        	}
         },
         "Schaefer07_600":{
             "name": "Schaefer2018_600Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_600Parcels_7Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_600Parcels_7Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer600 7N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Schaefer17_600":{
             "name": "Schaefer2018_600Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_600Parcels_17Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_600Parcels_17Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer600 17N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Schaefer07_700":{
             "name": "Schaefer2018_700Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_700Parcels_7Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_700Parcels_7Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer700 7N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Schaefer17_700":{
             "name": "Schaefer2018_700Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_700Parcels_17Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_700Parcels_17Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer700 17N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Schaefer07_800":{
             "name": "Schaefer2018_800Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_800Parcels_7Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_800Parcels_7Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer800 7N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Schaefer17_800":{
             "name": "Schaefer2018_800Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_800Parcels_17Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_800Parcels_17Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer800 17N",
+            "priority_level":{
+            	"structure": 1,
+            	"function": 1
+        	}
         },
         "Schaefer07_900":{
             "name": "Schaefer2018_900Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_900Parcels_7Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_900Parcels_7Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer900 7N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Schaefer17_900":{
             "name": "Schaefer2018_900Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_900Parcels_17Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_900Parcels_17Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer900 17N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Schaefer07_1000":{
             "name": "Schaefer2018_1000Parcels_7Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_1000Parcels_7Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_1000Parcels_7Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer1000 7N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Schaefer17_1000":{
             "name": "Schaefer2018_1000Parcels_17Networks_order_FSLMNI152_1mm.nii.gz",
-            "label": "Schaefer2018_1000Parcels_17Networks_order_FSLMNI152_1mm.csv"
+            "label": "Schaefer2018_1000Parcels_17Networks_order_FSLMNI152_1mm.csv",
+            "shortname": "Schaefer1000 17N",
+            "priority_level":{
+            	"structure": 1,
+            	"function": 1
+        	}
         },
         "Talairach":{
             "name": "Talairach-labels-1mm.nii.gz",
-            "label": "Talairach-labels-1mm.csv"
+            "label": "Talairach-labels-1mm.csv",
+            "shortname": "Talairach",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 3
+        	}
         },
         "Yeo07_liberal":{
             "name": "Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_LiberalMask_resliced.nii.gz",
-            "label": "Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_LiberalMask_resliced.csv"
+            "label": "Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_LiberalMask_resliced.csv",
+            "shortname": "Yeo 7N Liberal",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 1
+        	}
         },
         "Yeo07":{
             "name": "Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_resliced.nii.gz",
-            "label": "Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_resliced.csv"
+            "label": "Yeo2011_7Networks_MNI152_FreeSurferConformed1mm_resliced.csv",
+            "shortname": "Yeo 7N",
+            "priority_level":{
+            	"structure": 3,
+            	"function": 1
+        	}
         },
         "Yeo17_liberal":{
             "name": "Yeo2011_17Networks_MNI152_FreeSurferConformed1mm_LiberalMask_resliced.nii.gz",
-            "label": "Yeo2011_17Networks_MNI152_FreeSurferConformed1mm_LiberalMask_resliced.csv"
+            "label": "Yeo2011_17Networks_MNI152_FreeSurferConformed1mm_LiberalMask_resliced.csv",
+            "shortname": "Yeo 17N Liberal",
+            "priority_level":{
+            	"structure": 2,
+            	"function": 1
+        	}
         },
         "Yeo17":{
             "name": "Yeo2011_17Networks_MNI152_FreeSurferConformed1mm_resliced.nii.gz",
-            "label": "Yeo2011_17Networks_MNI152_FreeSurferConformed1mm_resliced.csv"
+            "label": "Yeo2011_17Networks_MNI152_FreeSurferConformed1mm_resliced.csv",
+            "shortname": "Yeo 17N",
+            "priority_level":{
+            	"structure": 2,
+            	"function": 1
+        	}
         }
     },
     "RANDOM":{
         "wholeBrainMNI":{
             "10":{
                 "name": "RandomAtlas0000010",
-                "permutations": 5
+                "permutations": 5,
+		        "priority_level":{
+		        	"structure": 3,
+		        	"function": 3
+		    	}
             },
             "30":{
                 "name": "RandomAtlas0000030",
-                "permutations": 5
+                "permutations": 5,
+		        "priority_level":{
+		        	"structure": 3,
+		        	"function": 3
+		    	}
             },
             "50":{
                 "name": "RandomAtlas0000050",
-                "permutations": 5
+                "permutations": 5,
+		        "priority_level":{
+		        	"structure": 1,
+		        	"function": 3
+		    	}
             },
             "75":{
                 "name": "RandomAtlas0000075",
-                "permutations": 5
+                "permutations": 5,
+		        "priority_level":{
+		        	"structure": 3,
+		        	"function": 3
+		    	}
             },
             "100":{
                 "name": "RandomAtlas0000100",
-                "permutations": 5
+                "permutations": 5,
+		        "priority_level":{
+		        	"structure": 1,
+		        	"function": 3
+		    	}
             },
             "200":{
                 "name": "RandomAtlas0000200",
-                "permutations": 5
+                "permutations": 5,
+		        "priority_level":{
+		        	"structure": 1,
+		        	"function": 3
+		    	}
             },
             "300":{
                 "name": "RandomAtlas0000300",
-                "permutations": 5
+                "permutations": 5,
+		        "priority_level":{
+		        	"structure": 1,
+		        	"function": 3
+		    	}
             },
             "400":{
                 "name": "RandomAtlas0000400",
-                "permutations": 5
+                "permutations": 5,
+		        "priority_level":{
+		        	"structure": 1,
+		        	"function": 3
+		    	}
             },
             "500":{
                 "name": "RandomAtlas0000500",
-                "permutations": 5
+                "permutations": 5,
+		        "priority_level":{
+		        	"structure": 1,
+		        	"function": 3
+		    	}
             },
             "750":{
                 "name": "RandomAtlas0000750",
-                "permutations": 5
+                "permutations": 5,
+		        "priority_level":{
+		        	"structure": 1,
+		        	"function": 3
+		    	}
             },
             "1000":{
                 "name": "RandomAtlas0001000",
-                "permutations": 5
+                "permutations": 5,
+		        "priority_level":{
+		        	"structure": 1,
+		        	"function": 3
+		    	}
             },
             "2000":{
                 "name": "RandomAtlas0002000",
-                "permutations": 5
+                "permutations": 5,
+		        "priority_level":{
+		        	"structure": 3,
+		        	"function": 3
+		    	}
             },
             "5000":{
                 "name": "RandomAtlas0005000",
-                "permutations": 5
+                "permutations": 5,
+		        "priority_level":{
+		        	"structure": 4,
+		        	"function": 3
+		    	}
             },
             "10000":{
                 "name": "RandomAtlas0010000",
-                "permutations": 5
+                "permutations": 5,
+		        "priority_level":{
+		        	"structure": 4,
+		        	"function": 3
+		    	}
             }
         }
     }

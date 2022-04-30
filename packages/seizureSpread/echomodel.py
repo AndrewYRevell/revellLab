@@ -13,6 +13,7 @@ from tensorflow.keras.layers import Dense, Flatten, Conv1D, MaxPooling1D, Dropou
 from tensorflow.keras.callbacks import ModelCheckpoint
 from sklearn.preprocessing import RobustScaler, MinMaxScaler, StandardScaler, MaxAbsScaler, OneHotEncoder, LabelEncoder
 
+from revellLab.packages.utilities import utils
 # %%
 """"
 Note 2020.05.06
@@ -75,13 +76,13 @@ def splitDataframeTrainTest(dataframe, colname, trainSize = 0.66):
         test = dataframe[dataframe[colname].isin(testSubjects)]
         return train, test
 
-def build_model_wavenet(learn_rate, beta_1, beta_2, input_shape, dropout):
+def build_model_wavenet_original(learn_rate, beta_1, beta_2, input_shape, dropout):
 	#CNN model
     rate = 2
     #rate_exp_add = 2
     optimizer = tf.keras.optimizers.Adam(learning_rate=learn_rate, beta_1=beta_1, beta_2=beta_2)
     model = Sequential()
-    
+
     model.add(Conv1D(filters=128, kernel_size=128,data_format="channels_last", activation='relu', dilation_rate = 2**rate, input_shape=input_shape,  padding="causal"))
     model.add(MaxPooling1D(pool_size=(2)))
     model.add(Dropout(dropout))
@@ -90,18 +91,18 @@ def build_model_wavenet(learn_rate, beta_1, beta_2, input_shape, dropout):
     model.add(Conv1D(filters=64, kernel_size=128, activation='relu', dilation_rate = 2**rate,padding="causal"))
     model.add(MaxPooling1D(pool_size=(2)))
     model.add(Dropout(dropout))
-    
+
     rate = rate #+ rate_exp_add * 2
     model.add(Conv1D(filters=8, kernel_size=128, activation='relu', dilation_rate = 2**rate, padding="causal"))
     model.add(MaxPooling1D(pool_size=(2)))
     model.add(Dropout(dropout))
 
-    
+
     model.add(Conv1D(filters=8, kernel_size=128, activation='relu', dilation_rate = 2**rate, padding="causal"))
     model.add(MaxPooling1D(pool_size=(2)))
     model.add(Dropout(dropout))
 
-    
+
     model.add(Conv1D(filters=8, kernel_size=(4), activation='relu', dilation_rate = 2**rate, padding="causal"))
     model.add(MaxPooling1D(pool_size=(2)))
     model.add(Dropout(dropout))
@@ -109,29 +110,58 @@ def build_model_wavenet(learn_rate, beta_1, beta_2, input_shape, dropout):
     model.add(Conv1D(filters=8, kernel_size=(4), activation='relu', dilation_rate = 2**rate, padding="causal"))
     model.add(MaxPooling1D(pool_size=(2)))
     model.add(Dropout(dropout))
-    
+
     model.add(Conv1D(filters=8, kernel_size=(4), activation='relu', dilation_rate = 2**rate, padding="causal"))
     model.add(MaxPooling1D(pool_size=(2)))
     model.add(Dropout(dropout))
-    
+
     model.add(Conv1D(filters=8, kernel_size=(4), activation='relu', dilation_rate = 2**rate, padding="causal"))
     model.add(MaxPooling1D(pool_size=(2)))
     model.add(Dropout(dropout))
-    
+
     model.add(Conv1D(filters=8, kernel_size=(4), activation='relu', dilation_rate = 2**rate, padding="causal"))
     model.add(MaxPooling1D(pool_size=(2)))
     model.add(Dropout(dropout))
-    
+
     model.add(Conv1D(filters=8, kernel_size=(4), activation='relu', dilation_rate = 2**rate, padding="causal"))
     #model.add(GlobalAveragePooling1D())
     model.add(MaxPooling1D(pool_size=(2)))
     model.add(Dropout(dropout))
 
-    
+
     model.add(Flatten())
     model.add(Dense(100, activation='relu'))
     model.add(Dense(2, activation='softmax'))
-	
+
+    model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics = ['accuracy'])
+    print(model.summary())
+    return model
+
+def build_model_wavenet(learn_rate, beta_1, beta_2, input_shape, dropout):
+	#CNN model
+    rate = 2
+
+    optimizer = tf.keras.optimizers.Adam(learning_rate=learn_rate, beta_1=beta_1, beta_2=beta_2)
+    model = Sequential()
+
+    model.add(Conv1D(filters=128, kernel_size=128, activation='relu', dilation_rate = 2**rate, padding="causal", data_format="channels_last", input_shape=input_shape))
+    model.add(MaxPooling1D(pool_size=(2)))
+    model.add(Dropout(dropout))
+
+    model.add(Conv1D(filters=64, kernel_size=64, activation='relu', dilation_rate = 2**rate, padding="causal"))
+    model.add(MaxPooling1D(pool_size=(2)))
+    model.add(Dropout(dropout))
+
+    model.add(Conv1D(filters=32, kernel_size=32, activation='relu', dilation_rate = 2**rate, padding="causal"))
+    model.add(MaxPooling1D(pool_size=(2)))
+    model.add(Dropout(dropout))
+
+    model.add(Flatten())
+    model.add(Dense(16, activation='relu'))
+    model.add(Dropout(dropout))
+
+    model.add(Dense(2, activation='softmax'))
+
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics = ['accuracy'])
     print(model.summary())
     return model
@@ -140,22 +170,25 @@ def build_model_1dCNN(learn_rate, beta_1, beta_2, input_shape, dropout):
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=learn_rate, beta_1=beta_1, beta_2=beta_2)
     model = Sequential()
-    
-    model.add(Conv1D(filters=8, kernel_size=256, strides = 2, activation='relu', input_shape=input_shape))
-    model.add(Conv1D(filters=6, kernel_size=128, strides = 2, activation='relu'))
+
+    model.add(Conv1D(filters=128, kernel_size=128, strides = 2, activation='relu', padding='same',  data_format="channels_last", input_shape=input_shape))
     model.add(MaxPooling1D(pool_size=(2)))
-    model.add(Conv1D(filters=3, kernel_size=64, activation='relu'))
     model.add(Dropout(dropout))
-    model.add(Conv1D(filters=4, kernel_size=8, strides = 2, activation='relu', ))
-    model.add(MaxPooling1D(pool_size=(3)))
+
+    model.add(Conv1D(filters=64, kernel_size=64, strides = 2, activation='relu', padding='same'))
+    model.add(MaxPooling1D(pool_size=(2)))
     model.add(Dropout(dropout))
-    model.add(Dense(512, activation='relu'))
-    model.add(Dense(256, activation='relu'))
+
+    model.add(Conv1D(filters=32, kernel_size=32, activation='relu', padding='same'))
+    model.add(MaxPooling1D(pool_size=(2)))
     model.add(Dropout(dropout))
-    model.add(Dense(128, activation='relu'))
-    model.add(Dropout(dropout))
+
     model.add(Flatten())
+    model.add(Dense(16, activation='relu'))
+    model.add(Dropout(dropout))
+
     model.add(Dense(2, activation='softmax'))
+
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics = ['accuracy'])
     print(model.summary())
     return model
@@ -164,18 +197,20 @@ def build_model_LSTM(learn_rate, beta_1, beta_2, input_shape, dropout):
 
     optimizer = tf.keras.optimizers.Adam(learning_rate=learn_rate, beta_1=beta_1, beta_2=beta_2)
     model = Sequential()
-    model.add(LSTM(4, activation='relu', input_shape=input_shape))
 
+    model.add(LSTM(4, activation='relu', input_shape=input_shape))
     model.add(Dropout(dropout))
 
-    model.add(Dense(128, activation='relu'))
-
+    model.add(Dense(8, activation='relu'))
+    model.add(Dropout(dropout))
     model.add(Flatten())
+
     model.add(Dense(2, activation='softmax'))
+
     model.compile(loss='categorical_crossentropy', optimizer=optimizer, metrics = ['accuracy'])
     print(model.summary())
     return model
-        
+
 
 
 def modelTrain(X_train, y_train, X_test, y_test, callbacks_list, modelName = "wavenet", learn_rate=0.01, beta_1=0.9, beta_2=0.999, input_shape=None, dropout=0.3, training_epochs=3, batch_size=2**11, validation_split = 0.2, verbose = 1):
@@ -195,48 +230,99 @@ def modelTrain(X_train, y_train, X_test, y_test, callbacks_list, modelName = "wa
 def modelPredict(fpath_model, X_test):
     model = load_model(fpath_model)
     print(model.summary())
-    
+
     yPredictProbability =  model.predict(X_test, verbose=1)
     return yPredictProbability
 
-def modelEvaluate(yPredictProbability, X_test, y_test, title = "Model Performance"):
-    Y_predict = np.argmax(yPredictProbability, axis=-1)
-    Y = np.argmax(y_test, axis=-1).reshape(y_test.shape[0], 1)
-    
-    #Sensitivity, specificit, PPV, NPC, and accuracy
-    positives = Y[np.where(Y_predict == 1)] 
-    positives_true = np.where(positives.flatten() == 1)[0]
-    positives_false = np.where(positives.flatten()  == 0)[0]
-    negatives = Y[np.where(Y_predict == 0)] 
-    negatives_true = np.where(negatives.flatten() == 0)[0]
-    negatives_false = np.where(negatives.flatten() == 1)[0]
-    TP = len(positives_true)
-    FP = len(positives_false)
-    TN = len(negatives_true)
-    FN = len(negatives_false)
+
+def calculate_fpr_and_tpr(Y_true, Y_predict):
+    TP = len(np.where((Y_true == 1) & (Y_predict == 1))[0])
+    TN = len(np.where((Y_true == 0) & (Y_predict == 0))[0])
+    FP = len(np.where((Y_true == 0) & (Y_predict == 1))[0])
+    FN = len(np.where((Y_true == 1) & (Y_predict == 0))[0])
+    #TN, FP, FN, TP = metrics.confusion_matrix(Y_true, Y_predict).ravel()
     acc = (TP+TN )/(TP + FP +  TN + FN)#accuracy
     sensitivity = TP/(TP+FN)
     specificity = TN/(TN+FP)
-    PPV = TP/(TP + FP)
+    if (TN + FP) > 0:
+        FPR = FP/(TN + FP)
+    else:
+        FPR = 0
+    if (TP + FP) > 0:
+        PPV = TP/(TP + FP)
+    else:
+        PPV = 0
     if (TN+FN) > 0:
         NPV = TN/(TN + FN)
     else:
         NPV = 0
+    return TN, FP, FN, TP,  acc, sensitivity, specificity, PPV, NPV, FPR
+
+def integrate(x, y):
+   sm = 0
+   for i in range(1, len(x)):
+       h = x[i] - x[i-1]
+       sm += h * (y[i-1] + y[i]) / 2
+   return sm    
+
+def modelEvaluate(yPredictProbability, X_test, y_test, title = "Model Performance",threshold = 0.5):
+  
+    Y_predict = np.zeros(yPredictProbability.shape[0])
+    Y_predict[yPredictProbability[:,1]  >=threshold]=1
+    Y = np.argmax(y_test, axis=-1).reshape(y_test.shape[0], 1)
     
-    #AUC
-    fpr, tpr, threshold = metrics.roc_curve(Y, yPredictProbability[:,1] )
-    roc_auc = metrics.auc(fpr, tpr)
     
+    
+    Y_true = Y.reshape([-1])
+    TN, FP, FN, TP,  acc, sensitivity, specificity, PPV, NPV, FPR = calculate_fpr_and_tpr(Y_true, Y_predict)
+    
+    #calculate AUC
+    fpr, tpr, threshold = metrics.roc_curve(Y, yPredictProbability[:,1],pos_label = 1 )
+    
+    """
+    NN =  201#len(threshold)
+    
+    fpr_2 = np.zeros(shape=[NN])
+    tpr_2 = np.zeros(shape=[NN])
+    count = 0
+    for t in np.linspace(0,1,NN): #threshold:
+        #print(t)
+        Y_predict = np.zeros(yPredictProbability.shape[0])
+        Y_predict[yPredictProbability[:,1]  >= t] = 1
+        Y_true = np.argmax(y_test, axis=-1)
+        TN, FP, FN, TP,  acc, sensitivity, specificity, PPV, NPV, FPR = calculate_fpr_and_tpr(Y_true, Y_predict)
+        tpr_2[count] = sensitivity
+        fpr_2[count] = FPR
+        count = count+1
+    #fig, axes = utils.plot_make()
+    #sns.scatterplot(x = fpr_2, y =tpr_2, ax = axes, s = 10)
+    #sns.lineplot(x = fpr_2, y =tpr_2, ax = axes)
+ 
+    integrate(fpr_2[::-1], tpr_2[::-1])
+    """
+    metrics.roc_auc_score(Y, yPredictProbability[:,1])
+    target_names = ['Interictal', 'Ictal']
+    print(metrics.classification_report(Y.reshape([-1]), Y_predict,target_names=target_names))
+    
+    metrics.precision_recall_fscore_support(Y.reshape([-1]), Y_predict)
+
+   
+    metrics.roc_auc_score(Y , yPredictProbability[:,1])
+    
+    #roc_auc = integrate(fpr_2[::-1], tpr_2[::-1])
+    roc_auc2 = metrics.auc(fpr, tpr)
+    
+    integrate(fpr,tpr)
     #precision-recall, and PR-AUC
-    precision, recall, thresholds = metrics.precision_recall_curve(Y, yPredictProbability[:,1])
+    precision, recall, thresholds = metrics.precision_recall_curve(Y,yPredictProbability[:,1] )
     f1 = metrics.f1_score(Y, Y_predict)
-    
+
     pr_auc = metrics.auc(recall, precision)
-    
+
     print(f"\nTP: {TP} \nFP: {FP} \nTN: {TN} \nFN: {FN}")
     print(f"\naccuracy: {acc} \nSensitivity: {sensitivity} \nSpecificity: {specificity} \nPPV: {PPV} \nNPV: {NPV} ")
-    
-    #plotting 
+
+    #plotting
     fig, ax = plt.subplots(2,2, figsize = (6.75,6.75), dpi = 300)
     ax[0,0].text(x= 0.05, y = 0.97, ha='left', va = "top" ,
                  s = f"{title}\n\nTP: {TP} \nFP: {FP} \nTN: {TN} \nFN: {FN}\
@@ -249,35 +335,53 @@ def modelEvaluate(yPredictProbability, X_test, y_test, title = "Model Performanc
     ax[0,0].get_xaxis().set_ticks([])
     ax[0,0].get_yaxis().set_ticks([])
     sns.despine(bottom=True, left=True, ax=ax[0,0])
-    
-    
+
+
     sns.histplot(data = yPredictProbability[:,1], ax = ax[0,1])
     ax[0,1].axes.axvline(x = 0.5, linestyle='--')
     ax[0,1].set_xlabel('Seizure Probability')
     ax[0,1].set_ylabel('Count')
     sns.despine(bottom=False, left=False, ax=ax[0,1])
-    ax[0,1].text(x= 0.5, y = 0.00, s = "Negatives  \n\n", ha='right', va = "bottom") 
-    ax[0,1].text(x= 0.5, y = 0.00, s = "  Positives\n\n", ha='left', va = "bottom") 
+    #ax[0,1].text(x= 0.5, y = 0.00, s = "Negatives  \n\n", ha='right', va = "bottom")
+    #ax[0,1].text(x= 0.5, y = 0.00, s = "  Positives\n\n", ha='left', va = "bottom")
+    #ax[0,1].set_xlim([0,1])
+    #sns.lineplot(fpr, tpr, ci = None, color = "darkorange" )
+    
     
     sns.lineplot(fpr, tpr, ci = None, ax = ax[1,0], color = "darkorange" )
     sns.lineplot([0, 1], [0, 1], ci = None, ax = ax[1,0], color = "navy", linestyle='--' )
     ax[1,0].set_xlim([-0.05, 1.05])
     ax[1,0].set_ylim([-0.05, 1.05])
     ax[1,0].set_xlabel('FPR')
-    ax[1,0].set_ylabel('TPR (Recall, Sensitivity)')    
-    ax[1,0].text(x= 1, y = 0.05, s = f'ROC Curve\nAUC = {roc_auc:0.3f}', ha='right', va = "bottom")
+    ax[1,0].set_ylabel('TPR (Recall, Sensitivity)')
+    ax[1,0].text(x= 1, y = 0.05, s = f'ROC Curve\nAUC = {roc_auc2:0.5f}', ha='right', va = "bottom")
     sns.despine(bottom=False, left=False, ax=ax[1,0])
-    
-    
+
+
     sns.lineplot(x = recall, y = precision, ax = ax[1,1], linewidth=1, ci=None,  color = "darkorange")
     sns.lineplot([0, 1], [0, 0], ci = None, ax = ax[1,1], color = "navy", linestyle='--' )
     ax[1,1].set_xlim([-0.05, 1.05])
     ax[1,1].set_ylim([-0.05, 1.05])
     ax[1,1].set_xlabel('Recall (TPR, Sensitivity)')
     ax[1,1].set_ylabel('Precision (PPV)')
-    ax[1,1].text(x= 1, y = 0.05, s = f'PR Curve\nF1 score = {f1:0.3f} \nAUC = {pr_auc:0.3f}', ha='right', va = "bottom")
+    ax[1,1].text(x= 1, y = 0.05, s = f'PR Curve\nF1 score = {f1:0.5f} \nAUC = {pr_auc:0.3f}', ha='right', va = "bottom")
     sns.despine(bottom=False, left=False, ax=ax[1,1])
 
+
+def get_optimal_threshold(pos, neg):
+    sorted_thresholds = np.sort(np.unique(neg))
+    optimal_threshold = np.zeros(len(sorted_thresholds))
+    for t in range(len(sorted_thresholds)):
+        print(f"\r{np.round((t+1)/len(sorted_thresholds)*100,2)}%   ", end = "\r")
+        thresh = sorted_thresholds[t]
+        if  len(np.where(pos < thresh)[0]) > 0:
+            optimal_threshold[t] = len(np.where(neg > thresh)[0]) / len(np.where(pos < thresh)[0])
+        else:
+            optimal_threshold[t] = 0
+            
+    ind = np.where( np.min(abs(optimal_threshold - 0.5)) == abs(optimal_threshold - 0.5))[0][0]
+    thresh = sorted_thresholds[ind]
+    return thresh
 
 # %%
 """
@@ -458,30 +562,30 @@ sns.histplot(adj_butter_spear[np.triu_indices( len(adj_butter_spear), k = 1)], a
 n1=18; n2 = 37
 d1= data_hat[:,n1]
 d2= data_hat[:,n2]
-print(f"\nx_xorr:   {np.round( adj_xcorr_025[n1,n2],2 )}"  ) 
-print(f"Pearson:  {np.round( pearsonr(d1, d2)[0],2 )}; p-value: {np.round( pearsonr(d1, d2)[1],2 )}"  ) 
-print(f"Spearman: {np.round( spearmanr(d1, d2)[0],2 )}; p-value: {np.round( spearmanr(d1, d2)[1],2 )}"  ) 
+print(f"\nx_xorr:   {np.round( adj_xcorr_025[n1,n2],2 )}"  )
+print(f"Pearson:  {np.round( pearsonr(d1, d2)[0],2 )}; p-value: {np.round( pearsonr(d1, d2)[1],2 )}"  )
+print(f"Spearman: {np.round( spearmanr(d1, d2)[0],2 )}; p-value: {np.round( spearmanr(d1, d2)[1],2 )}"  )
 adj_xcorr_025[n1,n2]; adj_pear[n1,n2]; adj_spear[n1,n2]
 fig,axes = plt.subplots(1,1,figsize=(8,4), dpi = 300)
 sns.regplot(  x = data_hat[range(fs*st, fs*sp),  n1], y= data_hat[range(fs*st, fs*sp),n2], ax = axes , scatter_kws={"s":0.05})
 d1= data_hat[:,n1]
 d2= data_hat[:,n2]
-print(f"\nx_xorr:   {np.round( adj_butter_xcorr[n1,n2],2 )}"  ) 
-print(f"\nPearson:  {np.round( pearsonr(d1, d2)[0],2 )}; p-value: {np.round( pearsonr(d1, d2)[1],2 )}"  ) 
-print(f"Spearman: {np.round( spearmanr(d1, d2)[0],2 )}; p-value: {np.round( spearmanr(d1, d2)[1],2 )}"  ) 
+print(f"\nx_xorr:   {np.round( adj_butter_xcorr[n1,n2],2 )}"  )
+print(f"\nPearson:  {np.round( pearsonr(d1, d2)[0],2 )}; p-value: {np.round( pearsonr(d1, d2)[1],2 )}"  )
+print(f"Spearman: {np.round( spearmanr(d1, d2)[0],2 )}; p-value: {np.round( spearmanr(d1, d2)[1],2 )}"  )
 fig,axes = plt.subplots(1,1,figsize=(8,4), dpi = 300)
 sns.regplot(  x = data_butter[range(fs*st, fs*sp),  n1], y= data_butter[range(fs*st, fs*sp),n2], ax = axes , scatter_kws={"s":0.1})
-elecLoc["Tissue_segmentation_distance_from_label_2"]   
-elecLoc["electrode_name"]   
+elecLoc["Tissue_segmentation_distance_from_label_2"]
+elecLoc["electrode_name"]
 
 
-eeg.columns    
+eeg.columns
 
 
-tmp = np.intersect1d(elecLoc["electrode_name"]   , eeg.columns  , return_indices = True )    
+tmp = np.intersect1d(elecLoc["electrode_name"]   , eeg.columns  , return_indices = True )
 
 
-elecLoc["Tissue_segmentation_distance_from_label_2"]   
+elecLoc["Tissue_segmentation_distance_from_label_2"]
 tmp2 = np.array(elecLoc.iloc[tmp[1],:]["Tissue_segmentation_distance_from_label_2"]    )
 
 adjjj = adj_xcorr

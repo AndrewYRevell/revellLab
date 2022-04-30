@@ -39,7 +39,7 @@ import matplotlib.pyplot as plt
 from revellLab.packages.eeg.echobase import echobase
 from revellLab.packages.seizureSpread import echomodel, seizurePattern
 from revellLab.packages.eeg.ieegOrg import downloadiEEGorg
-from revellLab.packages.dataClass import DataClassSfc, DataClassJson
+from revellLab.packages.dataclass import dataclass_SFC, dataclass_iEEG_metadata
 physical_devices = tf.config.list_physical_devices('GPU')
 tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
@@ -64,7 +64,7 @@ password = usernameAndpassword["password"]
 #%% Model parameters
 fsds = 128 #"sampling frequency, down sampled"
 window = 10 #window of eeg for training/testing. In seconds
-skipWindow = 0.25 #Next window is skipped over in seconds 
+skipWindow = 0.25 #Next window is skipped over in seconds
 time_step, skip = int(window*fsds), int(skipWindow*fsds)
 verbose = 1
 secondsBeforeSpread = 60
@@ -128,10 +128,10 @@ data_scalerDSPlot = data_scalerDS[:,c]
 data_scalerDSPlot_X = echomodel.overlapping_windows(data_scalerDSPlot, time_step, skip)
 windows, _, _ = data_scalerDSPlot_X.shape
 
-probWN = np.zeros(shape = (windows, len(c)))  
-probCNN = np.zeros(shape = (windows, len(c)))  
-probLSTM = np.zeros(shape = (windows, len(c)))  
-    
+probWN = np.zeros(shape = (windows, len(c)))
+probCNN = np.zeros(shape = (windows, len(c)))
+probLSTM = np.zeros(shape = (windows, len(c)))
+
 
 for ch in range(len(c)):
     print(ch)
@@ -139,16 +139,16 @@ for ch in range(len(c)):
     probWN[:,ch] =  modelWN.predict(ch_pred, verbose=1)[:,1]
     probCNN[:,ch] =  modelCNN.predict(ch_pred, verbose=1)[:,1]
     probLSTM[:,ch] =  modelLSTM.predict(ch_pred, verbose=1)[:,1]
-        
 
-    
+
+
 smoothing = 20
 w = int(smoothing*fsds/skip)
 mvgAvg = np.zeros(shape = (windows - w + 1, len(c)))
 for ch in range(len(c)):
-    mvgAvg[:,ch] =  echobase.movingaverage(probWN[:,ch], w)  
-    
-    
+    mvgAvg[:,ch] =  echobase.movingaverage(probWN[:,ch], w)
+
+
 #Calculate Raw Features
 
 #linelength, linelengthNorm = echobase.lineLengthOfArray(data_scalerDSPlot_X)
@@ -157,7 +157,7 @@ for ch in range(len(c)):
 
 #%% generate example EEG
 fnameFig = join(pathFigureOverview, "exampleEEGspread.png")
-DataJson.plot_eeg(data_scaler[int(ictalStartIndex-1*fs_plot):int(ictalStopIndex+2*fs_plot),c], fs_plot, nchan = None, dpi = 300, aspect=30, height=0.5, hspace=-0.87, lw = 0.8, savefig = False, pathFig = fnameFig)  
+DataJson.plot_eeg(data_scaler[int(ictalStartIndex-1*fs_plot):int(ictalStopIndex+2*fs_plot),c], fs_plot, nchan = None, dpi = 300, aspect=30, height=0.5, hspace=-0.87, lw = 0.8, savefig = False, pathFig = fnameFig)
 
 
 #%making pattern
@@ -254,19 +254,19 @@ data_scalerDSPlot = data_scalerDS[:,c2]
 data_scalerDSPlot_X = echomodel.overlapping_windows(data_scalerDSPlot, time_step, skip)
 windows, _, _ = data_scalerDSPlot_X.shape
 
-probWN = np.zeros(shape = (windows, len(c2)))  
-probCNN = np.zeros(shape = (windows, len(c2)))  
-probLSTM = np.zeros(shape = (windows, len(c2)))  
-     
+probWN = np.zeros(shape = (windows, len(c2)))
+probCNN = np.zeros(shape = (windows, len(c2)))
+probLSTM = np.zeros(shape = (windows, len(c2)))
+
 
 #for onset
 data_scalerDS_X = echomodel.overlapping_windows(data_scalerDS, time_step, skip)
 windows, _, nchan = data_scalerDS_X.shape
 
 probWN = np.zeros(shape = (windows, nchan)  )
-probCNN = np.zeros(shape = (windows, nchan))  
-probLSTM = np.zeros(shape = (windows, nchan))  
-    
+probCNN = np.zeros(shape = (windows, nchan))
+probLSTM = np.zeros(shape = (windows, nchan))
+
 
 for ch in range(nchan):
     print(ch)
@@ -274,10 +274,10 @@ for ch in range(nchan):
     probWN[:,ch] =  modelWN.predict(ch_pred, verbose=1)[:,1]
     probCNN[:,ch] =  modelCNN.predict(ch_pred, verbose=1)[:,1]
     probLSTM[:,ch] =  modelLSTM.predict(ch_pred, verbose=1)[:,1]
-        
+
 data_plotFiltPIII= np.concatenate([data_plotFiltDS, data_plotFiltDSII], axis = 0)
-    
-    
+
+
 # for raw features
 
 #line length
@@ -339,15 +339,15 @@ strengthNegNorm = strengthNegAbs / strengthNegAbs.max(axis=0)
 
 #%% geerate example single channel EEG
 fnameFig = join(pathFigureOverview, "exampleEEGspread_single_channel.png")
-DataJson.plot_eeg(data_plotFiltDS[(int(secondsBeforeSpread*fs_plot- 1*fs_plot)):(int((secondsBeforeSpread+89)*fs_plot- 85*fs_plot)),c], fs_plot, nchan = None, dpi = 300, aspect=3, height=5, hspace=-0, lw = 13, savefig = False, pathFig = fnameFig)  
+DataJson.plot_eeg(data_plotFiltDS[(int(secondsBeforeSpread*fs_plot- 1*fs_plot)):(int((secondsBeforeSpread+89)*fs_plot- 85*fs_plot)),c], fs_plot, nchan = None, dpi = 300, aspect=3, height=5, hspace=-0, lw = 13, savefig = False, pathFig = fnameFig)
 fnameFig = join(pathFigureOverview, "exampleEEGspread_single_channel2.png")
-DataJson.plot_eeg(data_plotFiltDS[(int(secondsBeforeSpread*fs_plot- 10*fs_plot)):(int((secondsBeforeSpread+89)*fs_plot- 71*fs_plot)),c], fs_plot, nchan = None, dpi = 300, aspect=3, height=5, hspace=-0, lw = 7, savefig = False, pathFig = fnameFig)  
+DataJson.plot_eeg(data_plotFiltDS[(int(secondsBeforeSpread*fs_plot- 10*fs_plot)):(int((secondsBeforeSpread+89)*fs_plot- 71*fs_plot)),c], fs_plot, nchan = None, dpi = 300, aspect=3, height=5, hspace=-0, lw = 7, savefig = False, pathFig = fnameFig)
 
 
 fnameFig = join(pathFigureOverview, "exampleEEG_periIctal.png")
-DataJson.plot_eeg(data_plotFiltDS[(int(secondsBeforeSpread*fs_plot- 15*fs_plot)):(int((secondsBeforeSpread+89)*fs_plot- 55*fs_plot)),c], fs_plot, nchan = None, dpi = 300, aspect=3, height=5, hspace=-0, lw = 5, savefig = False, pathFig = fnameFig)  
+DataJson.plot_eeg(data_plotFiltDS[(int(secondsBeforeSpread*fs_plot- 15*fs_plot)):(int((secondsBeforeSpread+89)*fs_plot- 55*fs_plot)),c], fs_plot, nchan = None, dpi = 300, aspect=3, height=5, hspace=-0, lw = 5, savefig = False, pathFig = fnameFig)
 fnameFig = join(pathFigureOverview, "exampleEEG_interictal.png")
-DataJson.plot_eeg(data_plotFiltDSII[(int(secondsBeforeSpread*fs_plot- 30*fs_plot)):(int((secondsBeforeSpread+89)*fs_plot- 71*fs_plot)),c], fs_plot, nchan = None, dpi = 300, aspect=3, height=5, hspace=-0, lw = 5, savefig = False, pathFig = fnameFig)  
+DataJson.plot_eeg(data_plotFiltDSII[(int(secondsBeforeSpread*fs_plot- 30*fs_plot)):(int((secondsBeforeSpread+89)*fs_plot- 71*fs_plot)),c], fs_plot, nchan = None, dpi = 300, aspect=3, height=5, hspace=-0, lw = 5, savefig = False, pathFig = fnameFig)
 
 
 fnameFig = join(pathFigureOverview,"Class0Class1", "class0_01.png")
@@ -365,12 +365,12 @@ unknown03 = data_scalerDS2[int(secondsBeforeSpread*fs_plot+ 40*fs_plot):(int((se
 
 examplesPlot = np.concatenate([ interictal01, interictal02,interictal03, ictal01, ictal02  , ictal03,unknown01, unknown02, unknown03 ], axis = 1)
 
-DataJson.plot_eeg(examplesPlot[fs_plot*0:fs_plot*5,:], fs_plot, nchan = None, dpi = 300, aspect=7, height=2, hspace=-0.4, lw = 7, savefig = False, pathFig = fnameFig)  
+DataJson.plot_eeg(examplesPlot[fs_plot*0:fs_plot*5,:], fs_plot, nchan = None, dpi = 300, aspect=7, height=2, hspace=-0.4, lw = 7, savefig = False, pathFig = fnameFig)
 
 #%%generate example multiple channels EEG
 fnameFig = join(pathFigureOverview, "exampleEEGspread_multipleChannels.png")
-DataJson.plot_eeg(data_scalerDS2[(int(secondsBeforeSpread*fs_plot- 0*fs_plot)):(int((secondsBeforeSpread+60)*fs_plot+ 0*fs_plot)),:], fs_plot, nchan = None, 
-                  dpi = 300, aspect=90, height=0.1, hspace=-0.9, lw = 1, savefig = False, pathFig = fnameFig)  
+DataJson.plot_eeg(data_scalerDS2[(int(secondsBeforeSpread*fs_plot- 0*fs_plot)):(int((secondsBeforeSpread+60)*fs_plot+ 0*fs_plot)),:], fs_plot, nchan = None,
+                  dpi = 300, aspect=90, height=0.1, hspace=-0.9, lw = 1, savefig = False, pathFig = fnameFig)
 
 
 
@@ -389,7 +389,7 @@ fnameFig = join(pathFigureOverview, "power.png")
 
 
 
-#%% Heatmap Line length 
+#%% Heatmap Line length
 seizurePattern.plot_heatmapSingle(linelengthNormFilt[220:575,c3], fsds, skip, figsize = (5,2.5), threshold = 0.5, smoothing = 1, vmin = -0, vmax = 1.0, cmapName="Purples")
 fnameFig = join(pathFigureOverview, "linelength.png")
 #plt.savefig( fnameFig, transparent=True)
@@ -426,12 +426,12 @@ thresholded[thresholded>threshold] = 1; thresholded[thresholded<=threshold] = 0
 w = int(smoothing*fsds/skip)
 mvgAvg = np.zeros(shape = (windows - w + 1, nchan))
 for c in range(nchan):
-    mvgAvg[:,c] =  echobase.movingaverage(probabilityArray[:,c], w)  
+    mvgAvg[:,c] =  echobase.movingaverage(probabilityArray[:,c], w)
 mvgAvgThreshold = copy.deepcopy(mvgAvg)
 mvgAvgThreshold[mvgAvgThreshold>threshold] = 1
 mvgAvgThreshold[mvgAvgThreshold<=threshold] = 0
 
-    
+
 seizure_start =int((secondsBeforeSpread-20)/skipWindow)
 seizure_stop = int((secondsBeforeSpread + 20)/skipWindow)
 
@@ -453,7 +453,7 @@ channel_orderPlot = channel_order[[0,2,3,11, 15]]
 channel_orderPlot = channel_order[np.array(range(15)).tolist()]
 
 startIndPlot =  int((  seizure_start  *skipWindow*fs)) + int(0*fs)
-stopIndPlot =   int((  seizure_stop  *skipWindow*fs))+ int(20*fs) 
+stopIndPlot =   int((  seizure_stop  *skipWindow*fs))+ int(20*fs)
 
 markers = spread_start_loc - startIndPlot
 
@@ -462,9 +462,9 @@ data_plotFiltDS = DataJson.downsample(data_plotFilt, fs,fs)
 data_plotFiltDS.shape
 
 fnameFig = join(pathFigureOverview, "ONSET_withMarkers.png")
-DataJson.plot_eeg(data_plotFilt[startIndPlot:stopIndPlot,channel_orderPlot], fs, markers = markers[channel_orderPlot], savefig = False, pathFig = fnameFig, nchan = len(channel_orderPlot), dpi = 300, aspect=10, height=1, hspace = -0.6, lw = 0.5)    
+DataJson.plot_eeg(data_plotFilt[startIndPlot:stopIndPlot,channel_orderPlot], fs, markers = markers[channel_orderPlot], savefig = False, pathFig = fnameFig, nchan = len(channel_orderPlot), dpi = 300, aspect=10, height=1, hspace = -0.6, lw = 0.5)
 fnameFig = join(pathFigureOverview, "ONSET_WITHOUT_markers.png")
-DataJson.plot_eeg(data_plotFilt[startIndPlot:stopIndPlot,channel_orderPlot], fs, savefig = False, pathFig = fnameFig, nchan = len(channel_orderPlot), dpi = 300, aspect=10, height=1, hspace = -0.6, lw = 3)    
+DataJson.plot_eeg(data_plotFilt[startIndPlot:stopIndPlot,channel_orderPlot], fs, savefig = False, pathFig = fnameFig, nchan = len(channel_orderPlot), dpi = 300, aspect=10, height=1, hspace = -0.6, lw = 3)
 
 
 
@@ -506,13 +506,13 @@ seizurePattern.plot_heatmapSingleThreshold(probLSTM[0:,range(nchan)], fsds, skip
 data_scalerDS_X = echomodel.overlapping_windows(data_scalerDS, time_step, skip)
 windows, _, _ = data_scalerDS_X.shape
 
-probWN = np.zeros(shape = (windows, nchan))  
-probCNN = np.zeros(shape = (windows, nchan))  
-probLSTM = np.zeros(shape = (windows, nchan))  
-    
+probWN = np.zeros(shape = (windows, nchan))
+probCNN = np.zeros(shape = (windows, nchan))
+probLSTM = np.zeros(shape = (windows, nchan))
 
 
-  
+
+
 #%%
 
 
@@ -521,7 +521,7 @@ for c in range(nchan):
     probWN[:,c] =  modelWN.predict(ch_pred, verbose=1)[:,1]
     probCNN[:,c] =  modelCNN.predict(ch_pred, verbose=1)[:,1]
     probLSTM[:,c] =  modelLSTM.predict(ch_pred, verbose=1)[:,1]
-        
+
 
 
 #%%
@@ -533,8 +533,8 @@ seizurePattern.plot_probheatmaps(probLSTM, fsds, skip, threshold=0.9)
 
 #%% subgeline
 
-DataJson.plot_eeg(probability_arr_movingAvg, fsds, nchan = nchan, dpi = 300, fill=True, aspect=200, height=0.05)    
-DataJson.plot_eeg(probability_arr_movingAvg_threshold, fsds, nchan = nchan, dpi = 300, fill=True, aspect=200, height=0.05)    
+DataJson.plot_eeg(probability_arr_movingAvg, fsds, nchan = nchan, dpi = 300, fill=True, aspect=200, height=0.05)
+DataJson.plot_eeg(probability_arr_movingAvg_threshold, fsds, nchan = nchan, dpi = 300, fill=True, aspect=200, height=0.05)
 
 
 #%%getting start times
@@ -557,30 +557,30 @@ channel_order = np.argsort(spread_start)
 print(np.array(df.columns)[channel_order])
 #%%
 
-DataJson.plot_eeg(probability_arr_movingAvg_threshold[:,channel_order], fsds, nchan = 50, dpi = 300, fill=True, aspect=200, height=0.05)    
+DataJson.plot_eeg(probability_arr_movingAvg_threshold[:,channel_order], fsds, nchan = 50, dpi = 300, fill=True, aspect=200, height=0.05)
 #%%
-DataJson.plot_eeg(data_scalerDS, fsds, markers = spread_start_loc, nchan = 10, dpi = 300, aspect=200, height=0.1)    
+DataJson.plot_eeg(data_scalerDS, fsds, markers = spread_start_loc, nchan = 10, dpi = 300, aspect=200, height=0.1)
 
 
-DataJson.plot_eeg(data_scalerDS[:,channel_order], fsds, markers = spread_start_loc[channel_order], nchan = nchan, dpi = 300, aspect=200, height=0.05)    
+DataJson.plot_eeg(data_scalerDS[:,channel_order], fsds, markers = spread_start_loc[channel_order], nchan = nchan, dpi = 300, aspect=200, height=0.05)
 
 
- 
-DataJson.plot_eeg(data_avgref, fs, markers =  ( (spread_start + seizure_start)  *skipWindow*fs).astype(int)[0:5], nchan = 5, dpi = 300, aspect=20, height=0.5)    
+
+DataJson.plot_eeg(data_avgref, fs, markers =  ( (spread_start + seizure_start)  *skipWindow*fs).astype(int)[0:5], nchan = 5, dpi = 300, aspect=20, height=0.5)
 
 
 #%% Visualize
 
 
-DataJson.plot_eeg(probability_arr_movingAvg, fsds, nchan = 5, dpi = 300, fill=True, aspect=35, height=0.3)    
-DataJson.plot_eeg(data, fs, nchan = 5, dpi = 300, aspect=35)    
-DataJson.plot_eeg(data_scalerDS, fsds, nchan = 5, dpi = 300, aspect=35)    
+DataJson.plot_eeg(probability_arr_movingAvg, fsds, nchan = 5, dpi = 300, fill=True, aspect=35, height=0.3)
+DataJson.plot_eeg(data, fs, nchan = 5, dpi = 300, aspect=35)
+DataJson.plot_eeg(data_scalerDS, fsds, nchan = 5, dpi = 300, aspect=35)
 
-echobase.show_eeg_compare(data, data, int(fsds), channel=2)  
+echobase.show_eeg_compare(data, data, int(fsds), channel=2)
 
-    
 
-    
+
+
 #%%diffusion model
 
 
@@ -593,7 +593,7 @@ sub = "sub0278"
 iEEG_filename = "HUP138_phaseII"
 
 start_time_usec = 416023190000
-stop_time_usec = 416112890000 
+stop_time_usec = 416112890000
 fname = join(sfc_datapath,   f"sub-{sub}_{iEEG_filename}_{start_time_usec}_{stop_time_usec}_data.pickle" )
 
 os.path.exists(fname)
@@ -601,8 +601,8 @@ os.path.exists(fname)
 if (os.path.exists(fname)):
     with open(fname, 'rb') as f: all_data = pickle.load(f)
 
-sfc_data = DataClassSfc.sfc( **all_data  ) 
-atlas = sfc_data.get_atlas_names()[1]   
+sfc_data = DataClassSfc.sfc( **all_data  )
+atlas = sfc_data.get_atlas_names()[1]
 
 
 
@@ -611,7 +611,7 @@ stp = int((secondsBeforeSpread +20)/skipWindow)
 
 SC, SC_regions = sfc_data.get_structure(atlas)
 spread = copy.deepcopy(probability_arr_movingAvg[st:stp,:])
-spread_regions = np.array(df.columns )   
+spread_regions = np.array(df.columns )
 electrodeLocalization = sfc_data.get_electrodeLocalization(atlas)
 
 #SC= SC_distInv
@@ -620,20 +620,20 @@ electrodeLocalization = sfc_data.get_electrodeLocalization(atlas)
 #null
 #SC_null = bct.randmio_und(SC, 30)[0]
 
-#sns.heatmap(SC, square=True)   
-#sns.heatmap(SC_null, square=True)   
+#sns.heatmap(SC, square=True)
+#sns.heatmap(SC_null, square=True)
 
 #SC = SC_null
 #%%
 
 import diffusionModels as DM
-dm_data = DM.diffusionModels(SC, SC_regions, spread, spread_regions, electrodeLocalization)    
+dm_data = DM.diffusionModels(SC, SC_regions, spread, spread_regions, electrodeLocalization)
 
-SC_hat = dm_data.preprocess_SC(SC, 0.4)    
-    
+SC_hat = dm_data.preprocess_SC(SC, 0.4)
+
 def get_LTM(SC, threshold=0.1, time_steps = 6):
     corrs = np.zeros(shape = (len(SC)))
-        
+
     for r in range(len(corrs)):
         node_state = dm_data.LTM(SC_hat, seed=r, threshold=0.1, time_steps = 6)
         #equalizing node state and spread
@@ -646,20 +646,20 @@ def get_LTM(SC, threshold=0.1, time_steps = 6):
         #remove structure with no electrodes
         ind2 = np.intersect1d(SC_regions, el_mod_regions, return_indices=True)
         node_state_mod = node_state[:,ind2[1]]
-        #select a random electrode from a region with multiple electrodes 
+        #select a random electrode from a region with multiple electrodes
         SC_mod_region_names = ind2[0]
         ind3 = []
         #np.random.seed(41)
         for s in range(len(SC_mod_region_names)):
             ind3.append(np.random.choice(np.where(SC_mod_region_names[s] == el_mod_regions)[0],1)[0])
         ind3 = np.array(ind3)
-        spreadMod_state = spreadMod[:, ind3]   
+        spreadMod_state = spreadMod[:, ind3]
         #el_mod_sc = el_mod.iloc[ind3,:]
         #electrode_names = np.array(el_mod_sc["electrode_name"])
         #interpolate node state
         node_state_mod_resample = signal.resample(node_state_mod, spreadMod_state.shape[0])
-        #sns.heatmap(node_state_mod_resample.T, cbar=False)   
-        #sns.heatmap(spreadMod_state.T, cbar=False)   
+        #sns.heatmap(node_state_mod_resample.T, cbar=False)
+        #sns.heatmap(spreadMod_state.T, cbar=False)
         if (node_state_mod_resample == 0).all():#if entire prediction is zero, make the correlation zero
             corrs[r] = 0
         else:
@@ -673,8 +673,8 @@ corrs_null = np.zeros(shape = (Nnull, len(corrs)))
 for nu in range(Nnull):
     print(nu)
     SC_null = bct.randmio_und(SC, 30)[0]
-    dm_data = DM.diffusionModels(SC, SC_regions, spread, spread_regions, electrodeLocalization) 
-    SC_hat = dm_data.preprocess_SC(SC_null, 0.4)  
+    dm_data = DM.diffusionModels(SC, SC_regions, spread, spread_regions, electrodeLocalization)
+    SC_hat = dm_data.preprocess_SC(SC_null, 0.4)
     corrs_null[nu,:] = get_LTM(SC_hat)
 
 
@@ -686,7 +686,7 @@ corrs_order = corrs[ind]
 corrs_null_order = corrs_null[:,ind]
 corrs_order_null_df = pd.DataFrame(corrs_null_order).melt()
 
-fig, ax = plt.subplots(1,1, figsize = (5,5), dpi = 300)    
+fig, ax = plt.subplots(1,1, figsize = (5,5), dpi = 300)
 sns.lineplot(x = range(len(corrs_order)), y = corrs_order, ax = ax)
 sns.lineplot(x="variable", y="value", data=corrs_order_null_df,ax = ax, color = "red")
 ax.set_xlabel("Brain Region Number")
@@ -701,12 +701,12 @@ print(corrs_order[0:5])
 #%%
 
 
-#sns.heatmap(node_state_mod_resample.T, cbar=False) 
+#sns.heatmap(node_state_mod_resample.T, cbar=False)
 
-#sns.heatmap(spreadMod_state.T, cbar=False) 
+#sns.heatmap(spreadMod_state.T, cbar=False)
 
 #node_state2 = signal.resample(node_state, spreadMod_state.shape[0])
-#sns.heatmap(node_state2.T, cbar=False)   
+#sns.heatmap(node_state2.T, cbar=False)
 #node_state
 
 
@@ -742,7 +742,7 @@ ll = lineLength(vector)
 
 
 
-lineLength_arr = np.zeros(shape = (windows, nchan))  
+lineLength_arr = np.zeros(shape = (windows, nchan))
 for c in range(nchan):
     print(c)
     for win in range(windows):
@@ -756,20 +756,20 @@ for c in range(nchan):
 #%%
 fig, ax = plt.subplots(3,2, figsize=(10,10), dpi =300)
 
-sns.lineplot( x = range(windows),  y= lineLength_arr[:,0],    ci=None, ax = ax[0,0])    
-sns.lineplot( x = range(windows),  y= lineLength_arr[:,2],    ci=None, ax = ax[0,1])    
-    
-sns.heatmap( lineLength_arr.T , ax = ax[1,0])    
+sns.lineplot( x = range(windows),  y= lineLength_arr[:,0],    ci=None, ax = ax[0,0])
+sns.lineplot( x = range(windows),  y= lineLength_arr[:,2],    ci=None, ax = ax[0,1])
+
+sns.heatmap( lineLength_arr.T , ax = ax[1,0])
 
 THRESHOLD_LL = 0.7
 SMOOTHING = 20 #in seconds
-    
+
 lineLength_arr_threshold = copy.deepcopy(lineLength_arr)
 lineLength_arr_threshold[lineLength_arr_threshold>THRESHOLD_LL] = 1
 lineLength_arr_threshold[lineLength_arr_threshold<=THRESHOLD_LL] = 0
 
 
-sns.heatmap( lineLength_arr_threshold.T,  ax = ax[1,1] )    
+sns.heatmap( lineLength_arr_threshold.T,  ax = ax[1,1] )
 
 
 
@@ -778,20 +778,18 @@ lineLength_arr_movingAvg = np.zeros(shape = (windows - w + 1, nchan))
 
 for c in range(nchan):
     lineLength_arr_movingAvg[:,c] =  echobase.movingaverage(lineLength_arr[:,c], w)
-    
-    
-sns.heatmap( lineLength_arr_movingAvg.T , ax = ax[2,0] )      
-    
-    
+
+
+sns.heatmap( lineLength_arr_movingAvg.T , ax = ax[2,0] )
+
+
 lineLength_arr_movingAvg_threshold = copy.deepcopy(lineLength_arr_movingAvg)
 
 lineLength_arr_movingAvg_threshold[lineLength_arr_movingAvg_threshold>THRESHOLD_LL] = 1
 lineLength_arr_movingAvg_threshold[lineLength_arr_movingAvg_threshold<=THRESHOLD_LL] = 0
 
 
-sns.heatmap( lineLength_arr_movingAvg_threshold.T,  ax = ax[2,1] )      
-    
-    
+sns.heatmap( lineLength_arr_movingAvg_threshold.T,  ax = ax[2,1] )
 
 
 
@@ -799,21 +797,23 @@ sns.heatmap( lineLength_arr_movingAvg_threshold.T,  ax = ax[2,1] )
 
 
 
-#sns.heatmap(SC, square=True)   
-#sns.heatmap(SC_hat, square=True)   
-    
-    
-    
-    
+
+
+#sns.heatmap(SC, square=True)
+#sns.heatmap(SC_hat, square=True)
+
+
+
+
 #%% effect of distance
 
 
 centroidsPath = join(path, "data", "raw","atlases", "atlasCentroids", "AAL2_centroid.csv")
-    
-    
-centroids = pd.read_csv(centroidsPath)       
-    
-    
+
+
+centroids = pd.read_csv(centroidsPath)
+
+
 #get distance matrix
 SC_dist = np.zeros((len(centroids),len(centroids)  ))
 SC_distInv = np.zeros((len(centroids),len(centroids)  ))
@@ -826,13 +826,12 @@ for i in range(len(centroids)):
         SC_dist[i,j] = np.sqrt(np.sum((p1-p2)**2, axis=0))
         if i!=j:
             SC_distInv[i,j] = 1/(np.sqrt(np.sum((p1-p2)**2, axis=0)))
-    
-    
-sns.heatmap(SC_dist, square=True)    
-sns.heatmap(SC_distInv, square=True)    
-    
-    
-spearmanr(SC_distInv.flatten(),SC_hat.flatten() )  [0] 
-    
-    
-    
+
+
+sns.heatmap(SC_dist, square=True)
+sns.heatmap(SC_distInv, square=True)
+
+
+spearmanr(SC_distInv.flatten(),SC_hat.flatten() )  [0]
+
+

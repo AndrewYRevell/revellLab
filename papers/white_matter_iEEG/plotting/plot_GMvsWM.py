@@ -228,7 +228,7 @@ def plot_power_vs_distance_and_SNR(powerGMmean, powerWMmean, powerDistAvg, SNRAl
             k = k + 1
 
     #plot boxplot of SNR at 50 % of the way thru seizure
-    halfway = [110, 280,478,750]
+    halfway = [50, 250,450,750]
     j = 2
     for h in range(len(halfway)):
         SNRavgByPatients50 = SNRavgByPatients[halfway[h],:,:]
@@ -238,7 +238,7 @@ def plot_power_vs_distance_and_SNR(powerGMmean, powerWMmean, powerDistAvg, SNRAl
 
         w1 = np.array(SNRavgByPatients50dfLong.loc[SNRavgByPatients50dfLong['index'] == 0, 'value'])
         w2 =  np.array(SNRavgByPatients50dfLong.loc[SNRavgByPatients50dfLong['index'] == 3, 'value'])
-        stats.wilcoxon(  w1, w2 )[1] *4
+        ppp = stats.wilcoxon(  w1, w2 )[1] *4
         print( stats.wilcoxon(  w1, w2 )[1]  *4)
         if h >=0:
             sns.boxplot(data=SNRavgByPatients50dfLong, x="index", y="value", palette=line_colors, showfliers=False,
@@ -252,11 +252,11 @@ def plot_power_vs_distance_and_SNR(powerGMmean, powerWMmean, powerDistAvg, SNRAl
             if h == 0:
                 axes[j][0].set_ylim(-0.1, 2.8)
                 lim = axes[j][0].get_ylim()
-                axes[j][0].text( (0+3)/2, y = lim[0] + (lim[1] - lim[0])*-0.1 , fontsize = 25, s = "p>0.05", va='top', ha = "center")
+                axes[j][0].text( (0+3)/2, y = lim[0] + (lim[1] - lim[0])*-0.1 , fontsize = 25, s = f"p={np.round(ppp,2)}", va='top', ha = "center")
             if h == 1:
                 axes[j][0].set_ylim(-0.15, 3)
                 lim = axes[j][0].get_ylim()
-                axes[j][0].text( (0+3)/2, y = lim[0] + (lim[1] - lim[0])*-0.1 , fontsize = 25, s = "p>0.05", va='top', ha = "center")
+                axes[j][0].text( (0+3)/2, y = lim[0] + (lim[1] - lim[0])*-0.1 , fontsize = 25, s = f"p={np.round(ppp,2)}", va='top', ha = "center")
             if h == 2:
                 axes[j][0].set_ylim(-2.7, 11.9)
                 lim = axes[j][0].get_ylim()
@@ -266,7 +266,7 @@ def plot_power_vs_distance_and_SNR(powerGMmean, powerWMmean, powerDistAvg, SNRAl
                 axes[j][0].plot([x1, x1], [y1, y3], '-', lw=lw, color="black")
                 axes[j][0].plot([x2, x2], [y1, y3], '-', lw=lw, color="black")
                 axes[j][0].text( (x1+x2)/1.3, y = lim[0] + (lim[1] - lim[0])*2.1 , fontsize = 50, s = "*", va='top', ha = "center", fontweight='bold')
-                axes[j][0].text( (x1+x2)/1.4, y = lim[0] + (lim[1] - lim[0])*1.65 , fontsize = 25, s = "p<5e-5", va='top', ha = "center")
+                axes[j][0].text( (x1+x2)/1.4, y = lim[0] + (lim[1] - lim[0])*1.65 , fontsize = 25, s = f"p={np.round(ppp,5)}", va='top', ha = "center")
             if h == 3:
                 axes[j][0].set_ylim(-1.5, 5.6)
                 lim = axes[j][0].get_ylim()
@@ -276,7 +276,7 @@ def plot_power_vs_distance_and_SNR(powerGMmean, powerWMmean, powerDistAvg, SNRAl
                 axes[j][0].plot([x1, x1], [y1, y3], '-', lw=lw, color="black")
                 axes[j][0].plot([x2, x2], [y1, y3], '-', lw=lw, color="black")
                 axes[j][0].text( (x1+x2)/2, y = lim[0] + (lim[1] - lim[0])*-0.39 , fontsize = 50, s = "*", va='top', ha = "center", fontweight='bold')
-                axes[j][0].text( (x1+x2)/2, y = lim[0] + (lim[1] - lim[0])*-0.1 , fontsize = 25, s = "p<0.05", va='top', ha = "center")
+                axes[j][0].text( (x1+x2)/2, y = lim[0] + (lim[1] - lim[0])*-0.1 , fontsize = 25, s = f"p={np.round(ppp,2)}", va='top', ha = "center")
             j = j+1
 
 #%%
@@ -521,7 +521,7 @@ def plotUnivariate(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paie
             k = k + 1
 
     #plot boxplot of SNR at 50 % of the way thru seizure
-    halfway = [110, 280,478,750]
+    halfway = [50, 250, 450, 750]
     j = 4
     for h in range(len(halfway)):
         SNRavgByPatients50 = SNRavgByPatients[halfway[h],:,:]
@@ -532,6 +532,7 @@ def plotUnivariate(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paie
         w1 = np.array(SNRavgByPatients50dfLong.loc[SNRavgByPatients50dfLong['index'] == 0, 'value'])
         w2 =  np.array(SNRavgByPatients50dfLong.loc[SNRavgByPatients50dfLong['index'] == 3, 'value'])
         stats.wilcoxon(  w1, w2 )[1] *4
+        ppp = stats.wilcoxon(  w1, w2 )[1] *4
         print( stats.wilcoxon(  w1, w2 )[1]  *4)
         if h >=0:
             sns.boxplot(data=SNRavgByPatients50dfLong, x="index", y="value", palette=line_colors, showfliers=False,
@@ -545,11 +546,11 @@ def plotUnivariate(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paie
             if h == 0:
                 axes[j][0].set_ylim(-0.1, 2.8)
                 lim = axes[j][0].get_ylim()
-                axes[j][0].text( (0+3)/2, y = lim[0] + (lim[1] - lim[0])*-0.03 , fontsize = 16, s = "p>0.05", va='top', ha = "center")
+                axes[j][0].text( (0+3)/2, y = lim[0] + (lim[1] - lim[0])*-0.03 , fontsize = 16, s = f"p={np.round(ppp,2)}", va='top', ha = "center")
             if h == 1:
                 axes[j][0].set_ylim(-0.15, 3)
                 lim = axes[j][0].get_ylim()
-                axes[j][0].text( (0+3)/2, y = lim[0] + (lim[1] - lim[0])*-0.03 , fontsize = 16, s = "p>0.05", va='top', ha = "center")
+                axes[j][0].text( (0+3)/2, y = lim[0] + (lim[1] - lim[0])*-0.03 , fontsize = 16, s = f"p={np.round(ppp,2)}", va='top', ha = "center")
             if h == 2:
                 axes[j][0].set_ylim(-2.7, 11.9)
                 lim = axes[j][0].get_ylim()
@@ -559,7 +560,7 @@ def plotUnivariate(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paie
                 axes[j][0].plot([x1, x1], [y1, y3], '-', lw=lw, color="black")
                 axes[j][0].plot([x2, x2], [y1, y3], '-', lw=lw, color="black")
                 axes[j][0].text( (x1+x2)/2, y = lim[0] + (lim[1] - lim[0])*0.125 , fontsize = 16, s = "*", va='top', ha = "center", fontweight='bold')
-                axes[j][0].text( (x1+x2)/2, y = lim[0] + (lim[1] - lim[0])*-0.03 , fontsize = 16, s = "p<0.00005", va='top', ha = "center")
+                axes[j][0].text( (x1+x2)/2, y = lim[0] + (lim[1] - lim[0])*-0.03 , fontsize = 16, s = f"p={np.round(ppp,5)}", va='top', ha = "center")
             if h == 3:
                 axes[j][0].set_ylim(-1.5, 5.6)
                 lim = axes[j][0].get_ylim()
@@ -569,7 +570,7 @@ def plotUnivariate(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAll, paie
                 axes[j][0].plot([x1, x1], [y1, y3], '-', lw=lw, color="black")
                 axes[j][0].plot([x2, x2], [y1, y3], '-', lw=lw, color="black")
                 axes[j][0].text( (x1+x2)/2, y = lim[0] + (lim[1] - lim[0])*0.11 , fontsize = 16, s = "*", va='top', ha = "center", fontweight='bold')
-                axes[j][0].text( (x1+x2)/2, y = lim[0] + (lim[1] - lim[0])*-0.03 , fontsize = 16, s = "p<0.05", va='top', ha = "center")
+                axes[j][0].text( (x1+x2)/2, y = lim[0] + (lim[1] - lim[0])*-0.03 , fontsize = 16, s = f"p={np.round(ppp,2)}", va='top', ha = "center")
             j = j+1
 
 
@@ -786,7 +787,7 @@ def plotUnivariatePercent(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAl
     fig1.text(0.02, 0.37, 'Frequency (Hz)', ha='center', va='center', rotation='vertical', fontdict = {'fontsize': fontsize*0.7})
     fig1.text(0.02, 0.151, 'SNR', ha='center', va='center', rotation='vertical', fontdict = {'fontsize': fontsize*0.7})
     fig1.text(0.5, 0.48, 'Time (% seizure length)', ha='center', va='center', fontdict = {'fontsize': fontsize*0.7})
-    fig1.text(0.5, 0.25, 'WM PUrity (%)', ha='center', va='center', fontdict = {'fontsize': fontsize*0.7})
+    fig1.text(0.5, 0.25, 'WM Depth (%)', ha='center', va='center', fontdict = {'fontsize': fontsize*0.7})
     fig1.text(0.5, 0.02, 'Time (% seizure length)', ha='center', va='center', fontdict = {'fontsize': fontsize*0.7})
 
     fig1.text(0.145, 0.9, 'Interictal (ii)', ha='center', fontdict = {'fontsize': fontsize*0.7})
@@ -796,7 +797,7 @@ def plotUnivariatePercent(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAl
     subplot_x=0.94
     fig1.text(subplot_x, 0.8, 'Gray\nMatter', ha='center', va='center', fontdict = {'fontsize': fontsize*1.1})
     fig1.text(subplot_x, 0.6, 'White\nMatter', ha='center', va='center',  fontdict = {'fontsize': fontsize*1.1})
-    fig1.text(subplot_x, 0.35, 'Purity\nvs\nPower', ha='center', va='center',  fontdict = {'fontsize': fontsize*1.1})
+    fig1.text(subplot_x, 0.35, 'Depth\nvs\nPower', ha='center', va='center',  fontdict = {'fontsize': fontsize*1.1})
     fig1.text(subplot_x, 0.121, 'SNR', ha='center', va='center', fontdict = {'fontsize': fontsize*1.1})
     fig1.text(0.5, 0.98, 'Univariate Analyses: Power and SNR', ha='center', va='top', fontdict = {'fontsize': fontsize*1.1})
     #fig1.text(subplot_x-0.05, 0.98, 'Patients: 5\nSeizures: 5\nGM electrodes: 434\nWM electrodes: 97', ha='left', va='top', fontdict = {'fontsize': 12})
@@ -906,7 +907,7 @@ def plotUnivariatePercent(powerGMmean, powerWMmean, powerDistAvg, SNRAll, distAl
                 axes[i][j].get_legend().set_visible(False)
             if j == 4:
                 handles, labels = axes[i][j].get_legend_handles_labels()
-                axes[i][j].legend(handles=handles[0:], labels=names[0:], title="Distance (mm)",
+                axes[i][j].legend(handles=handles[0:], labels=names[0:], title="Depth (0-1)",
                                   bbox_to_anchor=(1.05, 1), loc=2, borderaxespad=0.)
             old_ticks = axes[i][j].get_xticks()
             new_ticks = np.linspace(np.min(old_ticks), np.max(old_ticks), 5)
@@ -1256,7 +1257,7 @@ def plot_boxplot_all_FC_deltaT(summaryStatsLong, FREQUENCY_NAMES, FC_TYPES, pale
         for y in range(g.axes.shape[1]):
             axes = g.axes[int(x)][int(y)]
             plt.setp(axes.lines, zorder=100); plt.setp(axes.collections, zorder=100, label="")
-    ylims = [ [-0.03, 0.1], [-0.005, 0.04] ,[-0.025, 0.125] ]
+    ylims =[  [-0.03, 0.6], [-0.005, 0.5] ,[-0.055, 0.6] ] #[ [-0.03, 0.1], [-0.005, 0.04] ,[-0.025, 0.125] ]
     bonferroniFactor = len(FC_TYPES)*len(FREQUENCY_NAMES)
     for func in range(len(FC_TYPES)):
         for f in range(len(FREQUENCY_NAMES)):

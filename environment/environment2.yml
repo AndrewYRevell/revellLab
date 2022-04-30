@@ -1,0 +1,26 @@
+name: revellLab2
+channels:
+ - defaults
+dependencies:
+ - python=3.8
+ - numpy=1.19.*
+ - pandas=1.2.*
+ - scipy=1.5.*
+ - spyder
+ - pip
+ - pip:
+   - tensorflow==2.3.1 #deep learning
+   - scikit-learn==0.23.* #machine learning
+   - scikit-image==0.17.* #imaging
+   - nibabel==3.2.* #imaging MRI
+   - dipy==1.2.* #imaging MRI (diffusion)
+   - bctpy==0.5.2 #network analysis
+   - NetworkX==2.5.* #network analysis
+   - pingouin==0.3.* #statistics
+   - matplotlib==3.3.* #plotting
+   - seaborn==0.11.* #plotting
+   - fury==0.6.* #plotting
+   - deprecation==2.1.0 #download iEEG.org data
+   - requests==2.23.0 #download iEEG.org data
+   - pennprov==2.2.9 #download iEEG.org data
+   - xlrd==1.2.* #read excell xlsx files

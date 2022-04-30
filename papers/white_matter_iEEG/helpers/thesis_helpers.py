@@ -46,9 +46,9 @@ def power_analysis(patientsWithseizures, indexes, metadata_iEEG, USERNAME, PASSW
         paientList = paientList.append(dict(patient=patientsWithseizures["subject"][i]), ignore_index = True)
         # get data
         seizure, fs, ictalStartIndex, ictalStopIndex = metadata_iEEG.get_precitalIctalPostictal(patientsWithseizures["subject"][i], "Ictal", patientsWithseizures["idKey"][i], USERNAME, PASSWORD,
-                                                                                           BIDS=paths.BIDS, dataset="derivatives/iEEGorgDownload", session=SESSION, secondsBefore=180, secondsAfter=180, load=True)
+                                                                                           BIDS=paths.BIDS, dataset= paths.BIDS_DERIVATIVES_WM_IEEG_IEEG, session=SESSION, secondsBefore=180, secondsAfter=180, load=True)
         interictal, fs = metadata_iEEG.get_iEEGData(patientsWithseizures["subject"][i], "Interictal", patientsWithseizures["AssociatedInterictal"][i], USERNAME, PASSWORD,
-                                               BIDS=paths.BIDS, dataset="derivatives/iEEGorgDownload", session= SESSION, startKey="Start", load = True)
+                                               BIDS=paths.BIDS, dataset= paths.BIDS_DERIVATIVES_WM_IEEG_IEEG, session= SESSION, startKey="Start", load = True)
 
         ###filtering and downsampling
         ictalStartIndexDS = int(ictalStartIndex * (FREQUENCY_DOWN_SAMPLE/fs))
@@ -437,6 +437,9 @@ def get_channel_distances_from_WM(localization, localization_channels, channels,
 
     GM_index = np.where(dist["distance"] <= TISSUE_DEFINITION_GM)[0]
     WM_index = np.where(dist["distance"] > TISSUE_DEFINITION_WM)[0]
+    if TISSUE_DEFINITION_NAME == "percent_GM":
+        GM_index = np.where(dist["distance"] >= TISSUE_DEFINITION_GM)[0]
+        WM_index = np.where(dist["distance"] < TISSUE_DEFINITION_WM)[0]
     dist_order_ind = np.array(np.argsort(dist["distance"]))
     dist_order = dist.iloc[dist_order_ind].reset_index()
     return dist, GM_index, WM_index, dist_order
@@ -482,8 +485,8 @@ def get_functional_connectivity_and_tissue_subnetworks_for_single_patient(patien
     FC_type = FC_TYPES[FC_TYPES_ind]
 
     channels, FC = metadata_iEEG.get_FunctionalConnectivity(sub, idKey = patientsWithseizures["idKey"][index], username = USERNAME, password = PASSWORD,
-                                        BIDS = paths.BIDS, dataset ="derivatives/iEEGorgDownload", session = SESSION,
-                                        functionalConnectivityPath = join(paths.BIDS_DERIVATIVES_FUNCTIONAL_CONNECTIVITY_IEEG, f"sub-{sub}"),
+                                        BIDS = paths.BIDS, dataset ="derivatives/white_matter_iEEG", session = SESSION,
+                                        functionalConnectivityPath = join(paths.BIDS_DERIVATIVES_WM_IEEG_FUNCTIONAL_CONNECTIVITY_IEEG, f"sub-{sub}"),
                                         secondsBefore=180, secondsAfter=180, startKey = "EEC",
                                         fsds = FREQUENCY_DOWN_SAMPLE, montage = MONTAGE, FCtype = FC_type)
 
@@ -840,7 +843,7 @@ def get_tissue_SFC(patientsWithseizures, sfc_patient_list, paths,
         i = index_number_bootstrap[b]
         sub = patientsWithseizures["subject"][i]
         #print(f"{sub}: {i}")
-        path_SC = join(paths.BIDS_DERIVATIVES_TRACTOGRAPHY, f"sub-{sub}", "connectivity", "electrodeContactAtlas")
+        path_SC = join(paths.BIDS_DERIVATIVES_WM_IEEG_TRACTOGRAPHY, f"sub-{sub}", "connectivity", "electrodeContactAtlas")
 
         path_SC_contacts = glob.glob(join(path_SC, "*.txt"))[0]
         SC = utils.read_DSI_studio_Txt_files_SC(path_SC_contacts)
@@ -958,7 +961,7 @@ def get_SC_and_FC_adj(patientsWithseizures, index, metadata_iEEG, SESSION, USERN
     i = index
     sub = patientsWithseizures["subject"][i]
     print(f"{sub}: {i}")
-    path_SC = join(paths.BIDS_DERIVATIVES_TRACTOGRAPHY, f"sub-{sub}", "connectivity", "electrodeContactAtlas")
+    path_SC = join(paths.BIDS_DERIVATIVES_WM_IEEG_TRACTOGRAPHY, f"sub-{sub}", "connectivity", "electrodeContactAtlas")
 
     path_SC_contacts = glob.glob(join(path_SC, "*.txt"))[0]
     SC = utils.read_DSI_studio_Txt_files_SC(path_SC_contacts)
@@ -1512,8 +1515,8 @@ def permute_resampling_pvalues(summaryStatsLong, FCtissueAll, seizure_number, pa
                     fc = np.nanmedian(  utils.getUpperTriangle(FCtissueAll_bootstrap_outcomes_single[i][func][freq][t][s]))
                     df = df.append( dict( outcome = OUTCOME_NAMES[o], tissue =  TISSUE_TYPE_NAMES[t], state = STATE_NAMES[s] , FC = fc  ), ignore_index=True )
 
-    summaryStatsLong_bootstrap_good.insert(0, 'outcome', 'good')
-    summaryStatsLong_bootstrap_poor.insert(0, 'outcome', 'poor')
+    #summaryStatsLong_bootstrap_good.insert(0, 'outcome', 'good')
+    #summaryStatsLong_bootstrap_poor.insert(0, 'outcome', 'poor')
 
     summaryStatsLong_bootstrap_outcome = pd.concat( [ summaryStatsLong_bootstrap_good, summaryStatsLong_bootstrap_poor])
     tmp = summaryStatsLong_bootstrap_outcome[summaryStatsLong_bootstrap_outcome["frequency"] == FREQUENCY_NAMES[freq]]
@@ -1920,7 +1923,7 @@ def wm_vs_gm_good_vs_poor_redone(summaryStatsLong,
             if s == 2:
                 dd = np.array(ictal) - np.array(preictal)
                 delta = delta.append( dict( patient = sub, outcome = outcome, seizure_number = i, delta = dd), ignore_index=True)
-                diff1 = ictal_all_connectivity_per_channel - preictal_all_connectivity_per_channel
+                #diff1 = ictal_all_connectivity_per_channel - preictal_all_connectivity_per_channel
 
 
         gm_to_wm_all_ablated = gm_to_wm_all_ablated.append( dict( patient = sub, outcome = outcome, seizure_number = i, gm_to_wm_all_ablated = gm_to_wm_per_patient_ablated), ignore_index=True)
