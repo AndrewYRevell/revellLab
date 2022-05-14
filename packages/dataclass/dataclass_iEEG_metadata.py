@@ -32,6 +32,22 @@ from revellLab.packages.utilities import utils
 @dataclass
 class dataclass_iEEG_metadata:
     jsonFile: dict = "unknown"
+    
+    
+    def get_fname_ictal(self, sub, eventsKey, idKey, dataset= None, session = None, startUsec = None, stopUsec= None, startKey = "EEC",
+                        secondsBefore = 30, secondsAfter = 30):
+        #calculate exactly the start/stop times to pull
+        ictalStartUsec = int(float(self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey][startKey])*1e6)
+        precitalStartUsec = int(ictalStartUsec - secondsBefore*1e6)
+        ictalStopUsec = int(float(self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey]["Stop"])*1e6)
+        postictalStopUsec = int(ictalStopUsec + secondsAfter*1e6)
+        startUsec = precitalStartUsec
+        stopUsec = postictalStopUsec
+        duration = (ictalStopUsec - ictalStartUsec)/1e6
+
+        fname =  f"sub-{sub}_ses-{session}_task-{eventsKey}_acq-{startUsec}to{stopUsec}_ieeg.eeg"
+        return fname
+
 
     def get_iEEGData(self, sub, eventsKey, idKey, username, password,  BIDS = None, dataset= None, session = None, startUsec = None, stopUsec= None, startKey = "EEC", IGNORE_ELECTRODES = True, channels = "all", load = True):
         fname_iEEG = self.jsonFile["SUBJECTS"][sub]["Events"][eventsKey][idKey]["FILE"]
@@ -282,13 +298,18 @@ class dataclass_iEEG_metadata:
     def preprocessNormalizeDownsample(self, df, df_interictal, fs, fsds, montage = "bipolar", prewhiten = True):
         #% Preprocessing
         data, data_ref, _, data_filt, channels = echobase.preprocess(df, fs, fsds, montage=montage, prewhiten = prewhiten)
-        dataII, _, _, dataII_filt, channels = echobase.preprocess(df_interictal, fs, fsds, montage=montage, prewhiten = prewhiten)
+        dataII, _, _, dataII_filt, channelsII = echobase.preprocess(df_interictal, fs, fsds, montage=montage, prewhiten = prewhiten)
+        
+        ###DID NOT CHECK IF channels and channelsII are equal. echobase.preprocess may got rid of channels in one but not the other if there are any Nans.
+        
+        print("\n\n\nNormalizing data")
         #normalize
         dataII_scaler = echomodel.scaleData(dataII_filt, dataII_filt)
         data_scaler = echomodel.scaleData(data_filt, dataII_filt)
         #get annotated segments of preprocessed data
         #alter annotations to include time_step seconds beforehand
         #downsample
+        print("\n\n\nDownsampling data")
         dataII_scalerDS = self.downsample(dataII_scaler, fs, fsds)
         data_scalerDS = self.downsample(data_scaler, fs, fsds)
         return dataII_scaler, data_scaler, dataII_scalerDS, data_scalerDS, channels
@@ -441,13 +462,14 @@ class dataclass_iEEG_metadata:
         return X, Y, data_scalerDS, dataII_scalerDS, dataAnnotationDS
 """
     ##Plotting functions
-    def plot_eeg(self, data, fs, startSec = None, stopSec = None, nchan = None, markers = [], aspect = 20, height = 0.3, hspace = -0.3, dpi = 300, lw=1, fill = False, savefig = False, pathFig = None, color = "w"):
+    def plot_eeg(self, data, fs, startSec = None, stopSec = None, nchan = None, markers = [], aspect = 20, height = 0.3, hspace = -0.3, dpi = 300, lw=1, fill = False, savefig = False, pathFig = None, color = "w", channel_names_show = False, channel_names = None, channel_loc = "center", channel_size = 4, labelpad = 0, markers2 = []):
         if stopSec == None:
             stopSec = len(data)/fs
         if startSec == None:
             startSec = 0
         if nchan == None:
             nchan = data.shape[1]
+        
         df_wide = pd.DataFrame(data[   int(fs * startSec): int(fs * stopSec),  range(nchan)]    )
         df_long = pd.melt(df_wide, var_name = "channel", ignore_index = False)
         df_long["index"] = df_long.index
@@ -457,6 +479,8 @@ class dataclass_iEEG_metadata:
             pal = sns.cubehelix_palette(nchan, rot=-.25, light=0)
         sns.set(rc={"figure.dpi":dpi})
         sns.set_theme(style="white", rc={"axes.facecolor": (0, 0, 0, 0)})
+       
+        
         g = sns.FacetGrid(df_long, row="channel", hue="channel", aspect=aspect, height=height, palette=pal)
         if fill == True:
             g.map(sns.lineplot,"index", "value", clip_on=False, color="w", lw=0.8)
@@ -464,6 +488,16 @@ class dataclass_iEEG_metadata:
 
         else:
             g.map(sns.lineplot, "index", "value", clip_on=False, alpha=1, linewidth=lw)
+            
+            
+        if len(markers2) > 0:
+            axes = g.axes
+            if len(markers2) > 1:
+                for c in range(len(axes)):
+                    axes[c][0].axvline(x=markers2[c], color = "#992222")
+            else:
+                for c in range(len(axes)):
+                    axes[c][0].axvline(x=markers2[0], color = "#992222")
         if len(markers) > 0:
             axes = g.axes
             if len(markers) > 1:
@@ -473,10 +507,18 @@ class dataclass_iEEG_metadata:
                 for c in range(len(axes)):
                     axes[c][0].axvline(x=markers[0])
         g.fig.subplots_adjust(hspace=hspace)
+        g.set_axis_labels("", "")
+        
+        if channel_names_show:
+            axes = g.axes.flatten()
+            for x, ax in enumerate(axes):
+                ax.set_ylabel(channel_names[x], loc = channel_loc, size = channel_size, labelpad = labelpad , rotation=0)
+                #ax.set_title(channel_names[x], loc = "left", y=channel_loc_y, size = channel_size)
+            
+
         g.set_titles("")
         g.set(yticks=[])
         g.set(xticks=[])
-        g.set_axis_labels("", "")
         g.despine(bottom=True, left=True)
 
         if savefig:

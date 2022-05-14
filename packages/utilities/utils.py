@@ -168,6 +168,13 @@ def baseSplitext(path):
 def cohend(d1, d2):
     cohens_d = (np.mean(d2) - np.mean(d1)) / (np.sqrt((np.std(d2) ** 2 + np.std(d1) ** 2) / 2))
     return cohens_d
+
+def cohend2(x,y):
+    nx = len(x)
+    ny = len(y)
+    dof = nx + ny - 2
+    return -(np.mean(x) - np.mean(y)) / np.sqrt(((nx-1)*np.std(x, ddof=1) ** 2 + (ny-1)*np.std(y, ddof=1) ** 2) / dof)
+
 #%%
 def channel2stdCSV(outputTissueCoordinates):
     df = pd.read_csv(outputTissueCoordinates, sep=",", header=0)

@@ -59,6 +59,7 @@ import math
 import time
 import copy
 import inspect
+import re
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -910,22 +911,91 @@ def automaticBipolarMontageSEEG(data, data_columns):
     #naming to standard 4 character channel Name: (Letter)(Letter)(Number)(Number)
     channels = channel2std(channels)
     count = 0
+    
+    bipolar_channel_names = []
     for ch in range(nchan-1):
         ch1Ind = ch
         ch1 = channels[ch1Ind]
         #find sequential index
         ch2 = ch1[0:2] + f"{(int(ch1[2:4]) + 1):02d}"
 
+        bipolar_name = f"{ch1} - {ch2}"
+        bipolar_channel_names.append(bipolar_name)
         ch2exists = np.where(channels == ch2)[0]
         if len(ch2exists) > 0:
             ch2Ind = ch2exists[0]
+            #bipolar = pd.Series((data[:,ch1Ind] - data[:,ch2Ind])).rename(bipolar_name)
             bipolar = pd.Series((data[:,ch1Ind] - data[:,ch2Ind])).rename(ch1)
             if count == 0: #initialize
                 dfBipolar = pd.DataFrame( bipolar)
                 count = count + 1
             else:
                 dfBipolar = pd.concat([dfBipolar, pd.DataFrame( bipolar)], axis=1)
-    return np.array(dfBipolar), np.array(dfBipolar.columns)
+    return np.array(dfBipolar), np.array(dfBipolar.columns), np.array(bipolar_channel_names)
+
+
+def automaticBipolarMontageECOG(data, data_columns):
+    channels = np.array(data_columns)
+
+
+
+
+    nchan = len(channels)
+    #naming to standard 4 character channel Name: (Letter)(Letter)(Number)(Number)
+    channels = channel2std(channels)
+    count = 0
+    
+    
+    #grab all the electrode channels with the same LETTERS (e.g. LAT)
+    electrode_names = []
+    for ch in range(nchan-1):
+        electrode_names.append(("".join(re.split("[^a-zA-Z]*", channels[ch]))))
+    electrode_names_unique = np.unique(np.array(electrode_names))
+    
+    bipolar_channel_names = []
+    count = 0
+    for el in range(len(electrode_names_unique)):
+        electrode = electrode_names_unique[el]
+        
+        #these are the data indexes that are part of the same electrode.
+        electrode_indexes = np.where(electrode == np.array(electrode_names))[0]
+        
+        channel_numbers = [int("".join(re.split("[^0-9]*", x))) for x in channels[electrode_indexes]]
+
+        for ind in range(len(electrode_indexes)):
+            ch1Ind = electrode_indexes[ind]
+            #find sequential index
+    
+            ch1_number = int("".join(re.split("[^0-9]*", channels[ch1Ind]))) #the the channel number
+            ch2_number = ch1_number+1
+            
+            
+            #check if sequential electrode exists
+            if any(ch2_number == np.array(channel_numbers)):
+
+                ch2_elecrode_index = np.where(ch2_number == np.array(channel_numbers) )[0][0]
+                
+                ch2Ind = electrode_indexes[ch2_elecrode_index]
+                ch1_name = channels[ch1Ind]
+                ch2_name = channels[ch2Ind]
+                bipolar_name = f"{ch1_name} - {ch2_name}"
+                bipolar_channel_names.append(bipolar_name)
+                #bipolar = pd.Series((data[:,ch1Ind] - data[:,ch2Ind])).rename(bipolar_name)
+                bipolar = pd.Series((data[:,ch1Ind] - data[:,ch2Ind])).rename(ch1_name)
+                
+                if count == 0: #initialize
+                    dfBipolar = pd.DataFrame( bipolar)
+                    count = count + 1
+                else:
+                    dfBipolar = pd.concat([dfBipolar, pd.DataFrame( bipolar)], axis=1)
+    return np.array(dfBipolar), np.array(dfBipolar.columns), np.array(bipolar_channel_names)
+                
+                
+
+       
+        
+        
+
 
 
 def manual_bipolar_ref(data, data_col, csvcols):
@@ -1210,9 +1280,45 @@ def preprocess(df, fs, fsds, montage = "bipolar", prewhiten = True):
         channels = data_columns
         channels = channel2std(channels)
     if montage == "bipolar":
-        data_ref, channels = automaticBipolarMontageSEEG(data, data_columns)
-    if prewhiten == True: data_ar = ar_one(data_ref)
-    else: data_ar = data_ref
+        #Try SEEG bipolar first, if it doesnt work, then assume ECOG naming convention
+        #if that doesn't work, then check for very early implantation ppl with odd naming conventions (like RID0014).
+        #if that doesnt work, then return error
+        try:
+            print("\n\n Performing SEEG bipolar montage based on channel names. If that does not work, will try ECoG bipolar montage")
+            data_ref, channels, bipolar_channel_names = automaticBipolarMontageSEEG(data, data_columns)
+            print(f"\n\n\nBipolar channels are:\n\n{bipolar_channel_names}")
+        except:
+            print("\n\n SEEG bipolar montage did not work. Channel names do not match SEEG convetion of two letters followed by one or two numbers (LA1 or LA01). Trying ECoG bipolar montage (LAT1, LAT01, etc.")
+            try:
+                print("\n ... \n\n")
+                data_ref, channels, bipolar_channel_names = automaticBipolarMontageECOG(data, data_columns)
+                print(f"\n\n\nBipolar channels are:\n\n{bipolar_channel_names}")
+                print("\n\nECoG bipolar montage worked.")
+            except:
+                raise IOError(f"\n\n\nCannot perform bipolar montage. Names of channles do not match either SEEG or ECoG conventions. Check channel names\n\n\n The channel names are:\n{data_columns}")
+        
+        
+        
+    #Check if any artifact electrodes and throw out:
+    
+    #check if any Nans
+    nans_index = []
+    for ch in range(len(channels)):
+        if np.isnan(np.sum(data_ref[:,ch])):
+            nans_index.append(ch)
+    nans_index = np.array(nans_index)
+    
+    data_ref = np.delete(data_ref, obj = nans_index , axis = 1)
+    channels = np.delete(channels, obj =nans_index )
+    #Prewhiten
+        
+    if prewhiten == True: 
+        print("\n\nPerforming Pre-Whitening.")
+        data_ar = ar_one(data_ref)
+    else: 
+        print("\n\nDid not perform Pre-Whitening.")
+        data_ar = data_ref
+    print("\n\nFiltering.")
     data_filt = elliptic_bandFilter(data_ar, int(fs))[0]
     return data, data_ref, data_ar, data_filt, channels
 
