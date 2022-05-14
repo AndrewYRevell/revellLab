@@ -705,7 +705,7 @@ print(outcomes_stats[32])
 #count how many have hippocampus spread < X seconds
 
 for co  in np.arange(5,70,5):
-    threshold_hippocampus_spread = co
+    threshold_hippocampus_spread = co #cutoff in seconds for time to spread
     
     hipp_spread_time = abs(soz_overlap_single_median_outcomes.hipp_left_mean - soz_overlap_single_median_outcomes.hipp_right_mean)
     
@@ -866,60 +866,102 @@ df = df.fillna(np.nan)
 df = df.groupby(["model", "subject","time", "threshold"], as_index=False).median()
 
 
-sns.lineplot(x = seconds,y = percent_active.iloc[400,5:])
+#sns.lineplot(x = seconds,y = percent_active.iloc[400,5:])
 
 df = pd.merge(df, outcomes, on='subject')
 df = df.fillna(np.nan)
 
+#%%
 
-
+finding_max = pd.DataFrame(columns = ["model", "threshold", "cohensd_max", "pval_cohensd_max", "cohensd_max_sec", "pval_min", "pval_min_sec", "pval_30","pval_31" , "pval_32", "pval_60" ])
 thresh = 0.95
 m=1
-model_ID = model_IDs[m]
 
-category = "Engel_24_mo_binary"
+for m in range(len(model_IDs)):
+    for t in range(len(thresholds)):
+        model_ID = model_IDs[m]
+        thresh = np.round(thresholds[t],2)
+        
+        utils.printProgressBar(t+1, len(thresholds), prefix= model_ID )
+        
+        category = "Engel_24_mo_binary"
+        
+        df_thresh = df[( df["threshold"]== thresh )]
+        df_model =  df_thresh[( df_thresh["model"] ==model_ID )]
+        
+        df_filtered =     df_model[(df_model[category] != "unknown") & (df_model["time"] <= 90)]
+        df_filtered_90s = df_model[(df_model[category] != "unknown") & (df_model["time"] <= 90)]
+        
+        
+        
+        #ax = sns.lineplot(data = df_filtered_90s.fillna(np.nan), x = "time", y = "percent_active", hue = "Engel_24_mo_binary" )
+        #plt.show()
+        cohensd = np.zeros(len(seconds_active))
+        outcomes_stats = np.zeros(len(seconds_active))
+        np.where(seconds_active <= 90)
+        for tt in range(len(seconds_active[np.where(seconds_active <= 90)])):
+            
+            
+            tmp = df_filtered[df_filtered["time"] == seconds_active[tt]]
+            tmp=tmp.dropna()
+            tmp_good = tmp[tmp["Engel_24_mo_binary"] == "good"]
+            tmp_poor = tmp[tmp["Engel_24_mo_binary"] == "poor"]
+            
+            v1 = tmp_good["percent_active"]
+            v2 = tmp_poor["percent_active"]
+            
+            #if np.round(stats.mannwhitneyu(v1, v2)[1],2) <0.05:
+            #    extra = "****"
+            #else:
+            #    extra = ""
+            
+            if (len(np.unique(v1)) == 1 & len(np.unique(v2)) == 1):
+                outcomes_stats[tt] = 1
+                cohensd[tt] = np.nan
+            else:
+                outcomes_stats[tt] = stats.mannwhitneyu(v1, v2)[1]
+                cohensd[tt] = utils.cohend2(v1, v2)
+   
+            
+            
+            #print(f" {seconds_active[tt]}  {np.round(stats.mannwhitneyu(v1, v2)[1],2)},     {np.round(stats.ttest_ind(v1, v2)[1],2)}    {extra}")
+            
 
-df_thresh = df[( df["threshold"]== thresh )]
-df_model =  df_thresh[( df_thresh["model"] ==model_ID )]
-
-df_filtered = df_model[(df_model[category] != "unknown")]
-df_filtered_90s = df_model[(df_model[category] != "unknown") & (df_model["time"] <= 90)]
-
-
-
-ax = sns.lineplot(data = df_filtered_90s.fillna(np.nan), x = "time", y = "percent_active", hue = "Engel_24_mo_binary" , ci = 68)
-plt.show()
-cohensd = np.zeros(len(seconds_active))
-outcomes_stats = np.zeros(len(seconds_active))
-
-for tt in range(len(seconds_active)):
-    
-    
-    tmp = df_filtered[df_filtered["time"] == seconds_active[tt]]
-    tmp=tmp.dropna()
-    tmp_good = tmp[tmp["Engel_24_mo_binary"] == "good"]
-    tmp_poor = tmp[tmp["Engel_24_mo_binary"] == "poor"]
-    
-    v1 = tmp_good["percent_active"]
-    v2 = tmp_poor["percent_active"]
-    
-    if np.round(stats.mannwhitneyu(v1, v2)[1],2) <0.05:
-        extra = "****"
-    else:
-        extra = ""
-    print(f" {seconds_active[tt]}  {np.round(stats.mannwhitneyu(v1, v2)[1],2)},     {np.round(stats.ttest_ind(v1, v2)[1],2)}    {extra}")
-    
-    outcomes_stats[tt] = stats.mannwhitneyu(v1, v2)[1]
-    
-    cohensd[tt] = utils.cohend(v1, v2)
-    cohensd[tt] = utils.cohend2(v1, v2)
-    
-    #sns.boxplot(data = tmp, x = "Engel_24_mo_binary", y= "percent_active")
-    #sns.swarmplot(data = tmp, x = "Engel_24_mo_binary", y= "percent_active")
-
-
-sns.lineplot(x = seconds_active[0:90], y = cohensd[0:90])
-plt.show()
+            
+            #sns.boxplot(data = tmp, x = "Engel_24_mo_binary", y= "percent_active")
+            #sns.swarmplot(data = tmp, x = "Engel_24_mo_binary", y= "percent_active")
+        
+        if np.isnan(np.max(cohensd)):
+            cohensd_max = np.nan
+            pval_cohensd_max = 1
+            cohensd_max_sec = -1
+            
+            pval_min = 1
+            pval_min_sec = -1
+            pval_30 = 1
+            pval_31 = 1
+            pval_32 = 1
+            pval_60 = 1
+        else:
+            cohensd_max = np.max(cohensd)
+            ind = np.where(cohensd_max == cohensd)[0][0]
+            pval_cohensd_max = outcomes_stats[ind]
+            cohensd_max_sec = seconds_active[ind]
+            
+            pval_min = np.min(outcomes_stats )
+            ind_pval = np.where(pval_min== outcomes_stats)[0][0]
+            pval_min_sec = seconds_active[ind_pval] 
+            
+            pval_30 = outcomes_stats[30]
+            pval_31 = outcomes_stats[31]
+            pval_32 = outcomes_stats[32]
+            pval_60 = outcomes_stats[60]
+            
+            #sns.lineplot(x = seconds_active[0:90], y = cohensd[0:90])
+            #plt.show()
+            
+        
+        finding_max= finding_max.append(dict(model = model_ID, threshold = thresh, cohensd_max = cohensd_max, pval_cohensd_max = pval_cohensd_max , cohensd_max_sec = cohensd_max_sec,  pval_min =pval_min, pval_min_sec = pval_min_sec , pval_30 = pval_30, pval_31 = pval_31, pval_32 = pval_32, pval_60 = pval_60), ignore_index=True)
 
 print(outcomes_stats[30])
 print(outcomes_stats[31])
@@ -928,58 +970,68 @@ print(outcomes_stats[32])
 
 #%% How quickly spread from one hipp to another
 
+finding_max_quickness = pd.DataFrame(columns = ["model", "threshold", "cutoff", "pval_everyone", "pval_TLE" ])
+
+
+hipp_spread = copy.deepcopy(soz_overlap_median_outcomes)
+hipp_spread_time = abs(soz_overlap_median_outcomes.hipp_left_mean - soz_overlap_median_outcomes.hipp_right_mean)
+hipp_spread["hipp_spread_time"] = hipp_spread_time
 #count how many have hippocampus spread < X seconds
+for m in range(len(model_IDs)):
+    for t in range(len(thresholds)):
+        utils.printProgressBar(t+1, len(thresholds), prefix= model_ID )
+        for co  in np.arange(5,70,5):
+            
+            model_ID = model_IDs[m]
+            thresh = np.round(thresholds[t],2)
+            threshold_hippocampus_spread = co #cutoff in seconds for time to spread
+            
+            
+            
+            hipp_spread_thresh = hipp_spread[( hipp_spread["threshold"]== thresh )]
+            hipp_spread_model =  hipp_spread_thresh[( hipp_spread_thresh["model"] ==model_ID )]
+            
 
-for co  in np.arange(5,70,5):
-    threshold_hippocampus_spread = co
-    
-    hipp_spread_time = abs(soz_overlap_single_median_outcomes.hipp_left_mean - soz_overlap_single_median_outcomes.hipp_right_mean)
-    
-    hipp_spread = copy.deepcopy(soz_overlap_single_median_outcomes)
-    
-    hipp_spread["hipp_spread_time"] = hipp_spread_time
-    
-    tmp1 = hipp_spread[(hipp_spread["Engel_24_mo_binary"] == "good") ]
-    tmp2 =hipp_spread[(hipp_spread["Engel_24_mo_binary"] == "poor") ]
-    
-    good_len = len(hipp_spread[(hipp_spread["Engel_24_mo_binary"] == "good")])
-    poor_len = len(hipp_spread[(hipp_spread["Engel_24_mo_binary"] == "poor")])
-    
-    hipp_spread_good = hipp_spread[(hipp_spread["Engel_24_mo_binary"] == "good") & (hipp_spread["hipp_spread_time"] <= threshold_hippocampus_spread)]
-    hipp_spread_poor = hipp_spread[(hipp_spread["Engel_24_mo_binary"] == "poor") & (hipp_spread["hipp_spread_time"] <= threshold_hippocampus_spread)]
-    
-    hipp_spread_good_len = len(hipp_spread_good)
-    hipp_spread_poor_len = len(hipp_spread_poor)
-    
-    """
-    Contingency table
-          Hipp spread less than threshold   |    Never Spread
-    good   hipp_spread_good_len             |    good_len - hipp_spread_good_len
-    poor   hipp_spread_poor_len             |      poor_len - hipp_spread_poor_len
-    """
-    
-    
-    
-    contingency_table = [ [hipp_spread_good_len, good_len - hipp_spread_good_len] , [hipp_spread_poor_len,  poor_len - hipp_spread_poor_len]    ]
-    
-    pval1 = stats.chi2_contingency(contingency_table, correction=True)[1]
-    
-    
-    
-    
-    #Only consider temporal lobe epilepsy
-    good_len = len(hipp_spread[(hipp_spread["Engel_24_mo_binary"] == "good") & ((hipp_spread["Target"] == "MTL") | (hipp_spread["Target"] == "Temporal"))])
-    poor_len = len(hipp_spread[(hipp_spread["Engel_24_mo_binary"] == "poor") & ((hipp_spread["Target"] == "MTL") | (hipp_spread["Target"] == "Temporal"))])
-    
-    tmp1 = hipp_spread[(hipp_spread["Engel_24_mo_binary"] == "good") & ((hipp_spread["Target"] == "MTL") | (hipp_spread["Target"] == "Temporal"))]
-    tmp2 =hipp_spread[(hipp_spread["Engel_24_mo_binary"] == "poor") & ((hipp_spread["Target"] == "MTL") | (hipp_spread["Target"] == "Temporal"))]
-    
-    hipp_spread_good = hipp_spread[(hipp_spread["Engel_24_mo_binary"] == "good") & (hipp_spread["hipp_spread_time"] <= threshold_hippocampus_spread) & ((hipp_spread["Target"] == "MTL") | (hipp_spread["Target"] == "Temporal"))]
-    hipp_spread_poor = hipp_spread[(hipp_spread["Engel_24_mo_binary"] == "poor") & (hipp_spread["hipp_spread_time"] <= threshold_hippocampus_spread) & ((hipp_spread["Target"] == "MTL") | (hipp_spread["Target"] == "Temporal"))]
-    
-    contingency_table = [ [hipp_spread_good_len, good_len - hipp_spread_good_len] , [hipp_spread_poor_len,  poor_len - hipp_spread_poor_len]    ]
-    
-    pval2 = stats.chi2_contingency(contingency_table, correction=True)[1]
-
-    print(f"{co}: {pval1}, {pval2}")
+            tmp1 = hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "good") ]
+            tmp2 =hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "poor") ]
+            
+            good_len = len(hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "good")])
+            poor_len = len(hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "poor")])
+            
+            hipp_spread_model_good = hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "good") & (hipp_spread_model["hipp_spread_time"] <= threshold_hippocampus_spread)]
+            hipp_spread_model_poor = hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "poor") & (hipp_spread_model["hipp_spread_time"] <= threshold_hippocampus_spread)]
+            
+            hipp_spread_model_good_len = len(hipp_spread_model_good)
+            hipp_spread_model_poor_len = len(hipp_spread_model_poor)
+            
+            """
+            Contingency table
+                  Hipp spread less than threshold   |    Never Spread
+            good   hipp_spread_model_good_len             |    good_len - hipp_spread_model_good_len
+            poor   hipp_spread_model_poor_len             |      poor_len - hipp_spread_model_poor_len
+            """
+            
+            
+            
+            contingency_table = [ [hipp_spread_model_good_len, good_len - hipp_spread_model_good_len] , [hipp_spread_model_poor_len,  poor_len - hipp_spread_model_poor_len]    ]
+            
+            pval1 = stats.chi2_contingency(contingency_table, correction=True)[1]
+            
+            #Only consider temporal lobe epilepsy
+            good_len = len(hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "good") & ((hipp_spread_model["Target"] == "MTL") | (hipp_spread_model["Target"] == "Temporal"))])
+            poor_len = len(hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "poor") & ((hipp_spread_model["Target"] == "MTL") | (hipp_spread_model["Target"] == "Temporal"))])
+            
+            tmp1 = hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "good") & ((hipp_spread_model["Target"] == "MTL") | (hipp_spread_model["Target"] == "Temporal"))]
+            tmp2 =hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "poor") & ((hipp_spread_model["Target"] == "MTL") | (hipp_spread_model["Target"] == "Temporal"))]
+            
+            hipp_spread_model_good = hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "good") & (hipp_spread_model["hipp_spread_time"] <= threshold_hippocampus_spread) & ((hipp_spread_model["Target"] == "MTL") | (hipp_spread_model["Target"] == "Temporal"))]
+            hipp_spread_model_poor = hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "poor") & (hipp_spread_model["hipp_spread_time"] <= threshold_hippocampus_spread) & ((hipp_spread_model["Target"] == "MTL") | (hipp_spread_model["Target"] == "Temporal"))]
+            
+            contingency_table = [ [hipp_spread_model_good_len, good_len - hipp_spread_model_good_len] , [hipp_spread_model_poor_len,  poor_len - hipp_spread_model_poor_len]    ]
+            
+            pval2 = stats.chi2_contingency(contingency_table, correction=True)[1]
+            
+            finding_max_quickness = finding_max_quickness.append({"model": model_ID , "threshold": thresh, "cutoff": co, "pval_everyone" : pval1, "pval_TLE" : pval2}, ignore_index=True)
+        
+           # print(f"{co}: {pval1}, {pval2}")
 

@@ -142,6 +142,42 @@ for i, x in enumerate(unique_patients):
         
 indexes = np.array([v.get(x) for x in list(v.keys()) ])
 
+def prob_threshold_moving_avg(prob_array, fsds, skip, threshold = 0.9, smoothing = 20):
+    windows, nchan = prob_array.shape
+   
+    w = int(smoothing*fsds/skip)
+    probability_arr_movingAvg = np.zeros(shape = (windows - w + 1, nchan))
+    
+    for c in range(nchan):
+        probability_arr_movingAvg[:,c] =  echobase.movingaverage(prob_array[:,c], w)
+        
+    probability_arr_threshold = copy.deepcopy(probability_arr_movingAvg)
+    probability_arr_threshold[probability_arr_threshold > threshold] = 1
+    probability_arr_threshold[probability_arr_threshold <= threshold] = 0
+        
+    return probability_arr_movingAvg, probability_arr_threshold
+
+
+def get_start_times(secondsBefore, skipWindow, fsds, channels, start, stop, probability_arr_threshold):
+    
+    nchan = probability_arr_threshold.shape[1]
+    seizure_start =int((secondsBefore-start)/skipWindow)
+    seizure_stop = int((secondsBefore + stop)/skipWindow)
+    
+    probability_arr_movingAvg_threshold_seizure = probability_arr_threshold[seizure_start:,:]
+    spread_start = np.argmax(probability_arr_movingAvg_threshold_seizure == 1, axis = 0)
+    
+    for c in range(nchan): #if the channel never starts seizing, then np.argmax returns the index as 0. This is obviously wrong, so fixing this
+        if np.all( probability_arr_movingAvg_threshold_seizure[:,c] == 0  ) == True:
+            spread_start[c] = len(probability_arr_movingAvg_threshold_seizure)
+    
+    
+    spread_start_loc = ( (spread_start + seizure_start)  *skipWindow*fsds).astype(int)
+    markers = spread_start_loc
+    channel_order = np.argsort(spread_start)
+    channel_order_labels = np.array(channels)[channel_order]
+    print(np.array(channels)[channel_order])
+    return spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels
 
 #%%
 #for i in indexes[39]:#range(23,25):
@@ -190,22 +226,20 @@ for i in range(210,255):
         with open(preprocessed_file, 'wb') as f: pickle.dump(pickle_save, f)
         
         
+    ########################################
+    #########################################
+    #######################################
     
-    
-    
-    
+    #deploying model
+    ########################################
+    #########################################
+    #######################################
     
     _, nchan = data_scalerDS.shape
     
     np.unique(patientsWithseizures.subject) 
     tmp = df.columns
-   
-    # % Plot eeg  Optional
-    #DataJson.plot_eeg(data_scalerDSDS, 16, markers = [secondsBefore*16], dpi = 25, aspect=aspect*2, height=nchan/aspect/2)  
-    
-    
-    
-    
+
     version = 11
     fpath_wavenet = join(deepLearningModelsPath, f"wavenet/v{version:03d}.hdf5")
     fpath_1dCNN = join(deepLearningModelsPath, f"1dCNN/v{version:03d}.hdf5")
@@ -224,51 +258,6 @@ for i in range(210,255):
     probCNN = np.zeros(shape = (windows, nchan))  
     probLSTM = np.zeros(shape = (windows, nchan))  
         
-    
-    
-      
-    #%
-    
-    
-    
-    
-    
-    def prob_threshold_moving_avg(prob_array, fsds, skip, threshold = 0.9, smoothing = 20):
-        windows, nchan = prob_array.shape
-       
-        w = int(smoothing*fsds/skip)
-        probability_arr_movingAvg = np.zeros(shape = (windows - w + 1, nchan))
-        
-        for c in range(nchan):
-            probability_arr_movingAvg[:,c] =  echobase.movingaverage(prob_array[:,c], w)
-            
-        probability_arr_threshold = copy.deepcopy(probability_arr_movingAvg)
-        probability_arr_threshold[probability_arr_threshold > threshold] = 1
-        probability_arr_threshold[probability_arr_threshold <= threshold] = 0
-            
-        return probability_arr_movingAvg, probability_arr_threshold
-    
-    
-    def get_start_times(secondsBefore, skipWindow, fsds, channels, start, stop, probability_arr_threshold):
-        
-        nchan = probability_arr_threshold.shape[1]
-        seizure_start =int((secondsBefore-start)/skipWindow)
-        seizure_stop = int((secondsBefore + stop)/skipWindow)
-        
-        probability_arr_movingAvg_threshold_seizure = probability_arr_threshold[seizure_start:,:]
-        spread_start = np.argmax(probability_arr_movingAvg_threshold_seizure == 1, axis = 0)
-        
-        for c in range(nchan): #if the channel never starts seizing, then np.argmax returns the index as 0. This is obviously wrong, so fixing this
-            if np.all( probability_arr_movingAvg_threshold_seizure[:,c] == 0  ) == True:
-                spread_start[c] = len(probability_arr_movingAvg_threshold_seizure)
-        
-        
-        spread_start_loc = ( (spread_start + seizure_start)  *skipWindow*fsds).astype(int)
-        markers = spread_start_loc
-        channel_order = np.argsort(spread_start)
-        channel_order_labels = np.array(channels)[channel_order]
-        print(np.array(channels)[channel_order])
-        return spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels
     
     #%
 
@@ -297,9 +286,46 @@ for i in range(210,255):
             
         
         
+    ########################################### 
+    ########################################### 
+    ########################################### 
+    #Single features
+    ########################################### 
+    ########################################### 
+    ########################################### 
         
         
         
+        
+        
+        
+        
+        
+        
+        
+        
+        
+    ########################################### 
+    ########################################### 
+    ########################################### 
+    ########################################### 
+    ########################################### 
+    ########################################### 
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        
+
         
     #PLOTTING 
     #% Optional
@@ -418,3 +444,5 @@ for i in range(210,255):
         pic_name = splitext(spread_location_file_basename)[0] + "_PICTURE_00_EEG_ZOOM_ORDERED.png"
         plt.savefig(join(spread_location, pic_name) )
         plt.show()
+        
+        
