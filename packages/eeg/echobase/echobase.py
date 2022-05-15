@@ -66,6 +66,7 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from scipy import signal
 from scipy import interpolate
+from scipy.integrate import simps
 from scipy.spatial import distance_matrix
 from scipy.stats import pearsonr, spearmanr
 from sklearn.feature_selection import mutual_info_regression
@@ -1396,6 +1397,19 @@ def get_power(data, fs, avg = False):
             for ch in range(nchan):
                 _, power[:,w,ch] = signal.welch(data[st:sp,ch], fs, nperseg=1 * fs)
     return power
+
+def get_power_over_windows(data, fs):
+    windows, window_len, nchan = data.shape
+    power_tmp = signal.welch(data[0,:,0], fs, nperseg=1 * fs)
+    power = np.zeros(shape = (windows,  len(power_tmp[0]), nchan) )
+    
+    power_total = np.zeros(shape = (windows, nchan) ) #power under the curve
+    for w in range(windows):
+        print(f"\r{w}/{windows}   { np.round( (w+1)/windows*100 ,2) }%            ", end = "\r")
+        for ch in range(nchan):
+            _, power[w,:,ch] = signal.welch(data[w,:,ch], fs, nperseg=1 * fs)
+            power_total[w,ch] = simps(power[w,:,ch], dx=1)
+    return power, power_total
 
 
 

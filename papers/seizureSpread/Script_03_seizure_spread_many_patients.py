@@ -180,9 +180,9 @@ def get_start_times(secondsBefore, skipWindow, fsds, channels, start, stop, prob
     return spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels
 
 #%%
+i=0 
 #for i in indexes[39]:#range(23,25):
-    
-for i in range(210,255):
+for i in range(0,100):
 
     RID = np.array(patientsWithseizures["subject"])[i]
     idKey = np.array(patientsWithseizures["idKey"])[i]
@@ -196,15 +196,15 @@ for i in range(210,255):
     fname = DataJson.get_fname_ictal(RID, "Ictal", idKey, dataset= datasetiEEG, session = session, startUsec = None, stopUsec= None, startKey = "EEC", secondsBefore = secondsBefore, secondsAfter = secondsAfter )
     
     preprocessed_location = join(BIDS, datasetiEEG_preprocessed, f"sub-{RID}" )
-    utils.checkPathAndMake( preprocessed_location, preprocessed_location)
+    utils.checkPathAndMake( preprocessed_location, preprocessed_location, printBOOL=False)
     
     preprocessed_file_basename = f"{splitext(fname)[0]}_preprocessed.pickle"
     preprocessed_file = join(preprocessed_location, preprocessed_file_basename)
     
     
     #check if preproceed file exists, and if it does, load that instead of dowloading ieeg data and performing preprocessing on that
-    if utils.checkIfFileExists( preprocessed_file ):
-        print("\n\n\n\nPREPROCESSED FILE EXISTS\n\n\n\n")
+    if utils.checkIfFileExists( preprocessed_file, printBOOL=False ):
+        print(f"\n{RID} {i} PREPROCESSED FILE EXISTS")
         with open(preprocessed_file, 'rb') as f: [dataII_scaler, data_scaler, dataII_scalerDS, data_scalerDS, channels] = pickle.load(f)
         df, fs, ictalStartIndex, ictalStopIndex = DataJson.get_precitalIctalPostictal(RID, "Ictal", idKey, username, password,BIDS = BIDS, dataset= datasetiEEG, session = session, secondsBefore = secondsBefore, secondsAfter = secondsAfter)
         
@@ -217,7 +217,7 @@ for i in range(210,255):
         df_interictal = df_interictal.fillna(0)
      
         
-        print("\n\n\n\n\nPREPROCESSING\n\n\n\n\n\n")
+        print(f"\n{RID} {i} PREPROCESSING")
         
         
         dataII_scaler, data_scaler, dataII_scalerDS, data_scalerDS, channels = DataJson.preprocessNormalizeDownsample(df, df_interictal, fs, fsds, montage = montage)
@@ -246,34 +246,33 @@ for i in range(210,255):
     fpath_lstm = join(deepLearningModelsPath, f"lstm/v{version:03d}.hdf5")
     
     
-    modelWN = load_model(fpath_wavenet)
-    modelCNN= load_model(fpath_1dCNN)
-    modelLSTM = load_model(fpath_lstm)
-    
     #%window to fit model
     data_scalerDS_X = echomodel.overlapping_windows(data_scalerDS, time_step, skip)
     windows, _, _ = data_scalerDS_X.shape
     
-    probWN = np.zeros(shape = (windows, nchan))  
-    probCNN = np.zeros(shape = (windows, nchan))  
-    probLSTM = np.zeros(shape = (windows, nchan))  
-        
-    
-    #%
 
     
     #CHECKING IF MODEL FILES EXIST
     
     spread_location = join(BIDS, datasetiEEG_spread, f"v{version:03d}", f"sub-{RID}" )
-    utils.checkPathAndMake( spread_location, spread_location)
+    utils.checkPathAndMake( spread_location, spread_location, printBOOL=False)
     
     spread_location_file_basename = f"{splitext(fname)[0]}_spread.pickle"
     spread_location_file = join(spread_location, spread_location_file_basename)
     
-    if utils.checkIfFileExists( spread_location_file ):
-        print("\n\n\n\nSPREAD FILE EXISTS\n\n\n\n")
-        with open(spread_location_file, 'rb') as f:[probWN, probCNN, probLSTM, data_scalerDS, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
+    if utils.checkIfFileExists( spread_location_file , printBOOL=False):
+        print(f"\n{RID} {i} SPREAD FILE EXISTS")
+        #with open(spread_location_file, 'rb') as f:[probWN, probCNN, probLSTM, data_scalerDS, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
     else:
+        modelWN = load_model(fpath_wavenet)
+        modelCNN= load_model(fpath_1dCNN)
+        modelLSTM = load_model(fpath_lstm)
+        
+        probWN = np.zeros(shape = (windows, nchan))  
+        probCNN = np.zeros(shape = (windows, nchan))  
+        probLSTM = np.zeros(shape = (windows, nchan))  
+            
+        #%
         for c in range(nchan):
             print(f"\r{np.round((c+1)/nchan*100,2)}%     ", end = "\r")
             ch_pred =     data_scalerDS_X[:,:,c].reshape(windows, time_step, 1    )
@@ -285,48 +284,111 @@ for i in range(210,255):
         with open(spread_location_file, 'wb') as f: pickle.dump(pickle_save, f)
             
         
+    ########################################### 
+    #calculate absolute slope
+    ########################################### 
+    feature_name = "absolute_slope"
+    
+    #CHECKING IF MODEL FILES EXIST
+    spread_location_sf = join(BIDS, datasetiEEG_spread, "single_features", f"sub-{RID}" )
+    utils.checkPathAndMake( spread_location_sf, spread_location_sf, printBOOL=False)
+    
+    spread_location_sf_file_basename = f"{splitext(fname)[0]}_{feature_name}.pickle"
+    spread_location_sf_file = join(spread_location_sf, spread_location_sf_file_basename)
+    
+    if utils.checkIfFileExists( spread_location_sf_file , printBOOL=False):
+        print(f"\n{RID} {i} {feature_name} EXISTS")
+        #with open(spread_location_sf_file, 'rb') as f:[abs_slope_normalized_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
+    else:
+        abs_slope_all_windows = np.abs(np.divide(np.diff(data_scalerDS_X, axis=1), 1/fsds))
+        abs_slope_ii = np.abs(np.divide(np.diff(dataII_scalerDS, axis=0), 1/fsds))
+        sigma_ii = np.nanstd( abs_slope_ii ,  axis=0)
+        sigma_ii = np.mean(sigma_ii)
         
+        abs_slope_all_windows_normalized = abs_slope_all_windows/sigma_ii
+        abs_slope_normalized = np.nanmean(abs_slope_all_windows_normalized, axis = 1)
+        
+        #Tanh
+        multiplier = 1e-1 
+        abs_slope_normalized_tanh = utils.apply_tanh(abs_slope_normalized, multiplier = multiplier)
+        
+        pickle_save = [abs_slope_normalized_tanh, channels, window, skipWindow, secondsBefore, secondsAfter]
+        with open(spread_location_sf_file, 'wb') as f: pickle.dump(pickle_save, f)
+        
+    
+    #########
+    pic_name = splitext(spread_location_sf_file_basename)[0] + "_PICTURE_05_absolute_slope.png"
+    if not utils.checkIfFileExists( join(spread_location_sf, pic_name), printBOOL=False):
+    
+        THRESHOLD = 0.4
+        SMOOTHING = 20 #in seconds
+        prob_array= abs_slope_normalized_tanh
+        
+        
+        probability_arr_movingAvg, probability_arr_threshold = prob_threshold_moving_avg(prob_array, fsds, skip, threshold = THRESHOLD, smoothing = SMOOTHING)
+        
+        spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels = get_start_times(secondsBefore, skipWindow, fsds, channels, 0, seizure_length, probability_arr_threshold)
+        
+        
+        seizurePattern.plot_probheatmaps(prob_array[:,channel_order], fsds, skip, threshold=THRESHOLD, vmin = 0.4, vmax = 1, center=None, smoothing = 20 , title = "Absolute Slope", title_channel1 = channel_order_labels[0], title_channel2 = channel_order_labels[1], channel_names = channel_order_labels)    
+        
+        plt.savefig(join(spread_location_sf, pic_name) )
+        plt.show()
+        
+    ########################################### 
+    #calculate Line Length
+    ########################################### 
+    feature_name = "line_length"
+    
+    #CHECKING IF MODEL FILES EXIST
+    spread_location_sf = join(BIDS, datasetiEEG_spread, "single_features", f"sub-{RID}" )
+    utils.checkPathAndMake( spread_location_sf, spread_location_sf, printBOOL=False)
+    
+    spread_location_sf_file_basename = f"{splitext(fname)[0]}_{feature_name}.pickle"
+    spread_location_sf_file = join(spread_location_sf, spread_location_sf_file_basename)
+    
+    if utils.checkIfFileExists( spread_location_sf_file , printBOOL=False):
+        print(f"\n{RID} {i} {feature_name} EXISTS")
+        #with open(spread_location_sf_file, 'rb') as f:[probLL_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
+    else:
+        probLL, probLL_norm = echobase.lineLengthOfArray(data_scalerDS_X)
+        #apply tanh function to map LL to seizure probability
+        multiplier = 2e-3 #multiplier multiplies the abolute LL value to put into the tanh function. LL values are very large, so thats why multiplier is very small
+        probLL_tanh = utils.apply_tanh(probLL, multiplier = multiplier)
+        
+        pickle_save = [probLL_tanh, channels, window, skipWindow, secondsBefore, secondsAfter]
+        with open(spread_location_sf_file, 'wb') as f: pickle.dump(pickle_save, f)
+    
+    #########
+    pic_name = splitext(spread_location_sf_file_basename)[0] + "_PICTURE_04_line_length.png"
+    if not utils.checkIfFileExists( join(spread_location_sf, pic_name), printBOOL=False):
+        THRESHOLD = 0.5
+        SMOOTHING = 20 #in seconds
+        prob_array= probLL_tanh
+        
+        
+        probability_arr_movingAvg, probability_arr_threshold = prob_threshold_moving_avg(prob_array, fsds, skip, threshold = THRESHOLD, smoothing = SMOOTHING)
+        
+        spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels = get_start_times(secondsBefore, skipWindow, fsds, channels, 0, seizure_length, probability_arr_threshold)
+        
+        
+        seizurePattern.plot_probheatmaps(prob_array[:,channel_order], fsds, skip, threshold=THRESHOLD, vmin = 0.4, vmax = 1, center=None, smoothing = 20 , title = "Line Length", title_channel1 = channel_order_labels[0], title_channel2 = channel_order_labels[1], channel_names = channel_order_labels)
+        
+        plt.savefig(join(spread_location_sf, pic_name) )
+        plt.show()
+        
+    
+        
+        
+        #%%
+        
+ 
     ########################################### 
     ########################################### 
     ########################################### 
-    #Single features
     ########################################### 
     ########################################### 
     ########################################### 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-    ########################################### 
-    ########################################### 
-    ########################################### 
-    ########################################### 
-    ########################################### 
-    ########################################### 
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-        
-
-        
     #PLOTTING 
     #% Optional
     
@@ -350,7 +412,7 @@ for i in range(210,255):
         #sns.heatmap( probability_arr_threshold.T , cbar=False)    
         spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels = get_start_times(secondsBefore, skipWindow, fsds, channels, 0, seizure_length, probability_arr_threshold)
         
-        seizurePattern.plot_probheatmaps(probWN[:,channel_order], fsds, skip, threshold=THRESHOLD, vmin = 0.4, vmax = 1, center=None, smoothing = 20 , title = "Wavenet", title_channel1 = channel_order_labels[0], title_channel2 = channel_order_labels[1], channel_names = channel_order_labels)
+        seizurePattern.plot_probheatmaps(prob_array[:,channel_order], fsds, skip, threshold=THRESHOLD, vmin = 0.4, vmax = 1, center=None, smoothing = 20 , title = "Wavenet", title_channel1 = channel_order_labels[0], title_channel2 = channel_order_labels[1], channel_names = channel_order_labels)
         
         plt.savefig(join(spread_location, pic_name) )
         plt.show()
@@ -366,7 +428,7 @@ for i in range(210,255):
         spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels = get_start_times(secondsBefore, skipWindow, fsds, channels, 0, seizure_length, probability_arr_threshold)
         
         
-        seizurePattern.plot_probheatmaps(probCNN[:,channel_order], fsds, skip, threshold=THRESHOLD, vmin = 0.5, vmax = 1, center=None, smoothing = 20 , title = "1D CNN", title_channel1 = channel_order_labels[0], title_channel2 = channel_order_labels[1], channel_names = channel_order_labels)
+        seizurePattern.plot_probheatmaps(prob_array[:,channel_order], fsds, skip, threshold=THRESHOLD, vmin = 0.5, vmax = 1, center=None, smoothing = 20 , title = "1D CNN", title_channel1 = channel_order_labels[0], title_channel2 = channel_order_labels[1], channel_names = channel_order_labels)
         
         plt.savefig(join(spread_location, pic_name) )
         plt.show()
@@ -385,7 +447,7 @@ for i in range(210,255):
         
         
         
-        seizurePattern.plot_probheatmaps(probLSTM[:,channel_order], fsds, skip, threshold=THRESHOLD, vmin = 0.5, vmax = 1, center=None, smoothing = 20 , title = "LSTM", title_channel1 = channel_order_labels[0], title_channel2 = channel_order_labels[1], channel_names = channel_order_labels)
+        seizurePattern.plot_probheatmaps(prob_array[:,channel_order], fsds, skip, threshold=THRESHOLD, vmin = 0.5, vmax = 1, center=None, smoothing = 20 , title = "LSTM", title_channel1 = channel_order_labels[0], title_channel2 = channel_order_labels[1], channel_names = channel_order_labels)
         
         plt.savefig(join(spread_location, pic_name) )
         plt.show()
@@ -445,4 +507,93 @@ for i in range(210,255):
         plt.savefig(join(spread_location, pic_name) )
         plt.show()
         
+        
+
+
+
+
+    ########################################### 
+    ########################################### 
+    ########################################### 
+    #Single features
+    ########################################### 
+    ########################################### 
+    ########################################### 
+        
+        
+        
+    probLL = np.zeros(shape = (windows, nchan))  
+    abs_slope = np.zeros(shape = (windows, nchan))  
+    
+    ########################################### 
+    #calculate Line Length
+    ########################################### 
+
+    probLL, probLL_norm = echobase.lineLengthOfArray(data_scalerDS_X)
+    #apply tanh function to map LL to seizure probability
+    multiplier = 2e-3 #multiplier multiplies the abolute LL value to put into the tanh function. LL values are very large, so thats why multiplier is very small
+    probLL_tanh = utils.apply_tanh(probLL, multiplier = multiplier)
+
+    sns.heatmap( probLL_tanh.T )  
+    THRESHOLD = 0.5
+    SMOOTHING = 20 #in seconds
+    prob_array= probLL_tanh
+    
+    
+    probability_arr_movingAvg, probability_arr_threshold = prob_threshold_moving_avg(prob_array, fsds, skip, threshold = THRESHOLD, smoothing = SMOOTHING)
+    
+    spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels = get_start_times(secondsBefore, skipWindow, fsds, channels, 0, seizure_length, probability_arr_threshold)
+    
+    
+    seizurePattern.plot_probheatmaps(prob_array[:,channel_order], fsds, skip, threshold=THRESHOLD, vmin = 0.4, vmax = 1, center=None, smoothing = 20 , title = "Line Length", title_channel1 = channel_order_labels[0], title_channel2 = channel_order_labels[1], channel_names = channel_order_labels)
+    
+    
+    
+    
+    
+    
+    
+    ########################################### 
+    #calculate BB power
+    ########################################### 
+    power, power_total = echobase.get_power_over_windows(data_scalerDS_X, fsds)
+    
+    #Tanh
+    multiplier = 7e-2 
+    power_total_tanh = utils.apply_tanh(power_total, multiplier = multiplier)
+    
+    #########
+    THRESHOLD = 0.3
+    SMOOTHING = 20 #in seconds
+    prob_array= power_total_tanh
+    
+    
+    probability_arr_movingAvg, probability_arr_threshold = prob_threshold_moving_avg(prob_array, fsds, skip, threshold = THRESHOLD, smoothing = SMOOTHING)
+    
+    spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels = get_start_times(secondsBefore, skipWindow, fsds, channels, 0, seizure_length, probability_arr_threshold)
+    
+    
+    seizurePattern.plot_probheatmaps(prob_array[:,channel_order], fsds, skip, threshold=THRESHOLD, vmin = 0.4, vmax = 1, center=None, smoothing = 20 , title = "Power Broadband", title_channel1 = channel_order_labels[0], title_channel2 = channel_order_labels[1], channel_names = channel_order_labels)
+    
+    
+    ########################################### 
+    #calculate strength, pearson FC
+    ########################################### 
+    data_scalerDS_X.shape
+    
+    fc_degree = np.zeros(shape = (windows, nchan))
+    for w in range(windows):
+        print(f"{w}/{windows}")
+        fc_pearson = echobase.pearson_connectivity(data_scalerDS_X[w,:,:], fs)
+        fc_pearson_values = abs(fc_pearson[0])
+        fc_degree[w,:] = np.sum(fc_pearson_values, axis = 0)
+
+        
+        #calculate absolute degree
+    ########################################### 
+    ########################################### 
+    ########################################### 
+    ########################################### 
+    ########################################### 
+    ########################################### 
         

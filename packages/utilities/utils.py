@@ -16,6 +16,7 @@ import glob
 import pickle
 import smtplib
 import scipy
+import math
 
 import numpy as np
 import pandas as pd
@@ -175,6 +176,28 @@ def cohend2(x,y):
     dof = nx + ny - 2
     return -(np.mean(x) - np.mean(y)) / np.sqrt(((nx-1)*np.std(x, ddof=1) ** 2 + (ny-1)*np.std(y, ddof=1) ** 2) / dof)
 
+
+def apply_tanh(data, multiplier = 1, plot = False):
+    """
+    Applied a tanh function across all data points in a 2d array
+    data :   numpy array
+    multiplier : multiplier multiplies the abolute LL value to put into the tanh function. LL values are very large, so thats why multiplier is very small
+    """
+    data_tanh = copy.deepcopy(data)
+    nx, ny = data.shape
+    for x in range(nx):
+        for y in range(ny):
+            data_tanh[x,y] = math.tanh(data_tanh[x,y]*multiplier)
+            
+    if plot:
+        fig, axes = plot_make(r = 1, c = 2)
+        sns.heatmap(data = data, ax = axes [0])
+        sns.heatmap(data = data_tanh, ax = axes [1])
+        axes[0].set_title("original")
+        axes[1].set_title("Tanh, multipler: {multiplier} ")
+        plt.show()
+        
+    return data_tanh
 #%%
 def channel2stdCSV(outputTissueCoordinates):
     df = pd.read_csv(outputTissueCoordinates, sep=",", header=0)

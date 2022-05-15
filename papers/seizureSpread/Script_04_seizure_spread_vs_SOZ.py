@@ -292,6 +292,12 @@ for k in range(len(outcomes)): #if poor outcome at 6 or 12 month, then propagate
 i=0
 type_of_overlap = "soz"
 override_soz= True
+version=11
+threshold=0.6
+smoothing = 20
+model_ID="WN"
+seconds_active = np.arange(0,60*2+1,1)
+
 def calculate_mean_rank_deep_learning(i, patientsWithseizures, version=11, threshold=0.6, smoothing = 20, model_ID="WN", secondsAfter=180, secondsBefore=180, type_of_overlap = "soz", override_soz = False, seconds_active  = None):
     #override_soz if True, then if there are no soz marking, then use the resection markings and assume those are SOZ contacts
     RID = np.array(patientsWithseizures["subject"])[i]
@@ -304,14 +310,17 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version=11, thres
     fname = DataJson.get_fname_ictal(RID, "Ictal", idKey, dataset= datasetiEEG, session = session, startUsec = None, stopUsec= None, startKey = "EEC", secondsBefore = secondsBefore, secondsAfter = secondsAfter )
     
     spread_location = join(BIDS, datasetiEEG_spread, f"v{version:03d}", f"sub-{RID}" )
-
-    
     spread_location_file_basename = f"{splitext(fname)[0]}_spread.pickle"
     spread_location_file = join(spread_location, spread_location_file_basename)
     
-    if utils.checkIfFileExists( spread_location_file , printBOOL=False):
+    
+    feature_name = "absolute_slope"
+    location_abs_slope = join(BIDS, datasetiEEG_spread, "single_features", f"sub-{RID}" )
+    location_abs_slope_basename = f"{splitext(fname)[0]}_{feature_name}.pickle"
+    location_abs_slope_file = join(location_abs_slope, location_abs_slope_basename)
+    
+    if utils.checkIfFileExists( spread_location_file , printBOOL=False) and utils.checkIfFileExists( location_abs_slope_file , printBOOL=False):
         #print("\n\n\n\nSPREAD FILE EXISTS\n\n\n\n")
-        with open(spread_location_file, 'rb') as f:[probWN, probCNN, probLSTM, data_scalerDS, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
     
     
     
@@ -342,18 +351,17 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version=11, thres
         resected_channel_names = echobase.channel2std(resected_channel_names)
         #ignore__channel_names = echobase.channel2std(ignore__channel_names)
         
-        
-       
-     
+
         soz_channel_names = channel2std_ECoG(soz_channel_names)
         resected_channel_names = channel2std_ECoG(resected_channel_names)
         ignore__channel_names = channel2std_ECoG(ignore__channel_names)
-        #####
-        seizure_start = int((secondsBefore-0)/skipWindow)
-        seizure_stop = int((secondsBefore + seizure_length)/skipWindow)
         #%
         THRESHOLD = threshold
         SMOOTHING = smoothing #in seconds
+        
+        if model_ID == "WN" or model_ID == "CNN" or model_ID == "LSTM":
+            with open(spread_location_file, 'rb') as f:[probWN, probCNN, probLSTM, data_scalerDS, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
+            
         
         if model_ID == "WN":
             #print(model_ID)
@@ -364,10 +372,16 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version=11, thres
         elif model_ID == "LSTM":
             #print(model_ID)
             prob_array= probLSTM
+        elif model_ID == "abs_slope":
+            with open(location_abs_slope_file, 'rb') as f:[abs_slope_normalized_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
+            prob_array= abs_slope_normalized_tanh
         else:
             print("model ID not recognized. Using Wavenet")
             prob_array= probWN
         
+        #####
+        seizure_start = int((secondsBefore-0)/skipWindow)
+        seizure_stop = int((secondsBefore + seizure_length)/skipWindow)
         
         probability_arr_movingAvg, probability_arr_threshold = prob_threshold_moving_avg(prob_array, fsds, skip, threshold = THRESHOLD, smoothing = SMOOTHING)
         #sns.heatmap( probability_arr_movingAvg.T , cbar=False)      
@@ -581,8 +595,8 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version=11, thres
         return RID, idKey, len(soz_channel_names), len(channel_order_labels), mean_rank, median_rank, mean_rank_percent, median_rank_percent, seconds, percent_active_vec, hipp_left_mean,  hipp_right_mean
     
 #%%    
-model_ID="WN"
-threshold = 0.65
+model_ID="abs_slope"
+threshold = 0.4
 
 soz_overlap_single = pd.DataFrame(columns = ["subject", "seizure","number_channels_soz","number_channels", "mean_rank", "median_rank", "mean_rank_percent", "median_rank_percent",  "hipp_left_mean",  "hipp_right_mean"])
 
@@ -594,7 +608,7 @@ columns + list(seconds_active)
 percent_active = pd.DataFrame(columns = columns + list(seconds_active))
 
 for i in range(len(patientsWithseizures)):
-    print(f"\r{i}   { np.round(   (i+1)/len(patientsWithseizures)*100   ,2)    }                   ", end = "\r")
+    print(f"\r{i}   { np.round(   (i+1)/len(patientsWithseizures)*100   ,2)}%                  ", end = "\r")
     RID, idKey, number_channels_soz,number_channels, mean_rank, median_rank, mean_rank_percent, median_rank_percent, seconds, percent_active_vec,  hipp_left_mean,  hipp_right_mean = calculate_mean_rank_deep_learning(i, patientsWithseizures, version=11, threshold=threshold, smoothing = 20, model_ID=model_ID, secondsAfter=180, secondsBefore=180, type_of_overlap = "soz", override_soz = True, seconds_active = seconds_active)
     
     
@@ -681,7 +695,7 @@ for tt in range(len(seconds_active)):
     
     v1 = tmp_good["percent_active"]
     v2 = tmp_poor["percent_active"]
-    print(f" {tt}  {stats.mannwhitneyu(v1, v2)[1]},                {stats.ttest_ind(v1, v2)[1]}")
+    print(f" {seconds_active[tt]}  {np.round(stats.mannwhitneyu(v1, v2)[1],2)}")
     
     outcomes_stats[tt] = stats.mannwhitneyu(v1, v2)[1]
     
@@ -779,11 +793,10 @@ model_ID = "WN"
 version = 11
 
 by = 0.01
-np.linspace(0.5,1,10, endpoint=False)
-thresholds = np.arange(0.4,1 + by, by)
+thresholds = np.arange(0.0, 1 + by, by)
 thresholds = np.round(thresholds,2)
 
-model_IDs = ["WN","CNN","LSTM" ]
+model_IDs = ["WN","CNN","LSTM" , "abs_slope"]
 count = 0
 for m in range(len(model_IDs)):
     model_ID =model_IDs[m]
@@ -815,7 +828,7 @@ soz_overlap_outcomes = pd.merge(soz_overlap, outcomes, on='subject')
 soz_overlap_median_outcomes = pd.merge(soz_overlap_median, outcomes, on='subject')
 
 fig, axes = utils.plot_make(size_length=10)
-sns.lineplot(data = soz_overlap_median, x = "threshold", y = "median_rank_percent", hue="model", ci=95, estimator=np.median, ax = axes, hue_order=["WN", "CNN", "LSTM"])
+sns.lineplot(data = soz_overlap_median, x = "threshold", y = "median_rank_percent", hue="model", ci=95, estimator=np.median, ax = axes, hue_order=["WN", "CNN", "LSTM", "abs_slope"])
 #sns.lineplot(data = soz_overlap_median, x = "threshold", y = "median_rank_percent", hue="model", err_style="bars", ci=95, estimator=np.median, ax = axes)
 axes.set_ylim([0,0.65])
 
@@ -830,8 +843,8 @@ for m in range(len(model_IDs)):
 #%%
 
 #round threshold value cause python is so stupid with 0.5 will sometime be 0.50000001. wtf
-for t in range(len(percent_active)):
-    percent_active["threshold"][t] = int(np.round(percent_active["threshold"][t],2)*100)/100
+#for t in range(len(percent_active)):
+#    percent_active["threshold"][t] = int(np.round(percent_active["threshold"][t],2)*100)/100
 
 
 """
@@ -872,8 +885,9 @@ df = pd.merge(df, outcomes, on='subject')
 df = df.fillna(np.nan)
 
 #%%
-
+#finding most differences between good and poor outcome patients for percent spread
 finding_max = pd.DataFrame(columns = ["model", "threshold", "cohensd_max", "pval_cohensd_max", "cohensd_max_sec", "pval_min", "pval_min_sec", "pval_30","pval_31" , "pval_32", "pval_60" ])
+finding_max_seconds = pd.DataFrame(columns = ["model", "threshold", "second", "cohensd", "pval" ])
 thresh = 0.95
 m=1
 
@@ -898,7 +912,6 @@ for m in range(len(model_IDs)):
         #plt.show()
         cohensd = np.zeros(len(seconds_active))
         outcomes_stats = np.zeros(len(seconds_active))
-        np.where(seconds_active <= 90)
         for tt in range(len(seconds_active[np.where(seconds_active <= 90)])):
             
             
@@ -922,7 +935,7 @@ for m in range(len(model_IDs)):
                 outcomes_stats[tt] = stats.mannwhitneyu(v1, v2)[1]
                 cohensd[tt] = utils.cohend2(v1, v2)
    
-            
+            finding_max_seconds = finding_max_seconds.append({"model":model_ID, "threshold":thresh, "second":seconds_active[tt], "cohensd": cohensd[tt], "pval":outcomes_stats[tt] }, ignore_index=True )
             
             #print(f" {seconds_active[tt]}  {np.round(stats.mannwhitneyu(v1, v2)[1],2)},     {np.round(stats.ttest_ind(v1, v2)[1],2)}    {extra}")
             
@@ -967,10 +980,26 @@ print(outcomes_stats[30])
 print(outcomes_stats[31])
 print(outcomes_stats[32])
 
+#%%
+#plot heatmap of cohensd 
+
+m=2
+model_ID = model_IDs[m]
+cohensd_plot = finding_max_seconds[(finding_max_seconds["model"] == model_ID)]
+
+cohensd_plot_matrix = cohensd_plot.pivot(index='second', columns='threshold',values='cohensd')
+
+
+
+fig, axes = utils.plot_make(r = 1, c = 1)
+sns.heatmap(cohensd_plot_matrix, ax = axes)
+
+
+
 
 #%% How quickly spread from one hipp to another
 
-finding_max_quickness = pd.DataFrame(columns = ["model", "threshold", "cutoff", "pval_everyone", "pval_TLE" ])
+finding_max_quickness = pd.DataFrame(columns = ["model", "threshold", "cutoff", "pval_everyone", "N1", "cramers_V1", "odds_ratio1", "pval_TLE", "N2", "cramers_V2", "odds_ratio2"])
 
 
 hipp_spread = copy.deepcopy(soz_overlap_median_outcomes)
@@ -1014,8 +1043,15 @@ for m in range(len(model_IDs)):
             
             
             contingency_table = [ [hipp_spread_model_good_len, good_len - hipp_spread_model_good_len] , [hipp_spread_model_poor_len,  poor_len - hipp_spread_model_poor_len]    ]
-            
-            pval1 = stats.chi2_contingency(contingency_table, correction=True)[1]
+            N1 = sum(sum(np.array(contingency_table)))
+            if hipp_spread_model_good_len == 0 and hipp_spread_model_poor_len ==0:
+                pval1 = 1
+                cramers_V1 = 0
+                odds_ratio1=0
+            else:
+                pval1 = stats.chi2_contingency(contingency_table, correction=True)[1]
+                cramers_V1= np.sqrt((stats.chi2_contingency(contingency_table, correction=True)[0])/N1)
+                odds_ratio1 = (contingency_table[0][0]*contingency_table[1][1]) / (contingency_table[0][1]*contingency_table[1][0] )
             
             #Only consider temporal lobe epilepsy
             good_len = len(hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "good") & ((hipp_spread_model["Target"] == "MTL") | (hipp_spread_model["Target"] == "Temporal"))])
@@ -1029,9 +1065,56 @@ for m in range(len(model_IDs)):
             
             contingency_table = [ [hipp_spread_model_good_len, good_len - hipp_spread_model_good_len] , [hipp_spread_model_poor_len,  poor_len - hipp_spread_model_poor_len]    ]
             
-            pval2 = stats.chi2_contingency(contingency_table, correction=True)[1]
+            N2 = sum(sum(np.array(contingency_table)))
+            if hipp_spread_model_good_len == 0 and hipp_spread_model_poor_len ==0:
+                pvals2 = 1
+                cramers_V2 = 0
+                odds_ratio2 = 0
+            else:
+                pval2 = stats.chi2_contingency(contingency_table, correction=True)[1]
+                cramers_V2= np.sqrt((stats.chi2_contingency(contingency_table, correction=True)[0])/N2)               
+                arr = np.asarray(contingency_table)
+
+                chi2_stat = stats.chi2_contingency(arr)
+                phi2 = chi2_stat[0] / arr.sum()
+                n_rows, n_cols = arr.shape
+                cramers_V2 = np.sqrt(phi2 / min(n_cols - 1, n_rows - 1))
+                          
+                
+                odds_ratio2 = (contingency_table[0][0]*contingency_table[1][1]) / (contingency_table[0][1]*contingency_table[1][0] )
             
-            finding_max_quickness = finding_max_quickness.append({"model": model_ID , "threshold": thresh, "cutoff": co, "pval_everyone" : pval1, "pval_TLE" : pval2}, ignore_index=True)
+            finding_max_quickness = finding_max_quickness.append({"model": model_ID , "threshold": thresh, "cutoff": co, "pval_everyone" : pval1, "N1":N1, "cramers_V1":cramers_V1, "odds_ratio1":odds_ratio1, "pval_TLE" : pval2, "N2":N2, "cramers_V2":cramers_V2, "odds_ratio2":odds_ratio2}, ignore_index=True)
         
            # print(f"{co}: {pval1}, {pval2}")
+
+#%%
+#plot heatmap of cramers v
+
+m=2
+model_ID = model_IDs[m]
+cramersV_plot = finding_max_quickness[(finding_max_quickness["model"] == model_ID)]
+
+cramersV_plot_matrix1 = cramersV_plot.pivot(index='cutoff', columns='threshold',values='cramers_V1')
+cramersV_plot_matrix2 = cramersV_plot.pivot(index='cutoff', columns='threshold',values='cramers_V2')
+
+cramersV_plot_matrix1_odds = cramersV_plot.pivot(index='cutoff', columns='threshold',values='odds_ratio1')
+cramersV_plot_matrix2_odds = cramersV_plot.pivot(index='cutoff', columns='threshold',values='odds_ratio2')
+
+fig, axes = utils.plot_make(r = 2, c = 2)
+axes = axes.flatten()
+sns.heatmap(cramersV_plot_matrix1, ax = axes[0], vmin = 0, vmax = 0.6)
+sns.heatmap(cramersV_plot_matrix2, ax = axes[1], vmin = 0, vmax = 0.6)
+sns.heatmap(cramersV_plot_matrix1_odds, ax = axes[2])
+sns.heatmap(cramersV_plot_matrix2_odds, ax = axes[3])
+
+
+np.max(np.max(cramersV_plot_matrix2))
+
+
+
+
+
+
+
+
 
