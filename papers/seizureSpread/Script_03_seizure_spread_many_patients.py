@@ -96,13 +96,28 @@ atlasLocalizationFunctionDirectory = join(revellLabPath, "packages", "atlasLocal
 
 
 #% 03 Project parameters
-fsds = 128 #"sampling frequency, down sampled"
+
+version = 11
+
+if version == 11:
+    fsds = 128 
+    window = 1 #window of eeg for training/testing. In seconds
+    skipWindow = 0.1#Next window is skipped over in seconds
+if version == 14:    
+    fsds = 128 *2
+    window = 5 #window of eeg for training/testing. In seconds
+    skipWindow = 0.1#Next window is skipped over in seconds
+if version == 15 or version == 16 :    
+    fsds = 128 *2
+    window = 10 #window of eeg for training/testing. In seconds
+    skipWindow = 0.1#Next window is skipped over in seconds
 annotationLayerName = "seizureChannelBipolar"
 #annotationLayerName = "seizure_spread"
 secondsBefore = 180
 secondsAfter = 180
-window = 1 #window of eeg for training/testing. In seconds
-skipWindow = 0.1#Next window is skipped over in seconds
+
+#window = 1 #window of eeg for training/testing. In seconds
+#skipWindow = 0.1#Next window is skipped over in seconds
 time_step, skip = int(window*fsds), int(skipWindow*fsds)
 montage = "bipolar"
 prewhiten = True
@@ -141,6 +156,8 @@ for i, x in enumerate(unique_patients):
         v[x] = i
         
 indexes = np.array([v.get(x) for x in list(v.keys()) ])
+
+special_index = np.array([0,23,54, 137, 156])
 
 def prob_threshold_moving_avg(prob_array, fsds, skip, threshold = 0.9, smoothing = 20):
     windows, nchan = prob_array.shape
@@ -182,7 +199,8 @@ def get_start_times(secondsBefore, skipWindow, fsds, channels, start, stop, prob
 #%%
 i=0 
 #for i in indexes[39]:#range(23,25):
-for i in range(0,100):
+for i in range(90,120):
+#for i in special_index:
 
     RID = np.array(patientsWithseizures["subject"])[i]
     idKey = np.array(patientsWithseizures["idKey"])[i]
@@ -195,7 +213,10 @@ for i in range(0,100):
     #check if preprocessed is already saved
     fname = DataJson.get_fname_ictal(RID, "Ictal", idKey, dataset= datasetiEEG, session = session, startUsec = None, stopUsec= None, startKey = "EEC", secondsBefore = secondsBefore, secondsAfter = secondsAfter )
     
-    preprocessed_location = join(BIDS, datasetiEEG_preprocessed, f"sub-{RID}" )
+    preprocessed_location = join(BIDS, datasetiEEG_preprocessed, f"v{version:03d}", f"sub-{RID}" )
+    if version==15:
+        version_similar = 14
+        preprocessed_location = join(BIDS, datasetiEEG_preprocessed, f"v{version_similar:03d}", f"sub-{RID}" )
     utils.checkPathAndMake( preprocessed_location, preprocessed_location, printBOOL=False)
     
     preprocessed_file_basename = f"{splitext(fname)[0]}_preprocessed.pickle"
@@ -240,7 +261,7 @@ for i in range(0,100):
     np.unique(patientsWithseizures.subject) 
     tmp = df.columns
 
-    version = 11
+    
     fpath_wavenet = join(deepLearningModelsPath, f"wavenet/v{version:03d}.hdf5")
     fpath_1dCNN = join(deepLearningModelsPath, f"1dCNN/v{version:03d}.hdf5")
     fpath_lstm = join(deepLearningModelsPath, f"lstm/v{version:03d}.hdf5")
@@ -284,6 +305,7 @@ for i in range(0,100):
         with open(spread_location_file, 'wb') as f: pickle.dump(pickle_save, f)
             
         
+    """
     ########################################### 
     #calculate absolute slope
     ########################################### 
@@ -296,10 +318,11 @@ for i in range(0,100):
     spread_location_sf_file_basename = f"{splitext(fname)[0]}_{feature_name}.pickle"
     spread_location_sf_file = join(spread_location_sf, spread_location_sf_file_basename)
     
-    if utils.checkIfFileExists( spread_location_sf_file , printBOOL=False):
+    if not utils.checkIfFileExists( spread_location_sf_file , printBOOL=False):
         print(f"\n{RID} {i} {feature_name} EXISTS")
-        #with open(spread_location_sf_file, 'rb') as f:[abs_slope_normalized_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
+        #with open(spread_location_sf_file, 'rb') as f:[abs_slope_normalized, abs_slope_normalized_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
     else:
+        print(f"\n{RID} {i} {feature_name} CALCULATING ")
         abs_slope_all_windows = np.abs(np.divide(np.diff(data_scalerDS_X, axis=1), 1/fsds))
         abs_slope_ii = np.abs(np.divide(np.diff(dataII_scalerDS, axis=0), 1/fsds))
         sigma_ii = np.nanstd( abs_slope_ii ,  axis=0)
@@ -312,15 +335,15 @@ for i in range(0,100):
         multiplier = 1e-1 
         abs_slope_normalized_tanh = utils.apply_tanh(abs_slope_normalized, multiplier = multiplier)
         
-        pickle_save = [abs_slope_normalized_tanh, channels, window, skipWindow, secondsBefore, secondsAfter]
+        pickle_save = [abs_slope_normalized, abs_slope_normalized_tanh, channels, window, skipWindow, secondsBefore, secondsAfter]
         with open(spread_location_sf_file, 'wb') as f: pickle.dump(pickle_save, f)
         
-    
+
     #########
     pic_name = splitext(spread_location_sf_file_basename)[0] + "_PICTURE_05_absolute_slope.png"
     if not utils.checkIfFileExists( join(spread_location_sf, pic_name), printBOOL=False):
     
-        THRESHOLD = 0.4
+        THRESHOLD = 0.25
         SMOOTHING = 20 #in seconds
         prob_array= abs_slope_normalized_tanh
         
@@ -335,9 +358,13 @@ for i in range(0,100):
         plt.savefig(join(spread_location_sf, pic_name) )
         plt.show()
         
+
+        
     ########################################### 
     #calculate Line Length
     ########################################### 
+    
+    """
     feature_name = "line_length"
     
     #CHECKING IF MODEL FILES EXIST
@@ -347,19 +374,22 @@ for i in range(0,100):
     spread_location_sf_file_basename = f"{splitext(fname)[0]}_{feature_name}.pickle"
     spread_location_sf_file = join(spread_location_sf, spread_location_sf_file_basename)
     
-    if utils.checkIfFileExists( spread_location_sf_file , printBOOL=False):
+    if not utils.checkIfFileExists( spread_location_sf_file , printBOOL=False):
         print(f"\n{RID} {i} {feature_name} EXISTS")
-        #with open(spread_location_sf_file, 'rb') as f:[probLL_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
+        #with open(spread_location_sf_file, 'rb') as f:[probLL, probLL_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
     else:
+        print(f"\n{RID} {i} {feature_name} CALCULATING ")
         probLL, probLL_norm = echobase.lineLengthOfArray(data_scalerDS_X)
         #apply tanh function to map LL to seizure probability
         multiplier = 2e-3 #multiplier multiplies the abolute LL value to put into the tanh function. LL values are very large, so thats why multiplier is very small
         probLL_tanh = utils.apply_tanh(probLL, multiplier = multiplier)
         
-        pickle_save = [probLL_tanh, channels, window, skipWindow, secondsBefore, secondsAfter]
+        pickle_save = [probLL, probLL_tanh, channels, window, skipWindow, secondsBefore, secondsAfter]
         with open(spread_location_sf_file, 'wb') as f: pickle.dump(pickle_save, f)
     
     #########
+    
+    #%%
     pic_name = splitext(spread_location_sf_file_basename)[0] + "_PICTURE_04_line_length.png"
     if not utils.checkIfFileExists( join(spread_location_sf, pic_name), printBOOL=False):
         THRESHOLD = 0.5
@@ -376,7 +406,56 @@ for i in range(0,100):
         
         plt.savefig(join(spread_location_sf, pic_name) )
         plt.show()
+    
+    """    
         
+    
+    ########################################### 
+    #calculate BB power
+    ########################################### 
+    feature_name = "power_broadband"
+    
+    #CHECKING IF MODEL FILES EXIST
+    spread_location_sf = join(BIDS, datasetiEEG_spread, "single_features", f"sub-{RID}" )
+    utils.checkPathAndMake( spread_location_sf, spread_location_sf, printBOOL=False)
+    
+    spread_location_sf_file_basename = f"{splitext(fname)[0]}_{feature_name}.pickle"
+    spread_location_sf_file = join(spread_location_sf, spread_location_sf_file_basename)
+    
+    if not utils.checkIfFileExists( spread_location_sf_file , printBOOL=False):
+        print(f"\n{RID} {i} {feature_name} EXISTS")
+        #with open(spread_location_sf_file, 'rb') as f:[power_total, power_total_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
+    else:
+        print(f"\n{RID} {i} {feature_name} CALCULATING ")
+        power, power_total = echobase.get_power_over_windows(data_scalerDS_X, fsds)
+        
+        #Tanh
+        multiplier = 7e-2 
+        power_total_tanh = utils.apply_tanh(power_total, multiplier = multiplier)
+        
+        pickle_save = [power_total, power_total_tanh, channels, window, skipWindow, secondsBefore, secondsAfter]
+        with open(spread_location_sf_file, 'wb') as f: pickle.dump(pickle_save, f)
+        
+    #%%
+    #########%
+    pic_name = splitext(spread_location_sf_file_basename)[0] + "_PICTURE_04_line_length.png"
+    if not utils.checkIfFileExists( join(spread_location_sf, pic_name), printBOOL=False):
+        THRESHOLD = 0.25
+        SMOOTHING = 20 #in seconds
+        prob_array= power_total_tanh
+        
+        
+        probability_arr_movingAvg, probability_arr_threshold = prob_threshold_moving_avg(prob_array, fsds, skip, threshold = THRESHOLD, smoothing = SMOOTHING)
+        
+        spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels = get_start_times(secondsBefore, skipWindow, fsds, channels, 0, seizure_length, probability_arr_threshold)
+        
+        
+        seizurePattern.plot_probheatmaps(prob_array[:,channel_order], fsds, skip, threshold=THRESHOLD, vmin = 0.4, vmax = 1, center=None, smoothing = 20 , title = "Power Broadband", title_channel1 = channel_order_labels[0], title_channel2 = channel_order_labels[1], channel_names = channel_order_labels)
+        
+        plt.savefig(join(spread_location_sf, pic_name) )
+        plt.show()
+        
+    
     
         
         
@@ -402,7 +481,7 @@ for i in range(0,100):
     pic_name = splitext(spread_location_file_basename)[0] + "_PICTURE_01_wavenet.png"
     if not utils.checkIfFileExists( join(spread_location, pic_name)):
     
-        THRESHOLD = 0.7
+        THRESHOLD = 0.9
         SMOOTHING = 20 #in seconds
         prob_array= probWN
         
@@ -438,7 +517,7 @@ for i in range(0,100):
     pic_name = splitext(spread_location_file_basename)[0] + "_PICTURE_03_LSTM.png"
     if not utils.checkIfFileExists( join(spread_location, pic_name)):
     
-        THRESHOLD = 0.6
+        THRESHOLD = 0.7
         SMOOTHING = 20 #in seconds
         prob_array= probLSTM
         probability_arr_movingAvg, probability_arr_threshold = prob_threshold_moving_avg(prob_array, fsds, skip, threshold = THRESHOLD, smoothing = SMOOTHING)
@@ -551,31 +630,7 @@ for i in range(0,100):
     
     
     
-    
-    
-    ########################################### 
-    #calculate BB power
-    ########################################### 
-    power, power_total = echobase.get_power_over_windows(data_scalerDS_X, fsds)
-    
-    #Tanh
-    multiplier = 7e-2 
-    power_total_tanh = utils.apply_tanh(power_total, multiplier = multiplier)
-    
-    #########
-    THRESHOLD = 0.3
-    SMOOTHING = 20 #in seconds
-    prob_array= power_total_tanh
-    
-    
-    probability_arr_movingAvg, probability_arr_threshold = prob_threshold_moving_avg(prob_array, fsds, skip, threshold = THRESHOLD, smoothing = SMOOTHING)
-    
-    spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels = get_start_times(secondsBefore, skipWindow, fsds, channels, 0, seizure_length, probability_arr_threshold)
-    
-    
-    seizurePattern.plot_probheatmaps(prob_array[:,channel_order], fsds, skip, threshold=THRESHOLD, vmin = 0.4, vmax = 1, center=None, smoothing = 20 , title = "Power Broadband", title_channel1 = channel_order_labels[0], title_channel2 = channel_order_labels[1], channel_names = channel_order_labels)
-    
-    
+
     ########################################### 
     #calculate strength, pearson FC
     ########################################### 
