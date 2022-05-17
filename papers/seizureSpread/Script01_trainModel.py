@@ -198,26 +198,26 @@ for i in range(len(test)):
 
 #%% Model training
 
-version = 15
+version = 16
 # Wavenet
 filepath = join(deepLearningModelsPath, f"wavenet/v{version:03d}.hdf5")
 checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
-score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_list, modelName = "wavenet", training_epochs = 5, batch_size=2**11, learn_rate = 0.001)
+score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_list, modelName = "wavenet", training_epochs = 5, batch_size=2**9, learn_rate = 0.001)
 
-
+#batch_size=2**11
 # 1dCNN
 filepath = join(deepLearningModelsPath,f"1dCNN/v{version:03d}.hdf5")
 checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
-score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_list, modelName = "1dCNN", training_epochs = 3, batch_size=2**11, learn_rate = 0.001)
+score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_list, modelName = "1dCNN", training_epochs = 5, batch_size=2**9, learn_rate = 0.001)
 
 
 # lstm
 filepath = join(deepLearningModelsPath,f"lstm/v{version:03d}.hdf5")
 checkpoint = ModelCheckpoint(filepath, monitor='val_accuracy', verbose=1, save_best_only=True, mode='max')
 callbacks_list = [checkpoint]
-score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_list, modelName = "lstm", training_epochs = 5, batch_size=2**11, learn_rate = 0.001)
+score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_list, modelName = "lstm", training_epochs = 3, batch_size=2**9, learn_rate = 0.001)
 
 
 
@@ -226,7 +226,7 @@ score, hx = echomodel.modelTrain(X_train, y_train, X_test, y_test, callbacks_lis
 
 
 #%% Evaluate model
-version = 14
+version = 16
 fpath_model = join(deepLearningModelsPath, f"wavenet/v{version:03d}.hdf5")
 yPredictProbability = echomodel.modelPredict(fpath_model, X_test)
 echomodel.modelEvaluate(yPredictProbability, X_test, y_test, title = "Wavenet Performance")

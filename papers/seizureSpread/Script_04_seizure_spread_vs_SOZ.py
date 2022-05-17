@@ -402,6 +402,8 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshol
             if utils.checkIfFileExists(location_abs_slope_file, printBOOL=False):
                 with open(location_abs_slope_file, 'rb') as f:[abs_slope_normalized, abs_slope_normalized_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
                 if not tanh:
+                    #abs_slope_normalized = utils.apply_arctanh(abs_slope_normalized_tanh)/1e-1 
+                    abs_slope_normalized/np.max(abs_slope_normalized)
                     abs_slope_normalized = abs_slope_normalized/np.max(abs_slope_normalized)
                     prob_array=  abs_slope_normalized
                 else:
@@ -424,8 +426,10 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshol
             if utils.checkIfFileExists(location_power_broadband, printBOOL=False):
                 with open(location_power_broadband, 'rb') as f:[power_total, power_total_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
                 if not tanh:
+                    #power_total = utils.apply_arctanh(power_total_tanh)/7e-2  
                     power_total = power_total/np.max(power_total)
                     prob_array=  power_total
+                    
                 else:
                     prob_array= power_total_tanh
             
@@ -441,8 +445,8 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshol
         seizure_stop = int((secondsBefore + seizure_length)/skipWindow)
         
         probability_arr_movingAvg, probability_arr_threshold = prob_threshold_moving_avg(prob_array, fsds, skip, threshold = THRESHOLD, smoothing = SMOOTHING)
-        #sns.heatmap( probability_arr_movingAvg.T , cbar=False)      
-        #sns.heatmap( probability_arr_threshold.T , cbar=False)    
+        #sns.heatmap( probability_arr_movingAvg.T )      
+        #sns.heatmap( probability_arr_threshold.T)    
         spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels = get_start_times(secondsBefore, skipWindow, fsds, channels, 0, seizure_length, probability_arr_threshold)
    
         
@@ -660,7 +664,7 @@ tanh = False
 model_IDs = ["WN","CNN","LSTM" , "absolute_slope", "line_length", "power_broadband"]
 m=5
 model_ID= model_IDs[m]
-threshold = 0.2
+threshold = 0.1
 
 soz_overlap_single = pd.DataFrame(columns = ["subject", "seizure","number_channels_soz","number_channels", "mean_rank", "median_rank", "mean_rank_percent", "median_rank_percent",  "hipp_left_mean",  "hipp_right_mean"])
 
@@ -700,6 +704,10 @@ soz_overlap_single_outcomes = pd.merge(soz_overlap_single, outcomes, on='subject
 soz_overlap_single_median_outcomes = pd.merge(soz_overlap_single_median, outcomes, on='subject')
 #%%
 
+sns.swarmplot(data = soz_overlap_single_outcomes, y = "median_rank_percent")
+print(np.nanmedian(soz_overlap_single_median_outcomes.mean_rank_percent ))
+print(np.nanmedian(soz_overlap_single_median_outcomes.median_rank_percent ))
+
 """
 np.nanmean(soz_overlap_single_outcomes.mean_rank_percent )
 np.nanmean(soz_overlap_single_outcomes.median_rank_percent )
@@ -720,11 +728,6 @@ sns.swarmplot(data = soz_overlap_single_median_outcomes, x = "Gender", y = "mean
 np.nanmean(soz_overlap_single_median_outcomes.mean_rank_percent )
 np.nanmean(soz_overlap_single_median_outcomes.median_rank_percent )
 """
-#%%
-
-sns.swarmplot(data = soz_overlap_single_outcomes, y = "median_rank_percent")
-print(np.nanmedian(soz_overlap_single_median_outcomes.mean_rank_percent ))
-print(np.nanmedian(soz_overlap_single_median_outcomes.median_rank_percent ))
 
 
 
@@ -855,10 +858,31 @@ for co  in np.arange(5,70,5):
         extra = "***"
     print(f"{co}: {np.round(pval1,3)}, {np.round(pval2,3)}   {extra}    {np.round(cramers_V1,2)},  {np.round(cramers_V2,2)}")
 
-
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
+##############################################################
 
 #%% Compare over thresholds
-tanh = False
+tanh = True
 
 
 thresholds_median = pd.DataFrame(columns = ["model","version", "threshold", "mean", "median", "sd"])
@@ -875,11 +899,12 @@ percent_active = pd.DataFrame(columns = columns + list(seconds_active))
 
 
 
-by = 0.1
+by = 0.01
 thresholds = np.arange(0.0, 1 + by, by)
 thresholds = np.round(thresholds,2)
 
 model_IDs = ["WN","CNN","LSTM" , "absolute_slope", "line_length", "power_broadband"]
+#model_IDs = [ "absolute_slope", "line_length", "power_broadband"]
 count = 0
 for m in range(len(model_IDs)):
     model_ID =model_IDs[m]
@@ -986,8 +1011,8 @@ for m in range(len(model_IDs)):
         df_thresh = df[( df["threshold"]== thresh )]
         df_model =  df_thresh[( df_thresh["model"] ==model_ID )]
         
-        df_filtered =     df_model[(df_model[category] != "unknown") & (df_model["time"] <= 90)]
-        df_filtered_90s = df_model[(df_model[category] != "unknown") & (df_model["time"] <= 90)]
+        df_filtered =     df_model[(df_model[category] != "unknown") & (df_model["time"] <= 60)]
+        df_filtered_90s = df_model[(df_model[category] != "unknown") & (df_model["time"] <= 60)]
         
         
         
@@ -995,7 +1020,7 @@ for m in range(len(model_IDs)):
         #plt.show()
         cohensd = np.zeros(len(seconds_active))
         outcomes_stats = np.zeros(len(seconds_active))
-        for tt in range(len(seconds_active[np.where(seconds_active <= 90)])):
+        for tt in range(len(seconds_active[np.where(seconds_active <= 60)])):
             
             
             tmp = df_filtered[df_filtered["time"] == seconds_active[tt]]
@@ -1072,7 +1097,11 @@ for i in range(len(model_IDs)):
     model_ID = model_IDs[m]
     cohensd_plot = finding_max_seconds[(finding_max_seconds["model"] == model_ID)]
     cohensd_plot_matrix = cohensd_plot.pivot(index='second', columns='threshold',values='cohensd')
-    sns.heatmap(cohensd_plot_matrix, ax = axes[i], vmin= 0, vmax = cohensd_max)
+    
+    cohensd_plot_matrix_nanfill = np.nan_to_num(np.asarray(cohensd_plot_matrix))
+
+    
+    sns.heatmap(cohensd_plot_matrix_nanfill, ax = axes[i], vmin= 0, vmax = cohensd_max)
     axes[i].set_title(model_ID)
     
 
@@ -1089,8 +1118,8 @@ hipp_spread["hipp_spread_time"] = hipp_spread_time
 for m in range(len(model_IDs)):
     for t in range(len(thresholds)):
         utils.printProgressBar(t+1, len(thresholds), prefix= model_ID )
-        cutoff_by = 0.5
-        for co  in np.arange(5,35+cutoff_by,cutoff_by):
+        cutoff_by = 0.25
+        for co  in np.round(np.arange(5,35+cutoff_by,cutoff_by),2):
             
             model_ID = model_IDs[m]
             thresh = np.round(thresholds[t],2)
@@ -1188,7 +1217,7 @@ for m in range(len(model_IDs)):
 #%%
 #plot heatmap of cramers v
 
-np.arange(5,35+cutoff_by,cutoff_by)[26]
+np.arange(5,35+cutoff_by,cutoff_by)
 
 fig, axes = utils.plot_make(r = len(model_IDs), c = 4, size_length=  20 ,size_height=len(model_IDs)*2 )
 #axes = axes.flatten()
@@ -1223,6 +1252,7 @@ for i in range(len(model_IDs)):
     sns.heatmap(np.array(cramersV_plot_matrix2_odds).astype("float"), ax = axes[i][3], vmin = 0, vmax = 1, cmap = "mako_r")
     
     
+    print(np.max(np.max(cramersV_plot_matrix1)))
     print(np.max(np.max(cramersV_plot_matrix2)))
     print(np.min(np.min(cramersV_plot.pivot(index='cutoff', columns='threshold',values='pval_everyone'))))
     print(np.min(np.min(cramersV_plot.pivot(index='cutoff', columns='threshold',values='pval_TLE'))))
@@ -1245,7 +1275,7 @@ finding_max_quickness_fdr["pval_TLE_fdr"] = utils.correct_pvalues_for_multiple_t
 
 
 
-cutoff = 20.0
+cutoff = 20
 quickness_comparison = finding_max_quickness_fdr[(finding_max_quickness_fdr["cutoff"] == cutoff)]
 
 
@@ -1256,12 +1286,14 @@ quickness_comparison_filtered = quickness_comparison[   ( (quickness_comparison[
 print(quickness_comparison_filtered.pval_TLE)
 print(quickness_comparison_filtered.pval_everyone)
 
-utils.correct_pvalues_for_multiple_testing(quickness_comparison_filtered.pval_everyone)
+utils.correct_pvalues_for_multiple_testing(list(quickness_comparison_filtered.pval_everyone) + [0.04])
+utils.correct_pvalues_for_multiple_testing(list(quickness_comparison_filtered.pval_TLE) + [0.04])
+
+#%%
+
 pvals = quickness_comparison_filtered.pval_everyone
 
 np.min(   finding_max_quickness[   ( (finding_max_quickness["model"] == "WN")  )]["pval_everyone"]     )   
-
-#%%
 
 
 
@@ -1291,3 +1323,11 @@ utils.correct_pvalues_for_multiple_testing(pvals)[indind]
 
 
 pvalues=pvals
+
+
+
+
+#%%
+
+
+##############################################################################################

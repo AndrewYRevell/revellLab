@@ -199,7 +199,7 @@ def get_start_times(secondsBefore, skipWindow, fsds, channels, start, stop, prob
 #%%
 i=0 
 #for i in indexes[39]:#range(23,25):
-for i in range(90,120):
+for i in range(212,245):
 #for i in special_index:
 
     RID = np.array(patientsWithseizures["subject"])[i]
@@ -245,8 +245,14 @@ for i in range(90,120):
     
         pickle_save = [dataII_scaler, data_scaler, dataII_scalerDS, data_scalerDS, channels]
         with open(preprocessed_file, 'wb') as f: pickle.dump(pickle_save, f)
+    
         
-        
+    
+    data_ei = data_scaler[int(fs*170):-int(fs*170),:]
+    
+    #Epileptogenicity index
+    ei = echobase.get_ei_from_data(data_ei, dataII_scaler, fs)
+    channels[np.argsort(ei)]
     ########################################
     #########################################
     #######################################
@@ -521,7 +527,7 @@ for i in range(90,120):
         SMOOTHING = 20 #in seconds
         prob_array= probLSTM
         probability_arr_movingAvg, probability_arr_threshold = prob_threshold_moving_avg(prob_array, fsds, skip, threshold = THRESHOLD, smoothing = SMOOTHING)
-        spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels = get_start_times(secondsBefore, skipWindow, fsds, channels, 0, seizure_length, probability_arr_threshold)
+        spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels = get_start_times(secondsBefore, skipWindow, fsds, channels, 30, seizure_length, probability_arr_threshold)
         
         
         
