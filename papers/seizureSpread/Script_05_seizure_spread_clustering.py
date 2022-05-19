@@ -30,7 +30,7 @@ from scipy.stats import pearsonr, spearmanr
         
 from sklearn.decomposition import PCA 
 from sklearn.cluster import KMeans
-        
+from fuzzywuzzy import fuzz, process
 from os.path import join, splitext, basename
 
 from dataclasses import dataclass
@@ -203,6 +203,7 @@ deepLearningModelsPath = paths.DEEP_LEARNING_MODELS
 datasetiEEG = "derivatives/seizure_spread/iEEG_data"
 datasetiEEG_preprocessed = "derivatives/seizure_spread/preprocessed" ##################################################
 datasetiEEG_spread = "derivatives/seizure_spread/seizure_spread_measurements"
+project_folder = "derivatives/seizure_spread"
 session = "implant01"
 SESSION_RESEARCH3T = "research3Tv[0-9][0-9]"
 
@@ -269,7 +270,8 @@ patients, labels, ignore, resect, gm_wm, coords, region, soz = pull_patient_loca
 RID_HUP = pd.read_csv(RID_HUP)
 with open(fnameJSON) as f: jsonFile = json.load(f)
 
-
+paths.ATLAS_LABELS
+with open(paths.ATLAS_FILES_PATH) as f: atlas_files = json.load(f)
 #% Get files and relevant patient information to train model
 
 #turning jsonFile to a @dataclass to make easier to extract info and data from it
@@ -311,13 +313,13 @@ for k in range(len(outcomes)):
             outcomes.loc[outcomes["subject"] == outcomes["subject"][k], outcomes_list2[o]] = "good"
             
         if np.isnan(value):
-            outcomes.loc[outcomes["subject"] == outcomes["subject"][k], outcomes_list2[o]] = "unknown"
+            outcomes.loc[outcomes["subject"] == outcomes["subject"][k], outcomes_list2[o]] = "NA"
     
 for k in range(len(outcomes)): #if poor outcome at 6 or 12 month, then propagate that thru if unknown
       outcomes_list2 = ["Engel_6_mo_binary", "Engel_12_mo_binary","Engel_24_mo_binary"]
       for o in [1,2]:
           value = np.array(outcomes.loc[outcomes["subject"] == outcomes["subject"][k]][outcomes_list2[o]])[0]
-          if value =="unknown":
+          if value =="NA":
               value_previous = np.array(outcomes.loc[outcomes["subject"] == outcomes["subject"][k]][outcomes_list2[o-1]])[0]
               if value_previous == "poor":
                   outcomes.loc[outcomes["subject"] == outcomes["subject"][k], outcomes_list2[o]] = "poor"
@@ -337,14 +339,14 @@ for r in range(len(region)):
             regions_all.append(reg)
 regions_unique = np.unique(regions_all)
 #%%
-i=0
+i=137
 type_of_overlap = "soz"
 threshold=0.6
 smoothing = 20
 model_ID="WN"
 tanh = False
 
-def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshold=0.6, smoothing = 20, model_ID="WN", secondsAfter=180, secondsBefore=180, tanh = False):
+def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshold=0.6, smoothing = 20, model_ID="WN", secondsAfter=180, secondsBefore=180, tanh = False, use_atlas = False):
     #override_soz if True, then if there are no soz marking, then use the resection markings and assume those are SOZ contacts
     RID = np.array(patientsWithseizures["subject"])[i]
     idKey = np.array(patientsWithseizures["idKey"])[i]
@@ -373,12 +375,6 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshol
     location_power_broadband_basename = f"{splitext(fname)[0]}_{feature_name}.pickle"
     location_power_broadband = join(location_feature, location_power_broadband_basename)
     
-    if seconds_active is None:
-        seconds = np.arange(0,60*2+1,1)
-    else:
-        seconds = seconds_active
-    percent_active_vec = np.zeros(len(seconds))
-    percent_active_vec[:] = np.nan
     
     if utils.checkIfFileExists( spread_location_file , printBOOL=False) and utils.checkIfFileExists( location_abs_slope_file , printBOOL=False):
         #print("\n\n\n\nSPREAD FILE EXISTS\n\n\n\n")
@@ -458,7 +454,7 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshol
                     prob_array= probLL_tanh
             else: 
                 print(f"{i} {RID} file does not exist {location_line_length_file}\n")
-        
+        elif model_ID == "power_broadband":
             if utils.checkIfFileExists(location_power_broadband, printBOOL=False):
                 with open(location_power_broadband, 'rb') as f:[power_total, power_total_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
                 if not tanh:
@@ -522,102 +518,173 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshol
         #build array of unique regions
         
     
-        
-        
+    
         region_activation = pd.DataFrame(columns = regions_unique )
         
         #find time at which that region became active as a percentage of seizure length
         
         channel_names = labels[i_patient]
         regions_patient = region[i_patient]
-
-
-
-        len(channel_names)
-        channels_region_index_label = []
-        for r in range(len(regions_patient)):
+        regions_to_use = regions_unique
+        if use_atlas:
+            atlas_localization_path = join(paths.BIDS_DERIVATIVES_ATLAS_LOCALIZATION, f"sub-{RID}", f"ses-{session}", f"sub-{RID}_ses-{session}_desc-atlasLocalization.csv")
+            atlas_labels = pd.read_csv(join(paths.ATLAS_LABELS, atlas_files["STANDARD"]["AAL3"]["label"]))
+            regions_unique_atlas = np.array(atlas_labels.iloc[1:,1])
+            region_activation = pd.DataFrame(columns = regions_unique_atlas )
+                
+            regions_to_use = regions_unique_atlas
+            if utils.checkIfFileExists(atlas_localization_path, printBOOL=False):
+                atlas_localization = pd.read_csv(atlas_localization_path)
+                
+                
+                atlas_localization.channel = channel2std_ECoG(atlas_localization.channel)
+                channel_names = list(atlas_localization.channel)
+                regions_patient = atlas_localization["AAL3v1_1mm_label"]
+                channels_region_index_label = []
+                for r in range(len(regions_patient)):
             
-            reg = str(np.unique(regions_patient[r].flatten())[0])
-            
-            reg = replace_region_name(reg)
-            
-            reg_index = np.where( reg ==  regions_unique  )[0]
-            if len(reg_index) == 0:
-                ind = -1
-            else:
-                ind = reg_index[0]
-            channels_region_index_label.append(ind)
-        channels_region_index_label = np.asarray(channels_region_index_label)
-  
-        channels_region_index_label.shape
-        
-        
-        channel_activation_time = pd.DataFrame(columns = ["channel", "region_num", "activation_time"])
-        
-        len(channel_names)
-        len(channel2std_ECoG(channel_names))
-        np.array(channel_names)
-        channel2std_ECoG(channel_names)
-        
-        channel_names = channel2std_ECoG(channel_names)
-        channel_activation_time["channel"] = channel_names
-        channel_activation_time["region_num"] = channels_region_index_label
-        
-        #get activation time
-        
-        for ch in range(len(channel_activation_time)):
-            chan = channel_activation_time["channel"][ch]
-            ind_overlap = np.where(chan == channels2  )[0]
-            
-            if len(ind_overlap) > 0:
-                ind_chan = np.where(chan == channels2  )[0][0]
-                chan_start = spread_start[ind_chan]
-                chan_start_percent = chan_start/seizure_length
-                if chan_start_percent > 1:
-                    chan_start_percent = np.nan
                     
-            else:
-                chan_start_percent = np.nan
-            channel_activation_time.loc[ch, 'activation_time'] = chan_start_percent
-
-        
-        channel_activation_time["activation_time"] = channel_activation_time["activation_time"].astype(float)
-        
-        
-        channel_activation_time_only_times = channel_activation_time.drop("channel", axis= 1)
-        region_activation_time = channel_activation_time_only_times.groupby(["region_num"], as_index=False).mean()
-        
-        reg_act_time = np.zeros(shape = (len(regions_unique)))
-        reg_act_time[:] = 1
-        for rrr in range(len(region_activation_time)):
-            reg_ind = region_activation_time["region_num"][rrr]
-            if not reg_ind == -1:
-                reg_act_time[reg_ind] = region_activation_time["activation_time"][rrr]
-        
+                    reg = str(regions_patient[r])
     
+                    reg_index = np.where( reg ==  regions_unique_atlas  )[0]
+                    if len(reg_index) == 0:
+                        ind = -1
+                    else:
+                        ind = reg_index[0]
+                    channels_region_index_label.append(ind)
+                channels_region_index_label = np.asarray(channels_region_index_label)
+               
+                channels_region_index_label = np.asarray(channels_region_index_label)
         
-        region_activation = region_activation.append(pd.DataFrame(reg_act_time.reshape(1,-1), columns=list(region_activation)), ignore_index=True)
+                
+                channel_activation_time = pd.DataFrame(columns = ["channel", "region_num", "activation_time"])
+                
+                
+                channel_names = channel2std_ECoG(channel_names)
+                channel_activation_time["channel"] = channel_names
+                channel_activation_time["region_num"] = channels_region_index_label
+                
+                #get activation time
+                for ch in range(len(channel_activation_time)):
+                    chan = channel_activation_time["channel"][ch]
+                    ind_overlap = np.where(chan == channels2  )[0]
+                    
+                    if len(ind_overlap) > 0:
+                        ind_chan = np.where(chan == channels2  )[0][0]
+                        chan_start = spread_start[ind_chan] * skipWindow
+                        chan_start_percent = chan_start/seizure_length
+                        if chan_start_percent > 1:
+                            chan_start_percent = np.nan
+                            
+                    else:
+                        chan_start_percent = np.nan
+                    channel_activation_time.loc[ch, 'activation_time'] = chan_start_percent
+        
+                
+                channel_activation_time["activation_time"] = channel_activation_time["activation_time"].astype(float)
+                
+            
+                channel_activation_time_only_times = channel_activation_time.drop("channel", axis= 1)
+                
+                channel_activation_time_only_times= channel_activation_time_only_times.astype('float')
+                region_activation_time = channel_activation_time_only_times.groupby(["region_num"], as_index=False).mean()
+                
+                reg_act_time = np.zeros(shape = (len(regions_to_use)))
+                reg_act_time[:] = np.nan
+                for rrr in range(len(region_activation_time)):
+                    reg_ind = region_activation_time["region_num"][rrr]
+                    if not reg_ind == -1:
+                        reg_act_time[int(reg_ind)] = region_activation_time["activation_time"][rrr]
+                
+                region_activation = region_activation.append(pd.DataFrame(reg_act_time.reshape(1,-1), columns=list(region_activation)), ignore_index=True)
+            else:
+                reg_act_time = np.zeros(shape = len(regions_to_use))
+                reg_act_time[:] = np.nan
+                region_activation = region_activation.append(pd.DataFrame(reg_act_time.reshape(1,-1), columns=list(region_activation)), ignore_index=True)
+                
+                     
+        else:
+            
+            channels_region_index_label = []
+            for r in range(len(regions_patient)):
+                
+                reg = str(np.unique(regions_patient[r].flatten())[0])
+                
+                reg = replace_region_name(reg)
+                
+                reg_index = np.where( reg ==  regions_unique  )[0]
+                if len(reg_index) == 0:
+                    ind = -1
+                else:
+                    ind = reg_index[0]
+                channels_region_index_label.append(ind)
+            channels_region_index_label = np.asarray(channels_region_index_label)
+    
+            
+            channel_activation_time = pd.DataFrame(columns = ["channel", "region_num", "activation_time"])
+            
+            
+            channel_names = channel2std_ECoG(channel_names)
+            channel_activation_time["channel"] = channel_names
+            channel_activation_time["region_num"] = channels_region_index_label
+            
+            #get activation time
+            for ch in range(len(channel_activation_time)):
+                chan = channel_activation_time["channel"][ch]
+                ind_overlap = np.where(chan == channels2  )[0]
+                
+                if len(ind_overlap) > 0:
+                    ind_chan = np.where(chan == channels2  )[0][0]
+                    chan_start = spread_start[ind_chan] * skipWindow
+                    chan_start_percent = chan_start/seizure_length
+                    if chan_start_percent > 1:
+                        chan_start_percent = np.nan
+                        
+                else:
+                    chan_start_percent = np.nan
+                channel_activation_time.loc[ch, 'activation_time'] = chan_start_percent
+    
+            
+            channel_activation_time["activation_time"] = channel_activation_time["activation_time"].astype(float)
+            
+        
+            channel_activation_time_only_times = channel_activation_time.drop("channel", axis= 1)
+            
+            channel_activation_time_only_times= channel_activation_time_only_times.astype('float')
+            region_activation_time = channel_activation_time_only_times.groupby(["region_num"], as_index=False).mean()
+            
+            reg_act_time = np.zeros(shape = (len(regions_to_use)))
+            reg_act_time[:] = np.nan
+            for rrr in range(len(region_activation_time)):
+                reg_ind = region_activation_time["region_num"][rrr]
+                if not reg_ind == -1:
+                    reg_act_time[int(reg_ind)] = region_activation_time["activation_time"][rrr]
+            
+            region_activation = region_activation.append(pd.DataFrame(reg_act_time.reshape(1,-1), columns=list(region_activation)), ignore_index=True)
+            
         
         return region_activation
         
         
 #%%  
-   
-tanh = False
+use_atlas = False   
+tanh = True
 model_IDs = ["WN","CNN","LSTM" , "absolute_slope", "line_length", "power_broadband"]
 m=0
 model_ID= model_IDs[m]
 threshold = 0.6
 #pd.DataFrame(columns = ["subject", "seizure"] +list( regions_unique) )
-region_activation =pd.DataFrame(columns = list( regions_unique) )
-
-seconds_active = np.arange(0,60*2+1,1)
-percent_active = pd.DataFrame(data = seconds_active, columns = ["time"])
-
+if use_atlas:
+    atlas_labels = pd.read_csv(join(paths.ATLAS_LABELS, atlas_files["STANDARD"]["AAL3"]["label"]))
+    regions_unique_atlas = np.array(atlas_labels.iloc[1:,1])
+    regions_to_use = regions_unique_atlas
+else:
+    regions_to_use = regions_unique
+region_activation =pd.DataFrame(columns = list( regions_to_use) )
 
 for i in range(len(patientsWithseizures)):
     print(f"\r{i}   { np.round(   (i+1)/len(patientsWithseizures)*100   ,2)}%                  ", end = "\r")
-    region_activation_patient = calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshold=0.6, smoothing = 20, model_ID="WN", secondsAfter=180, secondsBefore=180, tanh = False)
+    region_activation_patient = calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshold=threshold, smoothing = 20, model_ID=model_ID, secondsAfter=180, secondsBefore=180, tanh = tanh, use_atlas = use_atlas)
     
     region_activation= region_activation.append(region_activation_patient, ignore_index=True)
 
@@ -635,13 +702,14 @@ for c in range(nfeature):
     if len(np.unique(x_data[:, c])) == 0:
         ind_same.append(c)
 print(ind_same)
-#%%
-        
-        
 
-n_clusters = 3
-        
-pca_activation = PCA(n_components=2)        
+
+#%%
+SIZE = 300
+
+n_clusters = 5
+pca_nclusters = 20
+pca_activation = PCA(n_components=pca_nclusters)        
         
         
 principalComponents= pca_activation.fit_transform(x_data)        
@@ -649,9 +717,16 @@ principalComponents= pca_activation.fit_transform(x_data)
         
 pca_activation.explained_variance_ratio_
 
-df = pd.DataFrame(principalComponents, columns = ["PC1", "PC2"])
+df = pd.DataFrame(principalComponents[:, 0:3], columns = ["PC1", "PC2", "PC3"])
 
 
+palette = sns.color_palette("tab20")
+palette[0] = (0.8392156862745098, 0.15294117647058825, 0.1568627450980392)
+palette[2] = (0.12156862745098039, 0.4666666666666667, 0.7058823529411765)
+palette[3] =  (0.5803921568627451, 0.403921568627451, 0.7411764705882353)
+palette1 = palette[0:n_clusters] 
+palette2 = {"0": "#D62728", "1": "#9567BE", "2": "#5b1111", "3": "#1F78B5", "4": "#AEC8E9" }
+palette2 = {"0": "#5b1111", "1": "#9567BE", "2": "#c94849", "3": "#1F78B5", "4": "#AEC8E9" }
 
 
 kmeans = KMeans(init="random",n_clusters=n_clusters,n_init=10,max_iter=300,random_state=42)
@@ -667,14 +742,48 @@ df["cluster"] = kmeans.labels_
 df["cluster"] = df["cluster"].astype(str)
 
 #sns.scatterplot(data = df, x = "PC1", y = "PC2", s = 5, hue = "cluster" , palette = {"0":"#9b59b6", "1":"#3498db",   "2":"#95a5a6"}, linewidth=0)
-sns.scatterplot(data = df, x = "PC1", y = "PC2", s = 12, hue = "cluster" , palette = "tab10" , linewidth=0)
+fig, axes = utils.plot_make(size_length=10, size_height=6)
+sns.scatterplot(data = df, x = "PC1", y = "PC2", s = SIZE, hue = "cluster" , palette = palette2 , linewidth=0)
+
+# change all spines
+for axis in ['top','bottom','left','right']:
+    axes.spines[axis].set_linewidth(6)
+
+# increase tick width
+axes.tick_params(width=4)
+axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_minifig_big.pdf"), bbox_inches='tight')
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_clusters_big.pdf"), bbox_inches='tight')
+
+region_activation_class_avg = copy.deepcopy(region_activation_fillna)
+region_activation_class_avg = region_activation_class_avg.replace(1, np.nan)
+region_activation_class_avg["cluster"] =  kmeans.labels_
+
+fig, axes = utils.plot_make(size_length=10, size_height=6)
+sns.lineplot(x = range(pca_nclusters), y = pca_activation.explained_variance_ratio_, lw = 8)
+for axis in ['top','bottom','left','right']:
+    axes.spines[axis].set_linewidth(6)
+axes.set_title("explained_variance_ratio")
+axes.set_xlabel("explained_variance_ratio")
+axes.set_ylabel("n components")
+axes.tick_params(width=4)
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "explained_variance_ratio.pdf"), bbox_inches='tight')
 
 #%%
+palette = sns.color_palette("Set2")
+palette=  [ (0.8,0.8,0.8)] + palette 
 df["subject"] = patientsWithseizures["subject"]
 df["seizure"] = patientsWithseizures["idKey"]
+#palette[0:len(subjects_to_plot)+1] 
+palette2 = {"RID0472": "#5b1111", "RID0278": "#9567BE", "RID0238": "#c94849", "RID0522": "#1F78B5", "RID0060": "#AEC8E9" , "other": "#CDCDCD" }
+palette2 = {"RID0472": "#9567BE", "RID0278": "#c94849", "RID0238": "#1F78B5", "RID0522": "#AEC8E9", "RID0060": "#c98848" , "other": "#CDCDCD" }
+
+np.unique(patientsWithseizures["subject"])
 
 subject_categories = []
-subjects_to_plot = ["RID0442", "RID0309", "RID0278", "RID0267"]
+subjects_to_plot = ["RID0472", "RID0278", "RID0238", "RID0522", "RID0060" ]
+#subjects_to_plot = ["RID0442", "RID0309", "RID0365", "RID0472"]
+#subjects_to_plot = ["RID0055", "RID0024", "RID0021", "RID0020", "RID0014" ]
 for s in range(len(df)):
     sub = patientsWithseizures["subject"][s]
     if sub in subjects_to_plot:
@@ -685,10 +794,159 @@ for s in range(len(df)):
     subject_categories.append(sub)
     
 df["subject_category"] = subject_categories
-sns.scatterplot(data = df.sort_values(by =["subject_category"], ascending = False), x = "PC1", y = "PC2", s = 20, hue = "subject_category" , palette = "Spectral" , linewidth=0, hue_order= ["other"] + subjects_to_plot)
 
-df.sort_values(by =["subject_category"], ascending = False)
-sns.color_palette("Set2")
+df_ordered = df.sort_values(by =["subject_category"], ascending = False)
+
+fig, axes = utils.plot_make(size_length=10, size_height=6)
+sns.scatterplot(data = df_ordered, x = "PC1", y = "PC2", s = SIZE, hue = "subject_category" , palette = palette2 , linewidth=0, hue_order= ["other"] + subjects_to_plot)
+
+
+# change all spines
+for axis in ['top','bottom','left','right']:
+    axes.spines[axis].set_linewidth(6)
+
+# increase tick width
+axes.tick_params(width=4)
+axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_patients_big.pdf"), bbox_inches='tight')
+region_activation_fillna_about = copy.deepcopy(region_activation_fillna)
+#%%
+df_outcome = pd.merge(df, outcomes, on='subject')
+
+df_outcome_drop = copy.deepcopy(df_outcome)
+df_outcome_drop.drop(df_outcome_drop[df_outcome_drop['Engel_24_mo_binary']  == "NA"].index, inplace = True)
+
+fig, axes = utils.plot_make(size_length=10, size_height=6)
+sns.scatterplot(data = df_outcome_drop, x = "PC1", y = "PC2", s = SIZE, hue = "Engel_24_mo_binary"  , linewidth=0, hue_order=["good", "poor"], palette= dict(good = "#420067", poor = "#c17d00") )
+
+# change all spines
+for axis in ['top','bottom','left','right']:
+    axes.spines[axis].set_linewidth(6)
+
+# increase tick width
+axes.tick_params(width=4)
+axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_outcome_big.pdf"), bbox_inches='tight')
+
+#%%
+target_categories = []
+palette_target = {"Temporal": "#c94849", "Frontal": "#1F78B5", "Parietal": "#9567BE", "RID0522": "#AEC8E9", "RID0060": "#c98848" , "other": "#CDCDCD" }
+
+for s in range(len(df_outcome)):
+    tar = np.array(df_outcome["Target"])[s]
+    if tar == "Insular":
+        tar = "Temporal"
+    elif tar == "MTL":
+        tar = "Temporal"
+    elif tar == "MFL":
+        tar = "Frontal"
+    elif tar == "FP":
+        tar = "Frontal"
+    target_categories.append(tar)
+    
+    
+df_outcome["target_category"] = target_categories
+
+fig, axes = utils.plot_make(size_length=10, size_height=6)
+sns.scatterplot(data = df_outcome, x = "PC1", y = "PC2", s = SIZE, hue = "target_category"  , linewidth=0, palette= palette_target)
+
+
+
+
+# change all spines
+for axis in ['top','bottom','left','right']:
+    axes.spines[axis].set_linewidth(6)
+
+# increase tick width
+axes.tick_params(width=4)
+axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_target_category_big.pdf"), bbox_inches='tight')
+#%%
+fig, axes = utils.plot_make(size_length=10, size_height=6)
+sns.scatterplot(data = df_outcome, x = "PC1", y = "PC2", s = SIZE, hue = "Laterality"  , linewidth=0, palette= dict(L = "#a53132", R = "#151515") )
+
+# change all spines
+for axis in ['top','bottom','left','right']:
+    axes.spines[axis].set_linewidth(6)
+
+# increase tick width
+axes.tick_params(width=4)
+axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_Laterality_big.pdf"), bbox_inches='tight')
+#%%
+palette_implant = {"SEEG": "#d75253", "ECoG": "#458fd5" }
+palette_Lesion_status = {"Non-Lesional": "#2669a8", "Lesional": "#d58b45" }
+palette_gender = {"M": "#669dd2", "F": "#d2669d" }
+
+fig, axes = utils.plot_make(size_length=10, size_height=6)
+sns.scatterplot(data = df_outcome, x = "PC1", y = "PC2", s = SIZE, hue = "Implant"  , linewidth=0, palette=palette_implant)
+# change all spines
+for axis in ['top','bottom','left','right']:
+    axes.spines[axis].set_linewidth(6)
+# increase tick width
+axes.tick_params(width=4)
+axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_Implant_big.pdf"), bbox_inches='tight')
+
+
+
+fig, axes = utils.plot_make(size_length=10, size_height=6)
+sns.scatterplot(data = df_outcome, x = "PC1", y = "PC2", s = SIZE, hue = "Lesion_status"  , linewidth=0, palette=palette_Lesion_status)
+# change all spines
+for axis in ['top','bottom','left','right']:
+    axes.spines[axis].set_linewidth(6)
+# increase tick width
+axes.tick_params(width=4)
+axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_Lesion_status_big.pdf"), bbox_inches='tight')
+
+
+
+
+fig, axes = utils.plot_make(size_length=10, size_height=6)
+sns.scatterplot(data = df_outcome, x = "PC1", y = "PC2", s = SIZE, hue = "Gender"  , linewidth=0, palette=palette_gender)
+# change all spines
+for axis in ['top','bottom','left','right']:
+    axes.spines[axis].set_linewidth(6)
+# increase tick width
+axes.tick_params(width=4)
+axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_Gender_big.pdf"), bbox_inches='tight')
+
+
+
+region_activation_fillna_about["seizure"] = patientsWithseizures["idKey"]
+region_activation_fillna_about["subject"] = patientsWithseizures["subject"]
+region_activation_fillna_about["cluster"] =  kmeans.labels_
+
+#%% Plot on length
+time_cutoffs = [30,60,120]
+subject_cutoffs = []
+for s in range(len(df)):
+    length = patientsWithseizures["length"][s]
+    
+    cutoff_ind = np.where(length<time_cutoffs)[0]
+    if len(cutoff_ind) > 0:
+        cutoff = f"<{time_cutoffs[cutoff_ind[0]]}"
+    else:
+        cutoff = f">{time_cutoffs[-1]}"
+    
+    subject_cutoffs.append(cutoff)
+
+df_outcome["seizure_length"] = subject_cutoffs
+fig, axes = utils.plot_make(size_length=10, size_height=6)
+
+sns.scatterplot(data = df_outcome, x = "PC1", y = "PC2", s = SIZE, hue = "seizure_length"  , linewidth=0, hue_order= ["<30", "<60", "<120", ">120"], palette={"<30": "#ec9b9c", "<60": "#ac2124", "<120": "#267bd0", ">120": "#14406c" }   )
+# change all spines
+for axis in ['top','bottom','left','right']:
+    axes.spines[axis].set_linewidth(6)
+
+# increase tick width
+axes.tick_params(width=4)
+axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_seizure_length_big.pdf"), bbox_inches='tight')
+
 #%%
 
 kmeans_kwargs = {
@@ -704,25 +962,398 @@ for k in range(1, kmeans_clusters_max):
     kmeans.fit(x_data)
     sse.append(kmeans.inertia_)
 
-plt.plot(range(1, kmeans_clusters_max), sse)
-#plt.xticks(range(1, kmeans_clusters_max))
-plt.xlabel("Number of Clusters")
-plt.ylabel("SSE")
-plt.show()
+
+fig, axes = utils.plot_make(size_length=10, size_height=6)
+sns.lineplot(x = range(1,kmeans_clusters_max), y = sse, lw = 8, color = "#8586e8")
+for axis in ['top','bottom','left','right']:
+    axes.spines[axis].set_linewidth(6)
+axes.set_title("k means clustering")
+axes.set_xlabel("Number of Clusters")
+axes.set_ylabel("SSE")
+axes.tick_params(width=4)
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "kmeans_clustering.pdf"), bbox_inches='tight')
 
 
+#%%
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+#Number of regions active for each seizure cluster
+
+region_activation_class_avg
+
+num_regions_active = []
+
+for r in range(len(region_activation_class_avg)):
+    sample = region_activation_class_avg.iloc[r,:-1]
+    sample[np.isnan(sample)] = -1
+    num_regions_active.append(len(np.where(sample >= 0)[0]))
 
 
+region_activation_class_avg_regions_active = copy.deepcopy(region_activation_class_avg)
 
 
+region_activation_class_avg_regions_active["num_regions"] = np.array(num_regions_active)
 
+region_activation_class_avg_regions_active["cluster"] = region_activation_class_avg_regions_active["cluster"].astype(str)
 
+#%%
+palette2_light = {"0": "#be2323", "1": "#ba9dd5", "2": "#da8384", "3": "#2c94db", "4": "#eaf1f9" }
+palette2_clusters = {"0": "#5b1111", "1": "#9567BE", "2": "#c94849", "3": "#1F78B5", "4": "#AEC8E9" }
 
+cluster_order = ["3", "1", "4", "2", "0"]
 
+fig, axes = utils.plot_make(size_length=20)
+sns.boxplot(data = region_activation_class_avg_regions_active, x = "cluster", y = "num_regions", palette= palette2_light, order=cluster_order, width=0.5)
+sns.swarmplot(data = region_activation_class_avg_regions_active, x = "cluster", y = "num_regions", palette= palette2_clusters, order=cluster_order)
 
+for i,artist in enumerate(axes.artists):
+    # Set the linecolor on the artist to the facecolor, and set the facecolor to None
+    col = artist.get_facecolor()
+    artist.set_edgecolor(col)
+    #artist.set_facecolor('None')
 
-
-
-
-       
+    # Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
+    # Loop over them here, and use the same colour as above
+    for j in range(i*6,i*6+6):
+        line = axes.lines[j]
+        #line.set_color(col)
+        line.set_mfc(col)
+        line.set_mec(col)
         
+for i, tick in enumerate(axes.xaxis.get_major_ticks()):
+    tick.label.set_fontsize(6)        
+     
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "kmeans_clustering_number_of_regions.pdf"), bbox_inches='tight')       
+#%%
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+#Kinda skip this section
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+#Plot averages of atlas and clusters
+region_activation_class_avg = copy.deepcopy(region_activation_fillna)
+region_activation_class_avg = region_activation_class_avg.replace(1, np.nan)
+region_activation_class_avg["cluster"] =  kmeans.labels_
+
+
+region_activation_class_avg_group = region_activation_class_avg.groupby(["cluster"], as_index=False).mean()
+
+
+
+
+
+atlas_files["STANDARD"]["DKT"]["name"]
+atlas_files["STANDARD"]["DKT"]["label"]
+
+
+
+
+join(paths.ATLAS_LABELS, atlas_files["STANDARD"]["DKT"]["label"])
+join(paths.ATLAS_LABELS, atlas_files["STANDARD"]["HO_corticalSubcortical"]["label"])
+
+utils.checkIfFileExists(join(paths.ATLAS_LABELS, atlas_files["STANDARD"]["DKT"]["label"]))
+
+dkt_labels = pd.read_csv(join(paths.ATLAS_LABELS, atlas_files["STANDARD"]["DKT"]["label"]))
+ho_labels = pd.read_csv(join(paths.ATLAS_LABELS, atlas_files["STANDARD"]["HO_corticalSubcortical"]["label"]))
+
+dkt_labels_all = np.array(dkt_labels.iloc[1:,1])
+ho_labels_all = np.array(ho_labels.iloc[1:,1])
+regions_labels_all = np.array(region_activation_fillna.columns)
+
+regions_labels_all_process = copy.deepcopy(regions_labels_all)
+for a in range(len(regions_labels_all)):
+    reg = regions_labels_all_process[a]
+    reg = reg.replace("gyrus ", "")
+    reg = reg.replace("gyrus", "")
+    reg = reg.replace("ACgG ", "")
+    reg = reg.replace("AIns ", "")
+    reg = reg.replace("AOrG ", "")
+    reg = reg.replace("AnG ", "")
+    reg = reg.replace("CO ", "")
+    reg = reg.replace("Calc ", "")
+    reg = reg.replace("Cun ", "")
+    reg = reg.replace("Ent ", "")
+    reg = reg.replace("FO ", "")
+    reg = reg.replace("FRP ", "")
+    reg = reg.replace("FuG ", "")
+    reg = reg.replace("Greg ", "")
+    reg = reg.replace("IOG ", "")
+    reg = reg.replace("ITG ", "")
+    reg = reg.replace("LOrG ", "")
+    reg = reg.replace("MCgG ", "")
+    reg = reg.replace("MFC ", "")
+    reg = reg.replace("MOG ", "")
+    reg = reg.replace("MOrG ", "")
+    reg = reg.replace("MPrG ", "")
+    reg = reg.replace("MSFG ", "")
+    reg = reg.replace("MTG ", "")
+    reg = reg.replace("OCP ", "")
+    reg = reg.replace("OFuG ", "")
+    reg = reg.replace("OpIFG ", "")
+    reg = reg.replace("OrIFG ", "")
+    reg = reg.replace("PCgG ", "")
+    reg = reg.replace("PHG ", "")
+    reg = reg.replace("PO ", "")
+    reg = reg.replace("PP ", "")
+    reg = reg.replace("PCu ", "")
+    reg = reg.replace("PIns ", "")
+    reg = reg.replace("POrG ", "")
+    reg = reg.replace("PT ", "")
+    reg = reg.replace("PoG ", "")
+    reg = reg.replace("PrG ", "")
+    reg = reg.replace("SCA ", "")
+    reg = reg.replace("SFG ", "")
+    reg = reg.replace("SMC ", "")
+    reg = reg.replace("SMG ", "")
+    reg = reg.replace("SOG ", "")
+    reg = reg.replace("SPL ", "")
+    reg = reg.replace("STG ", "")
+    reg = reg.replace("TTG ", "")
+    reg = reg.replace("TrIFG ", "")
+    reg = reg.replace("TMP ", "")
+    reg = reg.replace("ACgG ", "")
+    reg = reg.replace("GRe ", "")
+    reg = reg.replace("posterior insula", "insula")
+    reg = reg.replace("anterior insula", "insula")
+    reg = reg.replace("middle cingulate", "cingulate")
+    regions_labels_all_process[a] = reg
+
+
+
+#%%
+
+activation_dkt_all_clusters = []
+activation_ho_all_clusters = []
+for cluster in range(n_clusters):
+    print(f"\n {cluster}")
+    process_amount = np.zeros((2,len(regions_labels_all_process)))
+    
+    activation_dkt = pd.DataFrame(columns =[ "region", "activation", "N"])
+    activation_dkt["region"] = dkt_labels_all
+    activation_dkt["activation"] = 0
+    activation_dkt["N"] = 0
+    
+    activation_ho = pd.DataFrame(columns =[ "region", "activation", "N"])
+    activation_ho["region"] = ho_labels_all
+    activation_ho["activation"] = 0
+    activation_ho["N"] = 0
+    
+    cluster = cluster
+    for a in range(len(regions_labels_all_process)):
+        reg= regions_labels_all_process[a]
+        lab_dkt = process.extract(reg, list(dkt_labels_all), limit=1)[0]
+        lab_ho = process.extract(reg, list(ho_labels_all), limit=1)[0]
+        #print(f" {reg}                 {lab_dkt[0]}                   {lab_dkt[1]} ")
+        process_amount[0,a] = lab_dkt[1]
+        process_amount[1,a] = lab_ho[1]
+        
+        
+        if  lab_dkt[1] > 86:
+            act = region_activation_class_avg_group.iloc[cluster,np.where(region_activation_class_avg_group.columns ==  regions_labels_all[a])[0][0]]
+            
+            activation_dkt.loc[activation_dkt["region"] == lab_dkt[0], "activation"] = activation_dkt.loc[activation_dkt["region"] == lab_dkt[0], "activation"]+ act
+            activation_dkt.loc[activation_dkt["region"] == lab_dkt[0], "N"] = activation_dkt.loc[activation_dkt["region"] == lab_dkt[0], "N"] + 1
+    
+    
+        if  lab_ho[1] > 86:
+            act = region_activation_class_avg_group.iloc[cluster,np.where(region_activation_class_avg_group.columns ==  regions_labels_all[a])[0][0]]
+            
+            activation_ho.loc[activation_ho["region"] == lab_ho[0], "activation"] = activation_ho.loc[activation_ho["region"] == lab_ho[0], "activation"]+ act
+            activation_ho.loc[activation_ho["region"] == lab_ho[0], "N"] = activation_ho.loc[activation_ho["region"] == lab_ho[0], "N"] + 1
+        
+    activation_dkt["activation"]  = activation_dkt["activation"] / activation_dkt["N"]
+    activation_ho["activation"]  = activation_ho["activation"] / activation_ho["N"]
+    
+    
+    activation_dkt_all_clusters.append(activation_dkt)
+    activation_ho_all_clusters.append(activation_ho)
+    
+np.mean(process_amount[0])
+np.mean(process_amount[1])
+
+#%% Open DKT atlas and save
+#atlas = glob.glob(join(paths.BIDS_DERIVATIVES_ATLAS_LOCALIZATION, f"sub-{RID}", f"ses-implant01", "tmp", "orig_nu_std.nii.gz" ))[0]
+atlas_path = join(paths.ATLASES, atlas_files["STANDARD"]["DKT"]["name"])
+img = nib.load(atlas_path)
+#utils.show_slices(img, data_type = "img")
+img_data = img.get_fdata()
+affine = img.affine
+shape = img_data.shape
+
+atlas_path2 = join(paths.ATLASES, atlas_files["STANDARD"]["HO_corticalSubcortical"]["name"])
+img2 = nib.load(atlas_path2)
+#utils.show_slices(img2, data_type = "img")
+img_data2 = img2.get_fdata()
+affine2 = img2.affine
+shape2 = img2.shape
+
+#%%
+
+cluster = 0
+
+img_data_activation = copy.deepcopy(img_data)
+region_nums = np.array(dkt_labels.iloc[1:,0])
+for a in range(len(region_nums)):
+    region_num = float(region_nums[a])  
+    act = activation_dkt_all_clusters[cluster]["activation"][a]
+    if np.isnan(act):
+        act = np.nanmax(activation_dkt_all_clusters[cluster]["activation"])
+    img_data_activation[np.where(region_num == img_data)] = act
+
+img_data_activation[np.where(img_data_activation == 0)] = np.nan
+
+utils.show_slices(img_data_activation, data_type = "data", cmap = "YlOrRd_r")
+
+
+
+
+cluster = 3
+
+img_data_activation2 = copy.deepcopy(img_data2)
+region_nums = np.array(ho_labels.iloc[1:,0])
+for a in range(len(region_nums)):
+    region_num = float(region_nums[a])  
+    act = activation_ho_all_clusters[cluster]["activation"][a]
+    if np.isnan(act):
+        act = np.nanmax(activation_ho_all_clusters[cluster]["activation"])
+    img_data_activation2[np.where(region_num == img_data2)] = act
+
+img_data_activation2[np.where(img_data_activation2 == 0)] = np.nan
+
+utils.show_slices(img_data_activation2, data_type = "data", cmap = "YlOrRd_r")
+
+
+
+#%%#%%
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+#For the proper atlas regions
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+###############################################
+
+#For the proper atlas regions
+
+use_atlas = True   
+tanh = True
+model_IDs = ["WN","CNN","LSTM" , "absolute_slope", "line_length", "power_broadband"]
+m=0
+model_ID= model_IDs[m]
+threshold = 0.6
+#pd.DataFrame(columns = ["subject", "seizure"] +list( regions_unique) )
+if use_atlas:
+    atlas_labels = pd.read_csv(join(paths.ATLAS_LABELS, atlas_files["STANDARD"]["AAL3"]["label"]))
+    regions_unique_atlas = np.array(atlas_labels.iloc[1:,1])
+    regions_to_use = regions_unique_atlas
+else:
+    regions_to_use = regions_unique
+region_activation =pd.DataFrame(columns = list( regions_to_use) )
+
+for i in range(len(patientsWithseizures)):
+    print(f"\r{i}   { np.round(   (i+1)/len(patientsWithseizures)*100   ,2)}%                  ", end = "\r")
+    region_activation_patient = calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshold=threshold, smoothing = 20, model_ID=model_ID, secondsAfter=180, secondsBefore=180, tanh = tanh, use_atlas = use_atlas)
+    
+    region_activation= region_activation.append(region_activation_patient, ignore_index=True)
+
+
+     
+        
+#%%
+region_activation_fillna = region_activation.fillna(1)
+x_data = np.array(region_activation_fillna)
+
+samples, nfeature = x_data.shape
+#find where column are all the same
+ind_same = []
+for c in range(nfeature):
+    if len(np.unique(x_data[:, c])) == 0:
+        ind_same.append(c)
+print(ind_same)
+
+
+
+
+
+region_activation_class_avg = copy.deepcopy(region_activation_fillna)
+region_activation_class_avg = region_activation_class_avg.replace(1, np.nan)
+region_activation_class_avg["cluster"] =  kmeans.labels_
+
+
+region_activation_class_avg_group = region_activation_class_avg.groupby(["cluster"], as_index=False).mean()
+region_activation_class_avg_group = region_activation_class_avg_group.fillna(1)
+#%%
+
+activation_aal_all_clusters = []
+for cluster in range(n_clusters):
+    print(f"\n {cluster}")
+    activation_aal = pd.DataFrame(columns =[ "region", "activation"])
+    activation_aal["region"] = regions_to_use
+    activation_aal["activation"] = 0
+    activation_aal["activation"] =      np.array(region_activation_class_avg_group.iloc[cluster,1:] )
+
+    activation_aal_all_clusters.append(activation_aal)
+
+    
+
+aal_labels = pd.read_csv(join(paths.ATLAS_LABELS, atlas_files["STANDARD"]["AAL3"]["label"]))
+
+# Open AAL atlas and save
+#atlas = glob.glob(join(paths.BIDS_DERIVATIVES_ATLAS_LOCALIZATION, f"sub-{RID}", f"ses-implant01", "tmp", "orig_nu_std.nii.gz" ))[0]
+atlas_path = join(paths.ATLASES, atlas_files["STANDARD"]["AAL3"]["name"])
+img = nib.load(atlas_path)
+#utils.show_slices(img, data_type = "img")
+img_data = img.get_fdata()
+affine = img.affine
+shape = img_data.shape
+
+
+#%%
+
+cluster = 4
+
+img_data_activation = copy.deepcopy(img_data)
+region_nums = np.array(aal_labels.iloc[1:,0])
+for a in range(len(region_nums)):
+    region_num = float(region_nums[a])  
+    act = activation_aal_all_clusters[cluster]["activation"][a]
+    #if np.isnan(act):
+    #    act = np.nanmax(activation_aal_all_clusters[cluster]["activation"])
+    img_data_activation[np.where(region_num == img_data)] = act
+
+img_data_activation[np.where(img_data_activation == 0)] = np.nan
+
+utils.show_slices(img_data_activation, data_type = "data", cmap = "Spectral")
+
+tmp = activation_aal_all_clusters[0]
+utils.save_nib_img_data(img_data_activation, img, join(BIDS, project_folder, f"atlases", f"cluster_{cluster}.nii.gz" ) )

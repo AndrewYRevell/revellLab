@@ -175,6 +175,7 @@ deepLearningModelsPath = paths.DEEP_LEARNING_MODELS
 datasetiEEG = "derivatives/seizure_spread/iEEG_data"
 datasetiEEG_preprocessed = "derivatives/seizure_spread/preprocessed" ##################################################
 datasetiEEG_spread = "derivatives/seizure_spread/seizure_spread_measurements"
+project_folder = "derivatives/seizure_spread"
 session = "implant01"
 SESSION_RESEARCH3T = "research3Tv[0-9][0-9]"
 
@@ -882,7 +883,7 @@ for co  in np.arange(5,70,5):
 ##############################################################
 
 #%% Compare over thresholds
-tanh = True
+tanh = False
 
 
 thresholds_median = pd.DataFrame(columns = ["model","version", "threshold", "mean", "median", "sd"])
@@ -927,6 +928,18 @@ for m in range(len(model_IDs)):
 ##########################
 ##########################
 ##########################
+
+#%%Full analysis save
+
+full_analysis = [soz_overlap, percent_active, tanh, seconds_active, by, thresholds, window, skipWindow, secondsBefore, secondsAfter]
+
+full_analysis_location = join(BIDS, project_folder, f"full_analysis_save")
+full_analysis_location_file_basename = f"soz_overlap_tanh_{tanh}_by_{by}_model_{version}.pickle"
+full_analysis_location_file = join(full_analysis_location, full_analysis_location_file_basename)
+
+#with open(full_analysis_location_file, 'wb') as f: pickle.dump(full_analysis, f)
+
+with open(full_analysis_location_file, 'rb') as f: [soz_overlap, percent_active, tanh, seconds_active, by, thresholds, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
 
 #%%
 soz_overlap_median = soz_overlap.groupby(['model', 'subject', "threshold"], as_index=False).median()
@@ -998,7 +1011,7 @@ finding_max = pd.DataFrame(columns = ["model", "threshold", "cohensd_max", "pval
 finding_max_seconds = pd.DataFrame(columns = ["model", "threshold", "second", "cohensd", "pval" ])
 thresh = 0.95
 m=1
-
+time_limit = 120
 for m in range(len(model_IDs)):
     for t in range(len(thresholds)):
         model_ID = model_IDs[m]
@@ -1011,8 +1024,8 @@ for m in range(len(model_IDs)):
         df_thresh = df[( df["threshold"]== thresh )]
         df_model =  df_thresh[( df_thresh["model"] ==model_ID )]
         
-        df_filtered =     df_model[(df_model[category] != "unknown") & (df_model["time"] <= 60)]
-        df_filtered_90s = df_model[(df_model[category] != "unknown") & (df_model["time"] <= 60)]
+        df_filtered =     df_model[(df_model[category] != "unknown") & (df_model["time"] <= time_limit)]
+        df_filtered_90s = df_model[(df_model[category] != "unknown") & (df_model["time"] <= time_limit)]
         
         
         
@@ -1020,7 +1033,7 @@ for m in range(len(model_IDs)):
         #plt.show()
         cohensd = np.zeros(len(seconds_active))
         outcomes_stats = np.zeros(len(seconds_active))
-        for tt in range(len(seconds_active[np.where(seconds_active <= 60)])):
+        for tt in range(len(seconds_active[np.where(seconds_active <= time_limit)])):
             
             
             tmp = df_filtered[df_filtered["time"] == seconds_active[tt]]
@@ -1035,7 +1048,8 @@ for m in range(len(model_IDs)):
             #    extra = "****"
             #else:
             #    extra = ""
-            
+            v1= v1[~np.isnan(v1)]
+            v2 = v2[~np.isnan(v2)]
             if (len(np.unique(v1)) == 1 & len(np.unique(v2)) == 1):
                 outcomes_stats[tt] = 1
                 cohensd[tt] = np.nan
@@ -1089,21 +1103,37 @@ print(outcomes_stats[31])
 print(outcomes_stats[32])
 
 #%%
+
+spread_at_time_save = [finding_max, finding_max_seconds, tanh]
+
+spread_at_time_save_location = join(BIDS, project_folder, f"full_analysis_save")
+spread_at_time_save_location_file_basename = f"spread_at_time_tanh_{tanh}_by_{by}_model_{version}_2.pickle"
+spread_at_time_save_location_file = join(spread_at_time_save_location, spread_at_time_save_location_file_basename)
+
+#with open(spread_at_time_save_location_file, 'wb') as f: pickle.dump(spread_at_time_save, f)
+
+with open(spread_at_time_save_location_file, 'rb') as f:  [finding_max, finding_max_seconds, tanh] = pickle.load(f)
+#%%
 #plot heatmap of cohensd 
 fig, axes = utils.plot_make(r = 1, c = len(model_IDs), size_length=  len(model_IDs)*9 )
 cohensd_max =  np.nanmax(np.asarray(finding_max_seconds["cohensd"]))
-for i in range(len(model_IDs)):
-    m=i
+for m in range(len(model_IDs)):
+
     model_ID = model_IDs[m]
     cohensd_plot = finding_max_seconds[(finding_max_seconds["model"] == model_ID)]
     cohensd_plot_matrix = cohensd_plot.pivot(index='second', columns='threshold',values='cohensd')
     
     cohensd_plot_matrix_nanfill = np.nan_to_num(np.asarray(cohensd_plot_matrix))
-
     
-    sns.heatmap(cohensd_plot_matrix_nanfill, ax = axes[i], vmin= 0, vmax = cohensd_max)
-    axes[i].set_title(model_ID)
-    
+    sns.heatmap(cohensd_plot_matrix_nanfill, ax = axes[m], vmin= 0, vmax = cohensd_max)
+    axes[m].set_title(model_ID)
+    if m == 0:
+        axes[m].set_xlim([43,100])
+    if m == 1:
+        axes[m].set_xlim([47,100])
+    if m == 2:
+        axes[m].set_xlim([48,100])
+ 
 
 
 #%% How quickly spread from one hipp to another
@@ -1118,7 +1148,7 @@ hipp_spread["hipp_spread_time"] = hipp_spread_time
 for m in range(len(model_IDs)):
     for t in range(len(thresholds)):
         utils.printProgressBar(t+1, len(thresholds), prefix= model_ID )
-        cutoff_by = 0.25
+        cutoff_by = 0.5
         for co  in np.round(np.arange(5,35+cutoff_by,cutoff_by),2):
             
             model_ID = model_IDs[m]
@@ -1214,10 +1244,23 @@ for m in range(len(model_IDs)):
         
            # print(f"{co}: {pval1}, {pval2}")
 
+
+
+#%%
+
+quickness_analysis_save = [finding_max_quickness, tanh]
+
+quickness_analysis_save_location = join(BIDS, project_folder, f"full_analysis_save")
+quickness_analysis_save_location_file_basename = f"quickness_analysis_tanh_{tanh}_by_{by}_model_{version}.pickle"
+quickness_analysis_save_location_file = join(quickness_analysis_save_location, quickness_analysis_save_location_file_basename)
+
+#with open(quickness_analysis_save_location_file, 'wb') as f: pickle.dump(quickness_analysis_save, f)
+
+with open(quickness_analysis_save_location_file, 'rb') as f: [finding_max_quickness, tanh] = pickle.load(f)
 #%%
 #plot heatmap of cramers v
 
-np.arange(5,35+cutoff_by,cutoff_by)
+
 
 fig, axes = utils.plot_make(r = len(model_IDs), c = 4, size_length=  20 ,size_height=len(model_IDs)*2 )
 #axes = axes.flatten()
@@ -1288,6 +1331,9 @@ print(quickness_comparison_filtered.pval_everyone)
 
 utils.correct_pvalues_for_multiple_testing(list(quickness_comparison_filtered.pval_everyone) + [0.04])
 utils.correct_pvalues_for_multiple_testing(list(quickness_comparison_filtered.pval_TLE) + [0.04])
+
+utils.correct_pvalues_for_multiple_testing(list(quickness_comparison_filtered.pval_everyone) )
+utils.correct_pvalues_for_multiple_testing(list(quickness_comparison_filtered.pval_TLE) )
 
 #%%
 
