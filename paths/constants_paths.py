@@ -51,6 +51,7 @@ BIDS_DERIVATIVES_WM_IEEG_TRACTOGRAPHY = "/media/arevell/data/linux/data/BIDS/der
 BIDS_DERIVATIVES_WM_IEEG_METADATA = "/media/arevell/data/linux/data/BIDS/derivatives/white_matter_iEEG/iEEGdata_WM_iEEG.json"
 DEEP_LEARNING_MODELS = "/media/arevell/data/linux/data/deepLearningModels/seizureSpread"
 SEIZURE_SPREAD_ATLASES_PROBABILITIES = "/media/arevell/data/linux/data/SOZ_atlas_probabilities"
+SEIZURE_SPREAD_FIGURES = "/media/arevell/data/linux/figures/seizureSpread"
 
 
 

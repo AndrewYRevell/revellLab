@@ -123,7 +123,7 @@ aspect = 50
 #turning jsonFile to a @dataclass to make easier to extract info and data from it
 DataJson = dataclass_iEEG_metadata.dataclass_iEEG_metadata(jsonFile)
 patientsWithseizures = DataJson.get_patientsWithSeizuresAndInterictal()
-
+np.unique(patientsWithseizures["subject"])
 #%%Get data
 
 

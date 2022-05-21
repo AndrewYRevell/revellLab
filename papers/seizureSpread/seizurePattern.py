@@ -13,6 +13,7 @@ import json
 import os
 import pickle
 import math
+import re
 import numpy as np
 import pandas as pd
 import seaborn as sns
@@ -35,8 +36,32 @@ from revellLab.packages.eeg.echobase import echobase
 
 #%%
 
-def plot_probheatmaps(probabilityArray, fsds, skip, threshold = 0.5, smoothing = 20, channel1 = 0, channel2 = 1, vmin = 0, vmax = 1, center=0.5):
-    fig, ax = plt.subplots(3,2, figsize=(10,10), dpi =300)
+def plot_probheatmaps(probabilityArray, fsds, skip, threshold = 0.5, smoothing = 20, channel1 = 0, channel2 = 1, vmin = 0, vmax = 1, center=0.5,  title = None, title_channel1 = None, title_channel2 = None, verticalline = 1800, channel_names = ""):
+    fig, ax = plt.subplots(3,2, figsize=(16,16), dpi =300)
+    
+    #printing channel names
+    channel_names_string = " ".join(channel_names)
+    names_len = len(channel_names_string)
+    max_char = 160 #max characters on single line
+    text_string = []
+    new_string = copy.deepcopy(channel_names_string)
+    s=0
+    while s < names_len:
+        spaces = np.array([i for i in range(len(new_string)) if new_string.startswith(" ", i)])
+        where_spaces_are_less_than_max = np.where(spaces < max_char)[0]
+        loc = spaces[where_spaces_are_less_than_max[-1]]
+        
+        text_string.append(  new_string[0:loc]     )
+        s = s+loc+1
+        new_string = new_string[loc+1:]
+        if s+max_char >names_len:
+            text_string.append(  new_string   )
+            s = s + max_char
+
+    text = "\n".join(text_string)
+    fig.text(0.1,0, text, size = 9, wrap=True, ha='left', va = "bottom")
+
+
     windows, nchan = probabilityArray.shape
     thresholded = copy.deepcopy(probabilityArray)
     thresholded[thresholded>threshold] = 1; thresholded[thresholded<=threshold] = 0
@@ -47,15 +72,55 @@ def plot_probheatmaps(probabilityArray, fsds, skip, threshold = 0.5, smoothing =
     mvgAvgThreshold = copy.deepcopy(mvgAvg)
     mvgAvgThreshold[mvgAvgThreshold>threshold] = 1
     mvgAvgThreshold[mvgAvgThreshold<=threshold] = 0
+    
+    #plot non-smoothed
+    #sns.lineplot( x = range(windows),  y= probabilityArray[:,channel1],    ci=None, ax = ax[0,0])
+    #sns.lineplot( x = range(windows),  y= probabilityArray[:,channel2],    ci=None, ax = ax[0,1])
+    
+    #plot smoothed
+    nan_add = windows - mvgAvg.shape[0]
+    lineplot1 =  np.concatenate([ mvgAvg[:,channel1], np.repeat(np.nan, nan_add)])
+    lineplot2 =  np.concatenate([ mvgAvg[:,channel2], np.repeat(np.nan, nan_add)])
+    np.array(range(windows)).shape[0]
+    sns.lineplot( x = range(windows),  y=  lineplot1,    ci=None, ax = ax[0,0])
+    sns.lineplot( x = range(windows),  y= lineplot2,    ci=None, ax = ax[0,1])
+    ax[0,0].axhline(y=threshold, color="#562686", linestyle='-', lw = 3)
+    ax[0,1].axhline(y=threshold, color="#562686", linestyle='-', lw = 3)
+    
 
-    sns.lineplot( x = range(windows),  y= probabilityArray[:,channel1],    ci=None, ax = ax[0,0])
-    sns.lineplot( x = range(windows),  y= probabilityArray[:,channel2],    ci=None, ax = ax[0,1])
+    ax[0,0].axvline(x=verticalline, c = "#aa2222", lw = 3 )
+    ax[0,1].axvline(x=verticalline, c = "#aa2222", lw = 3 )
     sns.heatmap( probabilityArray.T , ax = ax[1,0], vmin = vmin, vmax = vmax, center=center)
     sns.heatmap( thresholded.T,  ax = ax[1,1] )
     sns.heatmap( mvgAvg.T , ax = ax[2,0] , vmin = vmin, vmax = vmax, center=center)
     sns.heatmap( mvgAvgThreshold.T,  ax = ax[2,1] )
+    
+    if title == None:
+        title = "Seizure Probabilities"
+    if title_channel1 == None:
+        title_channel1 = 'Channel 0'
+    if title_channel2 == None:
+        title_channel2 = 'Channel 1'
 
+    fig.suptitle(title, fontsize=28, y= 0.93)
+    ax[0,0].set_xlabel("time (0.1 sec)")
+    ax[0,1].set_xlabel("time (0.1 sec)")
+    ax[0,0].set_ylabel("seizure probability")
+    ax[0,0].title.set_text(title_channel1)
+    ax[0,1].title.set_text(title_channel2)
+    
+    ax[1,0].set_ylabel("Channel #")
+    ax[2,0].set_ylabel("Channel #")
+    
+    ax[2,0].set_xlabel("time (0.1 sec)")
+    ax[2,1].set_xlabel("time (0.1 sec)")
 
+    ax[1,0].set_xticklabels(labels = ax[2,0].get_xticklabels(), fontsize = 7)
+    ax[1,1].set_xticklabels(labels = ax[2,0].get_xticklabels(), fontsize = 7)
+    ax[2,0].set_xticklabels(labels = ax[2,0].get_xticklabels(), fontsize = 7)
+    ax[2,1].set_xticklabels(labels = ax[2,0].get_xticklabels(), fontsize = 7)
+ 
+    
 
 def plot_singleProbability(probabilityArray, fsds, skip, channel=1, startInd = 0, stopInd = None, smoothing = 20, vmin = -0.2, vmax = 1.2):
     windows, nchan = probabilityArray.shape

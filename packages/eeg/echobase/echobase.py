@@ -59,12 +59,16 @@ import math
 import time
 import copy
 import inspect
+import re
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+
 from scipy import signal
 from scipy import interpolate
+from scipy.signal import convolve2d
+from scipy.integrate import simps
 from scipy.spatial import distance_matrix
 from scipy.stats import pearsonr, spearmanr
 from sklearn.feature_selection import mutual_info_regression
@@ -910,22 +914,91 @@ def automaticBipolarMontageSEEG(data, data_columns):
     #naming to standard 4 character channel Name: (Letter)(Letter)(Number)(Number)
     channels = channel2std(channels)
     count = 0
+    
+    bipolar_channel_names = []
     for ch in range(nchan-1):
         ch1Ind = ch
         ch1 = channels[ch1Ind]
         #find sequential index
         ch2 = ch1[0:2] + f"{(int(ch1[2:4]) + 1):02d}"
 
+        bipolar_name = f"{ch1} - {ch2}"
+        bipolar_channel_names.append(bipolar_name)
         ch2exists = np.where(channels == ch2)[0]
         if len(ch2exists) > 0:
             ch2Ind = ch2exists[0]
+            #bipolar = pd.Series((data[:,ch1Ind] - data[:,ch2Ind])).rename(bipolar_name)
             bipolar = pd.Series((data[:,ch1Ind] - data[:,ch2Ind])).rename(ch1)
             if count == 0: #initialize
                 dfBipolar = pd.DataFrame( bipolar)
                 count = count + 1
             else:
                 dfBipolar = pd.concat([dfBipolar, pd.DataFrame( bipolar)], axis=1)
-    return np.array(dfBipolar), np.array(dfBipolar.columns)
+    return np.array(dfBipolar), np.array(dfBipolar.columns), np.array(bipolar_channel_names)
+
+
+def automaticBipolarMontageECOG(data, data_columns):
+    channels = np.array(data_columns)
+
+
+
+
+    nchan = len(channels)
+    #naming to standard 4 character channel Name: (Letter)(Letter)(Number)(Number)
+    channels = channel2std(channels)
+    count = 0
+    
+    
+    #grab all the electrode channels with the same LETTERS (e.g. LAT)
+    electrode_names = []
+    for ch in range(nchan-1):
+        electrode_names.append(("".join(re.split("[^a-zA-Z]*", channels[ch]))))
+    electrode_names_unique = np.unique(np.array(electrode_names))
+    
+    bipolar_channel_names = []
+    count = 0
+    for el in range(len(electrode_names_unique)):
+        electrode = electrode_names_unique[el]
+        
+        #these are the data indexes that are part of the same electrode.
+        electrode_indexes = np.where(electrode == np.array(electrode_names))[0]
+        
+        channel_numbers = [int("".join(re.split("[^0-9]*", x))) for x in channels[electrode_indexes]]
+
+        for ind in range(len(electrode_indexes)):
+            ch1Ind = electrode_indexes[ind]
+            #find sequential index
+    
+            ch1_number = int("".join(re.split("[^0-9]*", channels[ch1Ind]))) #the the channel number
+            ch2_number = ch1_number+1
+            
+            
+            #check if sequential electrode exists
+            if any(ch2_number == np.array(channel_numbers)):
+
+                ch2_elecrode_index = np.where(ch2_number == np.array(channel_numbers) )[0][0]
+                
+                ch2Ind = electrode_indexes[ch2_elecrode_index]
+                ch1_name = channels[ch1Ind]
+                ch2_name = channels[ch2Ind]
+                bipolar_name = f"{ch1_name} - {ch2_name}"
+                bipolar_channel_names.append(bipolar_name)
+                #bipolar = pd.Series((data[:,ch1Ind] - data[:,ch2Ind])).rename(bipolar_name)
+                bipolar = pd.Series((data[:,ch1Ind] - data[:,ch2Ind])).rename(ch1_name)
+                
+                if count == 0: #initialize
+                    dfBipolar = pd.DataFrame( bipolar)
+                    count = count + 1
+                else:
+                    dfBipolar = pd.concat([dfBipolar, pd.DataFrame( bipolar)], axis=1)
+    return np.array(dfBipolar), np.array(dfBipolar.columns), np.array(bipolar_channel_names)
+                
+                
+
+       
+        
+        
+
 
 
 def manual_bipolar_ref(data, data_col, csvcols):
@@ -1210,9 +1283,45 @@ def preprocess(df, fs, fsds, montage = "bipolar", prewhiten = True):
         channels = data_columns
         channels = channel2std(channels)
     if montage == "bipolar":
-        data_ref, channels = automaticBipolarMontageSEEG(data, data_columns)
-    if prewhiten == True: data_ar = ar_one(data_ref)
-    else: data_ar = data_ref
+        #Try SEEG bipolar first, if it doesnt work, then assume ECOG naming convention
+        #if that doesn't work, then check for very early implantation ppl with odd naming conventions (like RID0014).
+        #if that doesnt work, then return error
+        try:
+            print("\n\n Performing SEEG bipolar montage based on channel names. If that does not work, will try ECoG bipolar montage")
+            data_ref, channels, bipolar_channel_names = automaticBipolarMontageSEEG(data, data_columns)
+            print(f"\n\n\nBipolar channels are:\n\n{bipolar_channel_names}")
+        except:
+            print("\n\n SEEG bipolar montage did not work. Channel names do not match SEEG convetion of two letters followed by one or two numbers (LA1 or LA01). Trying ECoG bipolar montage (LAT1, LAT01, etc.")
+            try:
+                print("\n ... \n\n")
+                data_ref, channels, bipolar_channel_names = automaticBipolarMontageECOG(data, data_columns)
+                print(f"\n\n\nBipolar channels are:\n\n{bipolar_channel_names}")
+                print("\n\nECoG bipolar montage worked.")
+            except:
+                raise IOError(f"\n\n\nCannot perform bipolar montage. Names of channles do not match either SEEG or ECoG conventions. Check channel names\n\n\n The channel names are:\n{data_columns}")
+        
+        
+        
+    #Check if any artifact electrodes and throw out:
+    
+    #check if any Nans
+    nans_index = []
+    for ch in range(len(channels)):
+        if np.isnan(np.sum(data_ref[:,ch])):
+            nans_index.append(ch)
+    nans_index = np.array(nans_index)
+    
+    data_ref = np.delete(data_ref, obj = nans_index , axis = 1)
+    channels = np.delete(channels, obj =nans_index )
+    #Prewhiten
+        
+    if prewhiten == True: 
+        print("\n\nPerforming Pre-Whitening.")
+        data_ar = ar_one(data_ref)
+    else: 
+        print("\n\nDid not perform Pre-Whitening.")
+        data_ar = data_ref
+    print("\n\nFiltering.")
     data_filt = elliptic_bandFilter(data_ar, int(fs))[0]
     return data, data_ref, data_ar, data_filt, channels
 
@@ -1242,13 +1351,21 @@ def lineLengthOfArray(data):
     lineLength_arr = np.zeros(shape = (windows, nchan))
     for c in range(nchan):
         for win in range(windows):
-            print(f"\r{c}/{nchan}:  {np.round((c+1)/nchan*100,2)}%     {int(np.round((win+1)/windows*100,0))}% ", end = "\r")
+            #print(f"\r{c}/{nchan}:  {np.round((c+1)/nchan*100,2)}%     {int(np.round((win+1)/windows*100,0))}% ", end = "\r")
             lineLength_arr[win, c] = lineLength(data[win, :, c])
 
     lineLengthNorm = copy.deepcopy(lineLength_arr)
     for c in range(nchan):
         lineLengthNorm[:,c] = lineLength_arr[:,c]/np.max(lineLength_arr[:,c])
     return lineLength_arr, lineLengthNorm
+
+def lineLengthOfArray_nonorm(data):
+    windows, nsamp, nchan = data.shape
+    lineLength_arr = np.zeros(shape = (windows, nchan))
+    for w in range(windows):
+        print(f"\r{int(np.round((w+1)/windows*100,0))}% ", end = "\r")
+        lineLength_arr[w, :] = sum([np.linalg.norm(np.array((0,x)) - np.array((1, data[0, ind+1, :]))  ) for ind, x in enumerate(data[0, :, :]) if len(data[0, :, :])-1 > ind])
+    return lineLength_arr
 
 def line_length_x_train(X_train):
     nchan, nsamp, windows = X_train.shape
@@ -1272,6 +1389,7 @@ def line_length_array_2d(data):
     return lineLength_arr
 
 
+
 #%% signal analysis
 
 
@@ -1290,6 +1408,19 @@ def get_power(data, fs, avg = False):
             for ch in range(nchan):
                 _, power[:,w,ch] = signal.welch(data[st:sp,ch], fs, nperseg=1 * fs)
     return power
+
+def get_power_over_windows(data, fs):
+    windows, window_len, nchan = data.shape
+    power_tmp = signal.welch(data[0,:,0], fs, nperseg=1 * fs)
+    power = np.zeros(shape = (windows,  len(power_tmp[0]), nchan) )
+    
+    power_total = np.zeros(shape = (windows, nchan) ) #power under the curve
+    for w in range(windows):
+        print(f"\r{w}/{windows}   { np.round( (w+1)/windows*100 ,2) }%            ", end = "\r")
+        for ch in range(nchan):
+            _, power[w,:,ch] = signal.welch(data[w,:,ch], fs, nperseg=1 * fs)
+            power_total[w,ch] = simps(power[w,:,ch], dx=1)
+    return power, power_total
 
 
 
@@ -1329,6 +1460,113 @@ def get_varaince_x_train(X_train):
         variance[ch] = np.var(X_train[ch,:,0])
     return variance
 
+
+#%% calculate epileptogenicity index
+
+
+# EI functions
+def compute_hfer(target_data, base_data, fs):
+    '''
+    This function computes the high frequency energy ratio for the target and baseline data.
+    It normalizes the energy in the target and baseline data to the average energy in each the target
+    and baseline respectively.
+    The input data, both target and baseline, must be bandpassed into the gamma range of either
+
+    :param target_data: (Time x Channel) data with pre-ictal to ictal transition
+    :param base_data: (Time x Channel) pre-ictal baseline data
+    :param fs: sampling frequency
+    :return: normalized high frequency energy for baseline and target data
+    '''
+    target_data = target_data.T
+    base_data = base_data.T
+    target_sq = target_data ** 2
+    base_sq = base_data ** 2
+    window = int(fs / 2.0)
+    target_energy=convolve2d(target_sq,np.ones((1,window)),'same')
+    base_energy=convolve2d(base_sq,np.ones((1,window)),'same')
+    base_energy_ref = np.sum(base_energy, axis=1) / base_energy.shape[1]
+    target_de_matrix = base_energy_ref[:, np.newaxis] * np.ones((1, target_energy.shape[1]))
+    base_de_matrix = base_energy_ref[:, np.newaxis] * np.ones((1, base_energy.shape[1]))
+    norm_target_energy = target_energy / target_de_matrix.astype(np.float32)
+    norm_base_energy = base_energy / base_de_matrix.astype(np.float32)
+    return norm_target_energy, norm_base_energy
+
+def determine_threshold_onset(target, base):
+    '''
+    Computes the threshold value that must be surpassed in order to detect the transition from interictal to ictal
+    in the target signal (10 sd above mean baseline signal)
+
+    :param target: (channels x time) normalized baseline energy data
+    :param base: (channels x time) normalized baseline energy data
+    :return: onset_location: time index for each channel at which transition interictal-ictal takes place
+    '''
+    base_data = base.copy()
+    target_data = target.copy()
+    sigma = np.std(base_data, axis=1, ddof=1)
+    channel_max_base = np.max(base_data, axis=1)
+    thresh_value = channel_max_base + 10 * sigma
+    onset_location = np.zeros(shape=(target_data.shape[0],))
+    for channel_idx in range(target_data.shape[0]):
+        logic_vec = target_data[channel_idx, :] > thresh_value[channel_idx]
+        if np.sum(logic_vec) == 0:
+            onset_location[channel_idx] = len(logic_vec)
+        else:
+            onset_location[channel_idx] = np.where(logic_vec != 0)[0][0]
+    return onset_location
+
+
+def compute_ei_index(target, base, fs):
+    '''
+    Function to actually compute the EI. The input is in Time x Channels, but it gets transposed
+    inside compute_hfer, therefore careful when debugging.
+
+    :param target: (Time x Channel) data with pre-ictal to ictal transition
+    :param base: (Time x Channel) pre-ictal baseline data
+    :param fs: sampling frequency
+    :return: ei: List of EI values for each of the input channels
+    '''
+    target, base = compute_hfer(target, base, fs)
+    ei = np.zeros([1, target.shape[0]])
+    hfer = np.zeros([1, target.shape[0]])
+    onset_rank = np.zeros([1, target.shape[0]])
+    channel_onset = determine_threshold_onset(target, base)
+    seizure_location = np.min(channel_onset)
+    onset_channel = np.argmin(channel_onset)
+    hfer = np.sum(target[:, int(seizure_location):int(seizure_location + 0.25 * fs)], axis=1) / (fs * 0.25)
+    print(hfer)
+    onset_asend = np.sort(channel_onset)
+    time_rank_tmp = np.argsort(channel_onset)
+    onset_rank = np.argsort(time_rank_tmp) + 1
+    onset_rank = np.ones((onset_rank.shape[0],)) / np.float32(onset_rank)
+    ei = np.sqrt(hfer * onset_rank)
+    for i in range(len(ei)):
+        if np.isnan(ei[i]) or np.isinf(ei[i]):
+            ei[i] = 0
+    if np.max(ei) > 0:
+        ei = ei / np.max(ei)
+    return ei
+
+
+def get_ei_from_data(target, base, fs):
+    '''
+    :param target: (Time x Channel) data with pre-ictal to ictal transition
+    :param base: (Time x Channel) pre-ictal baseline data
+    :param fs: sampling frequency
+    :return: ei: List of EI values for each of the input channels
+    '''
+    # Define bandpass filter between 70Hz and either fs/2 or 140Hz (whichever is smaller)
+    if int(fs/2)<140:
+        b, a = signal.butter(4, [70,int(fs/2)-1], 'bandpass', fs=fs)
+    else:
+        b, a = signal.butter(4, [70, 140], 'bandpass', fs=fs)
+
+    # Get the Gamma components of the target and baseline signals
+    target_he = signal.filtfilt(b, a, target, axis=0)
+    base_he = signal.filtfilt(b, a, base, axis=0)
+
+    # Compute the EI in the high frequency signal
+    ei = compute_ei_index(target_he, base_he, fs=fs)
+    return ei
 
 #%%
 """

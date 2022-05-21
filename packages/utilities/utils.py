@@ -16,13 +16,14 @@ import glob
 import pickle
 import smtplib
 import scipy
+import math
 
 import numpy as np
 import pandas as pd
 import seaborn as sns
 import nibabel as nib
 import matplotlib.pyplot as plt
-
+from matplotlib.patches import PathPatch
 
 from os import listdir
 from scipy import ndimage
@@ -168,6 +169,120 @@ def baseSplitext(path):
 def cohend(d1, d2):
     cohens_d = (np.mean(d2) - np.mean(d1)) / (np.sqrt((np.std(d2) ** 2 + np.std(d1) ** 2) / 2))
     return cohens_d
+
+def cohend2(x,y):
+    nx = len(x)
+    ny = len(y)
+    dof = nx + ny - 2
+    return -(np.mean(x) - np.mean(y)) / np.sqrt(((nx-1)*np.std(x, ddof=1) ** 2 + (ny-1)*np.std(y, ddof=1) ** 2) / dof)
+
+
+def apply_tanh(data, multiplier = 1, plot = False):
+    """
+    Applied a tanh function across all data points in a 2d array
+    data :   numpy array
+    multiplier : multiplier multiplies the abolute LL value to put into the tanh function. LL values are very large, so thats why multiplier is very small
+    """
+    data_tanh = copy.deepcopy(data)
+    nx, ny = data.shape
+    for x in range(nx):
+        for y in range(ny):
+            data_tanh[x,y] = math.tanh(data_tanh[x,y]*multiplier)
+            
+    if plot:
+        fig, axes = plot_make(r = 1, c = 2)
+        sns.heatmap(data = data, ax = axes [0])
+        sns.heatmap(data = data_tanh, ax = axes [1])
+        axes[0].set_title("original")
+        axes[1].set_title("Tanh, multipler: {multiplier} ")
+        plt.show()
+        
+    return data_tanh
+
+def apply_arctanh(data, multiplier = 1, plot = False):
+    """
+    Applied a tanh function across all data points in a 2d array
+    data :   numpy array
+    multiplier : multiplier multiplies the abolute LL value to put into the tanh function. LL values are very large, so thats why multiplier is very small
+    """
+    data_tanh = copy.deepcopy(data)
+    nx, ny = data.shape
+    for x in range(nx):
+        for y in range(ny):
+            data_tanh[x,y] = np.arctanh(data_tanh[x,y]*multiplier)
+            
+    if plot:
+        fig, axes = plot_make(r = 1, c = 2)
+        sns.heatmap(data = data, ax = axes [0])
+        sns.heatmap(data = data_tanh, ax = axes [1])
+        axes[0].set_title("original")
+        axes[1].set_title("Tanh, multipler: {multiplier} ")
+        plt.show()
+        
+    return data_tanh
+
+def fdr(p_vals):
+    ranked_p_values = scipy.stats.rankdata(p_vals)
+    fdr = p_vals * len(p_vals) / ranked_p_values
+    fdr[fdr > 1] = 1
+
+    return fdr
+
+
+def correct_pvalues_for_multiple_testing(pvalues, correction_type = "Benjamini-Hochberg"):                
+    """                                                                                                   
+    consistent with R - print correct_pvalues_for_multiple_testing([0.0, 0.01, 0.029, 0.03, 0.031, 0.05, 0.069, 0.07, 0.071, 0.09, 0.1]) 
+    """                                                                   
+    pvalues = np.array(pvalues) 
+    n = pvalues.shape[0]                                                                          
+    new_pvalues = np.zeros(n)
+    if correction_type == "Bonferroni":                                                                   
+        new_pvalues = n * pvalues
+    elif correction_type == "Bonferroni-Holm":                                                            
+        values = [ (pvalue, i) for i, pvalue in enumerate(pvalues) ]                                      
+        values.sort()
+        for rank, vals in enumerate(values):                                                              
+            pvalue, i = vals
+            new_pvalues[i] = (n-rank) * pvalue                                                            
+    elif correction_type == "Benjamini-Hochberg":                                                         
+        values = [ (pvalue, i) for i, pvalue in enumerate(pvalues) ]                                      
+        values.sort()
+        values.reverse()                                                                                  
+        new_values = []
+        for i, vals in enumerate(values):                                                                 
+            rank = n - i
+            pvalue, index = vals                                                                          
+            new_values.append((n/rank) * pvalue)                                                          
+        for i in range(0, int(n)-1):  
+            if new_values[i] < new_values[i+1]:                                                           
+                new_values[i+1] = new_values[i]                                                           
+        for i, vals in enumerate(values):
+            pvalue, index = vals
+            new_pvalues[index] = new_values[i]                                                                                                                  
+    return new_pvalues
+
+def fdr2(pvalues):                
+    """                                                                                                   
+    consistent with R - print correct_pvalues_for_multiple_testing([0.0, 0.01, 0.029, 0.03, 0.031, 0.05, 0.069, 0.07, 0.071, 0.09, 0.1]) 
+    """                                                                   
+    pvalues = np.array(pvalues) 
+    n = pvalues.shape[0]                                                                          
+    new_pvalues = np.zeros(n)                                               
+    values = [ (pvalue, i) for i, pvalue in enumerate(pvalues) ]                                      
+    values.sort()
+    values.reverse()                                                                                  
+    new_values = []
+    for i, vals in enumerate(values):                                                                 
+        rank = n - i
+        pvalue, index = vals                                                                          
+        new_values.append((n/rank) * pvalue)                                                          
+    for i in range(0, int(n)-1):  
+        if new_values[i] < new_values[i+1]:                                                           
+            new_values[i+1] = new_values[i]                                                           
+    for i, vals in enumerate(values):
+        pvalue, index = vals
+        new_pvalues[index] = new_values[i]                                                                                                                  
+    return new_pvalues
 #%%
 def channel2stdCSV(outputTissueCoordinates):
     df = pd.read_csv(outputTissueCoordinates, sep=",", header=0)
@@ -265,7 +380,7 @@ def printProgressBar(iteration, total, prefix = '', suffix = '', decimals = 1, l
     if iteration == total:
         print()
 
-def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, saveFilename = None, data_type = "path", cmap="gray"):
+def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, saveFilename = None, data_type = "path", cmap="gray", show_cbar= False):
 
     img_data = load_img_data(fname, data_type = data_type )
     """ Function to display row of image slices """
@@ -297,6 +412,59 @@ def show_slices(fname, low = 0.33, middle = 0.5, high = 0.66, save = False, save
         plt.savefig(saveFilename, transparent=True)
     plt.show()
     plt.style.use('default')
+    
+def show_one_slice(fname, slice_ind = 0, slice_num = None, save = False, saveFilename = None, data_type = "path", cmap="gray", use_dark_background = True, size_length = None, size_height = None, show_cbar= True):
+    
+    img_data = load_img_data(fname, data_type = data_type )
+    if slice_num == None:
+        slice_num = int((img_data.shape[slice_ind]*0.5))
+    slice_num = int(slice_num)
+    """ Function to display row of image slices """
+    slices1 =  img_data[:, :, slice_num ] 
+    slices2 = img_data[:,slice_num, : ] 
+    slices3 = img_data[slice_num, :, : ] 
+    
+    slices = [slices1, slices2, slices3]
+    if use_dark_background:
+        plt.style.use('dark_background')
+    else:
+        plt.style.use('default')
+    
+    fig, axes = plot_make(size_length=size_length, size_height= size_height)
+    
+    
+    axes.imshow(slices[slice_ind].T, cmap=cmap, origin="lower")
+   
+    axes.set_xticklabels([])
+    axes.set_yticklabels([])
+    axes.set_xticks([])
+    axes.set_yticks([])
+    axes.axis("off")
+    
+    if show_cbar:
+        pos = axes.imshow(slices[slice_ind].T, cmap=cmap, origin="lower")
+        fig.colorbar(pos, ax=axes)
+
+    if save:
+        if saveFilename == None:
+            raise Exception("No file name was given to save figures")
+        plt.savefig(saveFilename, transparent=True)
+    plt.show()
+    plt.style.use('default')
+    return slices[slice_ind].T
+
+def get_slice(fname, slice_ind = 0, slice_num = None, data_type = "path"):
+    img_data = load_img_data(fname, data_type = data_type )
+    if slice_num == None:
+        slice_num = int((img_data.shape[slice_ind]*0.5))
+    slice_num = int(slice_num)
+    """ Function to display row of image slices """
+    slices1 =  img_data[:, :, slice_num ] 
+    slices2 = img_data[:,slice_num, : ] 
+    slices3 = img_data[slice_num, :, : ] 
+    
+    slices = [slices1, slices2, slices3]
+    return slices[slice_ind].T
 
 def expand_region_in_image(img_data, data_type = "data", iterations = 10):
     img_data = load_img_data(img_data, data_type = data_type )
@@ -390,6 +558,42 @@ def get_pariwise_distances(dist_coordinates_array):
             dist_array[ch1,ch2] = np.linalg.norm(coord1-coord2)
     dist_array = dist_array + dist_array.T - np.diag(np.diag(dist_array))
     return dist_array
+
+
+
+
+def adjust_box_widths(g, fac):
+    """
+    Adjust the withs of a seaborn-generated boxplot.
+    """
+
+    # iterating through Axes instances
+    for ax in g.axes:
+
+        # iterating through axes artists:
+        for c in ax.get_children():
+
+            # searching for PathPatches
+            if isinstance(c, PathPatch):
+                # getting current width of box:
+                p = c.get_path()
+                verts = p.vertices
+                verts_sub = verts[:-1]
+                xmin = np.min(verts_sub[:, 0])
+                xmax = np.max(verts_sub[:, 0])
+                xmid = 0.5*(xmin+xmax)
+                xhalf = 0.5*(xmax - xmin)
+
+                # setting new width of box
+                xmin_new = xmid-fac*xhalf
+                xmax_new = xmid+fac*xhalf
+                verts_sub[verts_sub[:, 0] == xmin, 0] = xmin_new
+                verts_sub[verts_sub[:, 0] == xmax, 0] = xmax_new
+
+                # setting new width of median line
+                for l in ax.lines:
+                    if np.all(l.get_xdata() == [xmin, xmax]):
+                        l.set_xdata([xmin_new, xmax_new])
 #%% structural connectivity
 
 
@@ -467,6 +671,10 @@ def plot_histplot(data, bins = 20, kde=True):
     fig, axes = plt.subplots(1, 1, figsize=(4, 4), dpi=300)
     sns.histplot(data, bins = bins, kde=kde , ax = axes)
     plt.show()
+    
+    
+    
+    
 def plot_make(r = 1, c = 1, size_length = None, size_height = None, dpi = 300, sharex = False, sharey = False , squeeze = True):
     if size_length == None:
        size_length = 4* c

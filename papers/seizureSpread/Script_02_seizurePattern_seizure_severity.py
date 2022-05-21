@@ -59,17 +59,26 @@ from revellLab.packages.diffusionModels import diffusionModels as DM
 physical_devices = tf.config.list_physical_devices('GPU')
 tf.config.experimental.set_memory_growth(physical_devices[0], True)
 
+#Plotting parameters
+custom_params = {"axes.spines.right": False, "axes.spines.top": False, 'figure.dpi': 300,
+                 "legend.frameon": False, "savefig.transparent": True}
+sns.set_theme(style="ticks", rc=custom_params,  palette="pastel")
+sns.set_context("talk")
 
+kde_kws = {"bw_adjust": 2}
+
+#%
 #% 02 Paths and files
 fnameiEEGusernamePassword = paths.IEEG_USERNAME_PASSWORD
 metadataDir =  paths.METADATA
-fnameJSON = join(metadataDir, "iEEGdataRevell.json")
+fnameJSON = join(metadataDir, "iEEGdataRevell_seizure_severity_joined.json")
 BIDS = paths.BIDS
 deepLearningModelsPath = paths.DEEP_LEARNING_MODELS
 datasetiEEG = "derivatives/seizure_spread/iEEG_data"
 session = "implant01"
 SESSION_RESEARCH3T = "research3Tv[0-9][0-9]"
 
+#%
 revellLabPath = pkg_resources.resource_filename("revellLab", "/")
 tools = pkg_resources.resource_filename("revellLab", "tools")
 atlasPath = join(tools, "atlases", "atlases" )
@@ -90,7 +99,7 @@ annotationLayerName = "seizureChannelBipolar"
 secondsBefore = 180
 secondsAfter = 180
 window = 1 #window of eeg for training/testing. In seconds
-skipWindow = 0.5#Next window is skipped over in seconds
+skipWindow = 0.1#Next window is skipped over in seconds
 time_step, skip = int(window*fsds), int(skipWindow*fsds)
 montage = "bipolar"
 prewhiten = True
@@ -124,11 +133,39 @@ aspect = 50
 DataJson = dataclass_iEEG_metadata.dataclass_iEEG_metadata(jsonFile)
 patientsWithseizures = DataJson.get_patientsWithSeizuresAndInterictal()
 
+len(np.unique(patientsWithseizures["subject"]))
+print(f"number of patients: {len(np.unique(patientsWithseizures['subject']))}")
+print(f"number of seizures: {len(patientsWithseizures)}")
+#%% Plot some metadata 
+
+#plot distribution of seizures lengths
+axes = sns.histplot(patientsWithseizures.length, binwidth=15, kde = True )
+#axes.set_xlim([300,700])
+#axes.set_ylim([0,1])
+
+#plot distribution of num of seizures per patient
+
+patientsWithseizures_tmp = copy.deepcopy(patientsWithseizures)
+patientsWithseizures_tmp['idKey']=patientsWithseizures_tmp.idKey.astype('int64')
+num_of_seizures_per_patinet = patientsWithseizures_tmp.groupby('subject')['idKey'].max()
+
+
+num_of_seizures_per_patinet_df = pd.DataFrame(dict(number_of_seizures = np.array(num_of_seizures_per_patinet)))
+
+axes = sns.histplot(num_of_seizures_per_patinet_df.number_of_seizures, binwidth=1, kde = True, color = "purple" )
+#axes.set_xlim([300,700])
+
+
+
+
+
+
+jsonFile["SUBJECTS"]["RID0442"]["Events"]["Interictal"]["1"]
 #%%Get data
 
 
 tmp = np.unique(patientsWithseizures["subject"])
-i = 86#RID0309: 33-43 ; RID0278:19; RID0596: 86
+i = 0 #RID0309: 33-43 ; RID0278:19; RID0596: 86
 RID = np.array(patientsWithseizures["subject"])[i]
 idKey = np.array(patientsWithseizures["idKey"])[i]
 AssociatedInterictal = np.array(patientsWithseizures["AssociatedInterictal"])[i]
@@ -155,8 +192,14 @@ nsamp, nchan = data_filt.shape
 #DataJson.plot_eeg(data_scalerDSDS, 16, markers = [secondsBefore*16], dpi = 25, aspect=aspect*2, height=nchan/aspect/2)  
 
 #for plotting eeg of 595
-#data_DSDS = DataJson.downsample(data_filt, fs, 16)
-#DataJson.plot_eeg(data_DSDS, 16, markers = [secondsBefore*16], dpi = 25, aspect=aspect*2, height=nchan/aspect/2)  
+fsfs = 16
+data_DSDS = DataJson.downsample(data_filt, fs, fsfs)
+
+DataJson.plot_eeg(data_DSDS, fsfs, markers = [secondsBefore*16], dpi = 25, aspect=aspect*2, height=nchan/aspect/2)  
+
+seizure_length = patientsWithseizures.length[i]
+DataJson.plot_eeg(data_DSDS, fsfs,  startSec = (secondsBefore-10), stopSec = (secondsBefore+ seizure_length + 10)  , markers = [10*16], dpi = 250, aspect=aspect*2, height=nchan/aspect/2)  
+
 
 #%%Meaure seizure spread
 version = 11
