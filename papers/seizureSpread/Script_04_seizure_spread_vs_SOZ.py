@@ -1136,7 +1136,41 @@ for m in range(len(model_IDs)):
  
 
 
+#%%
+#get laterality
+
+bilateral = []
+unilateral = []
+
+for p in range(len(patients)):
+    
+    pt = patients[p]
+    regs = region[p]
+    
+    lefts = []
+    rights = []
+    for k in range(len(regs)):
+        r = regs[k][0]
+        if len( r) > 0:
+            if "Left" in r[0]:
+                lefts.append(1)
+            if "Right" in r[0]:
+                rights.append(1)
+    left_sum = np.sum(np.array(lefts))
+    right_sum = np.sum(np.array(rights))
+    
+    rid = RID_HUP["record_id"][np.where(int(pt[3:]) ==  RID_HUP["hupsubjno"])[0][0]]
+    RID = f"RID{rid:04d}"
+    if left_sum > 0 and right_sum >0:
+        bilateral.append(RID)
+    else:
+        unilateral.append(RID)
+        
+#df = df[pd.DataFrame(df.subject.tolist()).isin(bilateral).any(1).values]
 #%% How quickly spread from one hipp to another
+
+
+
 
 finding_max_quickness = pd.DataFrame(columns = ["model", "threshold", "cutoff", "pval_everyone", "N1", "cramers_V1", "odds_ratio1", "pval_TLE", "N2", "cramers_V2", "odds_ratio2"])
 

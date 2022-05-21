@@ -72,7 +72,7 @@ kde_kws = {"bw_adjust": 2}
 #% 02 Paths and files
 fnameiEEGusernamePassword = paths.IEEG_USERNAME_PASSWORD
 metadataDir =  paths.METADATA
-fnameJSON = join(metadataDir, "iEEGdataRevell_seizure_severity.json")
+fnameJSON = join(metadataDir, "iEEGdataRevell_seizure_severity_joined.json")
 BIDS = paths.BIDS
 deepLearningModelsPath = paths.DEEP_LEARNING_MODELS
 datasetiEEG = "derivatives/seizure_spread/iEEG_data"
@@ -199,7 +199,7 @@ def get_start_times(secondsBefore, skipWindow, fsds, channels, start, stop, prob
 #%%
 i=0 
 #for i in indexes[39]:#range(23,25):
-for i in range(212,245):
+for i in range(267,268):
 #for i in special_index:
 
     RID = np.array(patientsWithseizures["subject"])[i]
@@ -248,11 +248,11 @@ for i in range(212,245):
     
         
     
-    data_ei = data_scaler[int(fs*170):-int(fs*170),:]
+    #data_ei = data_scaler[int(fs*170):-int(fs*170),:]
     
     #Epileptogenicity index
-    ei = echobase.get_ei_from_data(data_ei, dataII_scaler, fs)
-    channels[np.argsort(ei)]
+    #ei = echobase.get_ei_from_data(data_ei, dataII_scaler, fs)
+    #channels[np.argsort(ei)]
     ########################################
     #########################################
     #######################################
@@ -311,7 +311,7 @@ for i in range(212,245):
         with open(spread_location_file, 'wb') as f: pickle.dump(pickle_save, f)
             
         
-    """
+    
     ########################################### 
     #calculate absolute slope
     ########################################### 
@@ -324,7 +324,7 @@ for i in range(212,245):
     spread_location_sf_file_basename = f"{splitext(fname)[0]}_{feature_name}.pickle"
     spread_location_sf_file = join(spread_location_sf, spread_location_sf_file_basename)
     
-    if not utils.checkIfFileExists( spread_location_sf_file , printBOOL=False):
+    if utils.checkIfFileExists( spread_location_sf_file , printBOOL=False):
         print(f"\n{RID} {i} {feature_name} EXISTS")
         #with open(spread_location_sf_file, 'rb') as f:[abs_slope_normalized, abs_slope_normalized_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
     else:
@@ -380,7 +380,7 @@ for i in range(212,245):
     spread_location_sf_file_basename = f"{splitext(fname)[0]}_{feature_name}.pickle"
     spread_location_sf_file = join(spread_location_sf, spread_location_sf_file_basename)
     
-    if not utils.checkIfFileExists( spread_location_sf_file , printBOOL=False):
+    if utils.checkIfFileExists( spread_location_sf_file , printBOOL=False):
         print(f"\n{RID} {i} {feature_name} EXISTS")
         #with open(spread_location_sf_file, 'rb') as f:[probLL, probLL_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
     else:
@@ -428,7 +428,7 @@ for i in range(212,245):
     spread_location_sf_file_basename = f"{splitext(fname)[0]}_{feature_name}.pickle"
     spread_location_sf_file = join(spread_location_sf, spread_location_sf_file_basename)
     
-    if not utils.checkIfFileExists( spread_location_sf_file , printBOOL=False):
+    if utils.checkIfFileExists( spread_location_sf_file , printBOOL=False):
         print(f"\n{RID} {i} {feature_name} EXISTS")
         #with open(spread_location_sf_file, 'rb') as f:[power_total, power_total_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
     else:

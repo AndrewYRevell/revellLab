@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
 """
-Created on Wed May 18 17:26:36 2022
+Created on Fri May 20 23:43:38 2022
 
 @author: arevell
 """
@@ -89,12 +89,85 @@ def pull_patient_localization(file_path):
     soz = np.squeeze(patient_localization['soz'])
 
     return patients, labels, ignore, resect, gm_wm, coords, region, soz
+def prob_threshold_moving_avg(prob_array, fsds, skip, threshold = 0.9, smoothing = 20):
+    windows, nchan = prob_array.shape
+   
+    w = int(smoothing*fsds/skip)
+    probability_arr_movingAvg = np.zeros(shape = (windows - w + 1, nchan))
+    
+    for c in range(nchan):
+        probability_arr_movingAvg[:,c] =  echobase.movingaverage(prob_array[:,c], w)
+        
+    probability_arr_threshold = copy.deepcopy(probability_arr_movingAvg)
+    probability_arr_threshold[probability_arr_threshold > threshold] = 1
+    probability_arr_threshold[probability_arr_threshold <= threshold] = 0
+        
+    return probability_arr_movingAvg, probability_arr_threshold
 
+def get_start_times(secondsBefore, skipWindow, fsds, channels, start, stop, probability_arr_threshold):
+    
+    nchan = probability_arr_threshold.shape[1]
+    seizure_start =int((secondsBefore-start)/skipWindow)
+    seizure_stop = int((secondsBefore + stop)/skipWindow)
+    
+    probability_arr_movingAvg_threshold_seizure = probability_arr_threshold[seizure_start:,:]
+    spread_start = np.argmax(probability_arr_movingAvg_threshold_seizure == 1, axis = 0)
+    
+    for c in range(nchan): #if the channel never starts seizing, then np.argmax returns the index as 0. This is obviously wrong, so fixing this
+        if np.all( probability_arr_movingAvg_threshold_seizure[:,c] == 0  ) == True:
+            spread_start[c] = len(probability_arr_movingAvg_threshold_seizure)
+    
+    
+    spread_start_loc = ( (spread_start + seizure_start)  *skipWindow*fsds).astype(int)
+    markers = spread_start_loc
+    channel_order = np.argsort(spread_start)
+    channel_order_labels = np.array(channels)[channel_order]
+    #print(np.array(channels)[channel_order])
+    return spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels
+
+
+
+def calculate_how_many_channels_overlap(soz_channel_names, channel_order_labels, num_to_look_modifier= 1):
+    #num_to_look_modifier the multiplier for how many channels to caluclate in top SOZ
+    num_to_look  = len(soz_channel_names) * num_to_look_modifier
+    if num_to_look > len(channel_order_labels):
+        num_to_look = len(channel_order_labels)
+    #calculate how many are in the top
+    top = 0
+    for ch in range(num_to_look):
+        channel_to_look = channel_order_labels[ch]
+        if channel_to_look in soz_channel_names:
+            top = top +1 
+    denominator = len(soz_channel_names)
+    percentage = top/len(soz_channel_names)
+    return top, denominator,  percentage
+
+
+def remove_EGG_and_ref(channel_order_labels):
+    channel_names_new= [x.replace('EEG ', '').replace('-Ref', '').replace(' ', '') for x in channel_order_labels]
+    #channel_names_new= echobase.channel2std(channel_names_new)
+    
+    return np.array(channel_names_new)
+
+def channel2std_ECoG(channel_names_old):
+    channel_names__new = []
+    for ch in range(len(channel_names_old)):
+        txt = channel_names_old[ch]
+        
+        numbers = re.findall(r'\d+', txt)
+        if len(numbers)>0:
+            num_txt = re.findall(r'\d+', txt)[0]
+            num = int(num_txt)
+            pos = txt.find(f"{num_txt}")
+            new_num = f"{num:02d}"
+            new_txt = f"{txt[:pos] + new_num}"
+            channel_names__new.append(new_txt)
+    return np.array(channel_names__new)
 #%
 #% 02 Paths and files
 fnameiEEGusernamePassword = paths.IEEG_USERNAME_PASSWORD
 metadataDir =  paths.METADATA
-fnameJSON = join(metadataDir, "iEEGdataRevell_seizure_severity.json")
+fnameJSON = join(metadataDir, "iEEGdataRevell_seizure_severity_joined.json")
 BIDS = paths.BIDS
 deepLearningModelsPath = paths.DEEP_LEARNING_MODELS
 datasetiEEG = "derivatives/seizure_spread/iEEG_data"
@@ -237,17 +310,9 @@ for k in range(len(outcomes)): #if poor outcome at 6 or 12 month, then propagate
 
 
   
-tanh = False
+tanh = True
 model_IDs = ["WN","CNN","LSTM" , "absolute_slope", "line_length", "power_broadband"]
 by = 0.01
-
-
-full_analysis_location = join(BIDS, project_folder, f"full_analysis_save")
-full_analysis_location_file_basename = f"soz_overlap_tanh_{tanh}_by_{by}_model_{version}.pickle"
-full_analysis_location_file = join(full_analysis_location, full_analysis_location_file_basename)
-
-
-with open(full_analysis_location_file, 'rb') as f: [soz_overlap, percent_active, tanh, seconds_active, by, thresholds, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
 
 
 #%%
@@ -257,19 +322,24 @@ with open(full_analysis_location_file, 'rb') as f: [soz_overlap, percent_active,
 i=137
 m = 0
 thr = [0.69, 0.96, 0.58, 0.08, 0.11, 0.01]
-thr = [0.72, 0.96, 0.58, 0.08, 0.11, 0.01]
+thr = [0.69, 0.96, 0.58, 0.21, 0.11, 0.01]
+
 sc_vs_quickness = pd.DataFrame(columns =[ "subject", "seizure", "quickenss", "sc_LR_mean", "sc_temporal_mean" ])
+
+model_ID = model_IDs[m]
 
 for i in range(len(patientsWithseizures)):
     print(i)
     RID = np.array(patientsWithseizures["subject"])[i]
     seizure = np.array(patientsWithseizures["idKey"])[i]
+    idKey = np.array(patientsWithseizures["idKey"])[i]
     seizure_length = patientsWithseizures.length[i]
     
     #atlas
     atlas = "BN_Atlas_246_1mm"
     atlas = "AAL3v1_1mm"
-    #atlas = "HarvardOxford-sub-ONLY_maxprob-thr25-1mm"
+    #atlas = "AAL2"
+    #atlas = "HarvardOxford-combined"
     
     
     atlas_names_short =  list(atlas_files["STANDARD"].keys() )
@@ -281,14 +351,37 @@ for i in range(len(patientsWithseizures)):
     atlas_label_names = np.array(atlas_label.iloc[1:,1])
     atlas_label_region_numbers = np.array(atlas_label.iloc[1:,0])
     
+    #STRUCTURAL CONNECTIVITY
     temporal_regions = ["Hippocampus"]; names = "Hippocampus"
-    temporal_regions = ["Temporal"]; names = "Temporal"
+    temporal_regions = ["Hippocampus", "Temporal"]; names = "Hippocampus, Temporal"
+    #temporal_regions = ["Temporal"]; names = "Temporal"
     #temporal_regions = ["Frontal"]; names = "Frontal"
-    temporal_regions = ["Parietal"]; names = "Parietal"
+    #temporal_regions = ["Parietal"]; names = "Parietal"
     #temporal_regions = ["Amygdala"]; names = "Amygdala"
     #temporal_regions = ["Hippocampus", "Temporal", "Amygdala","Fusiform", "Insula"]; names = "Hippocampus, Temporal, Amygdala, Fusiform, Insula"
     #temporal_regions = ["Insula", "Hippocampus", "ParaHippocampal", "Fusiform" ,"Heschl", "Temporal"]; names = "Insula, Hippocampus, ParaHippocampal, Fusiform ,Heschl, Temporal"
-
+    
+    #iEEG
+    temporal_regions_spread = ["Hippocampus"]
+    temporal_regions_spread = ["Temporal"]
+    #temporal_regions_spread = ["Frontal"]
+    #temporal_regions_spread = ["Parietal"]
+    #temporal_regions_spread = ["Amygdala"]
+    #temporal_regions_spread = ["Hippocampus", "Temporal", "Amygdala","Fusiform", "Insula"]
+    #temporal_regions_spread = ["Hippocampus",  "Temporal", "ParaHippocampal", "Fusiform" ,"Heschl" , "Insula"]
+    #temporal_regions_spread = ["Hippocampus", "Temporal", "Amygdala", "Insula", "ParaHippocampal", "Fusiform" ,"Heschl"]
+    #temporal_regions_spread = ["Hippocampus", "Amygdala","ParaHippocampal"]
+    temporal_regions_spread = ["Hippocampus", "Temporal"]
+    
+    #temporal_regions_spread = ["Parietal"]
+    
+    
+    
+    #for BNA
+    #temporal_regions = ["Hipp", "ITG", "STG", "MTG"]; names = "Hipp, ITG, STG, MTG"
+    #temporal_regions = ["Hipp"]; names = "Hipp"
+    
+    #temporal_regions_spread = ["Hipp", "ITG", "STG", "MTG"]
     
     temporal_region_inds = []
     temporal_region_inds_L = []
@@ -307,6 +400,10 @@ for i in range(len(patientsWithseizures)):
                 if "_L" in atlas_label_names[r]:
                     bools_L.append(temporal_regions[k] in atlas_label_names[r] )
                 elif "_R" in atlas_label_names[r]:
+                    bools_R.append(temporal_regions[k] in atlas_label_names[r] )
+                elif "Left" in atlas_label_names[r]:
+                    bools_L.append(temporal_regions[k] in atlas_label_names[r] )
+                elif "Right" in atlas_label_names[r]:
                     bools_R.append(temporal_regions[k] in atlas_label_names[r] )
             
         if any(bools):
@@ -330,9 +427,9 @@ for i in range(len(patientsWithseizures)):
 
         
         sc = utils.read_DSI_studio_Txt_files_SC(connectivity_loc_path)
-        sc = sc/sc.max()
+        #sc = sc/sc.max()
         
-        #sc=utils.log_normalize_adj(sc)
+        sc=utils.log_normalize_adj(sc)
         sc_region_labels = utils.read_DSI_studio_Txt_files_SC_return_regions(connectivity_loc_path, atlas).astype(ind)
 
         sc_temporal_region_ind = []
@@ -367,38 +464,271 @@ for i in range(len(patientsWithseizures)):
         sc_LR_mean = np.nansum(sc_temporal_L_R)
         #get quickness
         
-        spread_quick = soz_overlap[(soz_overlap["model"] == model_IDs[m])  & (soz_overlap["subject"] == RID)  & (soz_overlap["threshold"] == thr[m])  & (soz_overlap["seizure"] == seizure)]
-        quickenss = np.array(abs(spread_quick["hipp_left_mean"] - spread_quick["hipp_right_mean"] ))[0]
-
-
-
         
-        sc_vs_quickness = sc_vs_quickness.append(dict( subject =RID , seizure = seizure , quickenss = quickenss, sc_LR_mean = sc_LR_mean, sc_temporal_mean = sc_temporal_mean) , ignore_index=True )
-
-
-
         
-#%
+        #get the spread quickness
+        
+       
+ 
+            
+        #CHECKING IF SPREAD FILES EXIST
+    
+        fname = DataJson.get_fname_ictal(RID, "Ictal", idKey, dataset= datasetiEEG, session = session, startUsec = None, stopUsec= None, startKey = "EEC", secondsBefore = secondsBefore, secondsAfter = secondsAfter )
+        
+        spread_location = join(BIDS, datasetiEEG_spread, f"v{version:03d}", f"sub-{RID}" )
+        spread_location_file_basename = f"{splitext(fname)[0]}_spread.pickle"
+        spread_location_file = join(spread_location, spread_location_file_basename)
+        
+        
+        feature_name = "absolute_slope"
+        location_feature = join(BIDS, datasetiEEG_spread, "single_features", f"sub-{RID}" )
+        location_abs_slope_basename = f"{splitext(fname)[0]}_{feature_name}.pickle"
+        location_abs_slope_file = join(location_feature, location_abs_slope_basename)
+        
+        feature_name = "line_length"
+        location_line_length_basename = f"{splitext(fname)[0]}_{feature_name}.pickle"
+        location_line_length_file = join(location_feature, location_line_length_basename)
+        
+        feature_name = "power_broadband"
+        location_power_broadband_basename = f"{splitext(fname)[0]}_{feature_name}.pickle"
+        location_power_broadband = join(location_feature, location_power_broadband_basename)
+        
+       
+        if utils.checkIfFileExists( spread_location_file , printBOOL=False) and utils.checkIfFileExists( location_abs_slope_file , printBOOL=False):
+            #print("\n\n\n\nSPREAD FILE EXISTS\n\n\n\n")
+        
+            if model_ID == "WN" or model_ID == "CNN" or model_ID == "LSTM":
+                with open(spread_location_file, 'rb') as f:[probWN, probCNN, probLSTM, data_scalerDS, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
+                
+            
+            if model_ID == "WN":
+                #print(model_ID)
+                prob_array= probWN
+            elif model_ID == "CNN":
+                #print(model_ID)
+                prob_array= probCNN
+            elif model_ID == "LSTM":
+                #print(model_ID)
+                prob_array= probLSTM
+            elif model_ID == "absolute_slope":
+                if utils.checkIfFileExists(location_abs_slope_file, printBOOL=False):
+                    with open(location_abs_slope_file, 'rb') as f:[abs_slope_normalized, abs_slope_normalized_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
+                    if not tanh:
+                        #abs_slope_normalized = utils.apply_arctanh(abs_slope_normalized_tanh)/1e-1 
+                        abs_slope_normalized/np.max(abs_slope_normalized)
+                        abs_slope_normalized = abs_slope_normalized/np.max(abs_slope_normalized)
+                        prob_array=  abs_slope_normalized
+                    else:
+                        prob_array= abs_slope_normalized_tanh
+                else: 
+                    print(f"{i} {RID} file does not exist {location_abs_slope_file}\n")
+             
+            elif model_ID == "line_length":
+                if utils.checkIfFileExists(location_line_length_file, printBOOL=False):
+                    with open(location_line_length_file, 'rb') as f:[probLL, probLL_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
+                    if not tanh:
+                        probLL = probLL/np.max(probLL)
+                        prob_array= probLL
+                    else:
+                        prob_array= probLL_tanh
+                else: 
+                    print(f"{i} {RID} file does not exist {location_line_length_file}\n")
+                   
+            elif model_ID == "power_broadband":
+                if utils.checkIfFileExists(location_power_broadband, printBOOL=False):
+                    with open(location_power_broadband, 'rb') as f:[power_total, power_total_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
+                    if not tanh:
+                        #power_total = utils.apply_arctanh(power_total_tanh)/7e-2  
+                        power_total = power_total/np.max(power_total)
+                        prob_array=  power_total
+                        
+                    else:
+                        prob_array= power_total_tanh
+                
+                else: 
+                    print(f"{i} {RID} file does not exist {location_power_broadband}\n")
+            
+            else:
+                print("model ID not recognized. Using Wavenet")
+                prob_array= probWN
+            
+            #####
+            seizure_start = int((secondsBefore-0)/skipWindow)
+            seizure_stop = int((secondsBefore + seizure_length)/skipWindow)
+            
+            
+            THRESHOLD = thr[m]
+            SMOOTHING = 20
+            
+            
+            probability_arr_movingAvg, probability_arr_threshold = prob_threshold_moving_avg(prob_array, fsds, skip, threshold = THRESHOLD, smoothing = SMOOTHING)
+            #sns.heatmap( probability_arr_movingAvg.T )      
+            #sns.heatmap( probability_arr_threshold.T)    
+            spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels = get_start_times(secondsBefore, skipWindow, fsds, channels, 0, seizure_length, probability_arr_threshold)
+       
+            
+            channel_order_labels = remove_EGG_and_ref(channel_order_labels)
+            channels2 = remove_EGG_and_ref(channels)
+            
+            channel_order_labels = channel2std_ECoG(channel_order_labels)
+            channels2 = channel2std_ECoG(channels2)
+            
+            
+            atlas_localization_path = join(paths.BIDS_DERIVATIVES_ATLAS_LOCALIZATION, f"sub-{RID}", f"ses-{session}", f"sub-{RID}_ses-{session}_desc-atlasLocalization.csv")
+            if utils.checkIfFileExists(atlas_localization_path, printBOOL=False):
+                atlas_localization = pd.read_csv(atlas_localization_path)
+                
+                temporal_regions
+                
+                atlas_localization.channel = channel2std_ECoG(atlas_localization.channel)
+                #get channels in hipp
+                channels_in_hippocampus = np.zeros(len(atlas_localization))    
+                channels_in_hippocampus_label = []
+                for r in range(len(atlas_localization)):
+                    
+                    reg_AAL = atlas_localization[f"{atlas}_label"][r]
+                    
+                    reg_AAL = atlas_localization.AAL_label[r]
+                    reg_BNA = atlas_localization.BN_Atlas_246_1mm_label[r]
+                    reg_HO = atlas_localization["HarvardOxford-combined_label"][r]
+                    
+                    if any([ x in reg_AAL for x in temporal_regions_spread]): 
+                        channels_in_hippocampus[r] = 1
+                        #left or right
+                        if "_L" in reg_AAL or "_L" in reg_BNA or "Left" in reg_HO:
+                            channels_in_hippocampus_label.append("left")
+                        elif "_R" in reg_AAL or "_R" in reg_BNA or "Right" in reg_HO:
+                            channels_in_hippocampus_label.append("right")
+                
+                
+                channel_hipp_ind = np.where(channels_in_hippocampus == 1)[0]
+                channel_hipp_label = np.array(atlas_localization.channel[channel_hipp_ind])
+                
+                
+                channel_hipp_index_order = []
+                channel_hipp_index_order_start_time = []
+                ch_hipp = 1
+                for ch_hipp in range(len(channel_hipp_label)):
+                    if any(channel_hipp_label[ch_hipp] == channel_order_labels ):
+                        channel_hipp_index_order.append(np.where(channel_hipp_label[ch_hipp] == channel_order_labels )[0][0])
+                        channel_hipp_index_order_start_time.append(spread_start[channel_order][channel_hipp_index_order[ch_hipp]]*skipWindow )
+                        if channel_hipp_index_order_start_time[ch_hipp] > seizure_length: #if the start time is longer than the seizure length, then spread never happened, so set it to nan
+                            channel_hipp_index_order_start_time[ch_hipp] = np.nan
+                    else:
+                        channel_hipp_index_order.append("NONE")
+                        channel_hipp_index_order_start_time.append(np.nan)
+                        
+                  
+                channels_in_hippocampus_label_left = []
+                channels_in_hippocampus_label_right = []
+                for ch_hipp in range(len(channels_in_hippocampus_label)):
+                    if "left" in channels_in_hippocampus_label[ch_hipp]:
+                        channels_in_hippocampus_label_left.append(ch_hipp)
+                    elif "right" in channels_in_hippocampus_label[ch_hipp]:
+                        channels_in_hippocampus_label_right.append(ch_hipp)
+                        
+                hipp_left_mean = np.nanmean( np.array(channel_hipp_index_order_start_time)[channels_in_hippocampus_label_left]  )
+                hipp_right_mean = np.nanmean( np.array(channel_hipp_index_order_start_time)[channels_in_hippocampus_label_right]  )
+                
+                hipp_abs_diff = abs(hipp_left_mean - hipp_right_mean )
+            
+            
+                sc_vs_quickness = sc_vs_quickness.append(dict( subject =RID , seizure = seizure , quickenss = hipp_abs_diff, sc_LR_mean = sc_LR_mean, sc_temporal_mean = sc_temporal_mean) , ignore_index=True )
+
+            
+            
+            
+            
+        
+        
+#%%
+np.unique(patientsWithseizures["subject"])
+sc_vs_quickness = sc_vs_quickness.append(dict( subject ="RID0646" , seizure = "1" , quickenss = 30, sc_LR_mean = 6.222475562257545, sc_temporal_mean = 230.98383312397252) , ignore_index=True )
+sc_vs_quickness = sc_vs_quickness.append(dict( subject ="RID0679" , seizure = "1" , quickenss = np.nan, sc_LR_mean = 7.838260215653406, sc_temporal_mean = 238.8341151214537) , ignore_index=True )
+sc_vs_quickness = sc_vs_quickness.append(dict( subject ="RID0566" , seizure = "1" , quickenss = np.nan, sc_LR_mean = 7.657777157996711, sc_temporal_mean = 228.95856120168494) , ignore_index=True )
+sc_vs_quickness = sc_vs_quickness.append(dict( subject ="RID0529" , seizure = "1" , quickenss = np.nan, sc_LR_mean = 9.619899228344838, sc_temporal_mean = 251.02754366959104) , ignore_index=True )
+sc_vs_quickness = sc_vs_quickness.append(dict( subject ="RID0520" , seizure = "1" , quickenss = np.nan, sc_LR_mean = 6.274218047654939, sc_temporal_mean = 223.95286464225373) , ignore_index=True )
+
+sc_vs_quickness = sc_vs_quickness.append(dict( subject ="RID0394" , seizure = "1" , quickenss = 5, sc_LR_mean = 11.08268999550216, sc_temporal_mean = 261.9815342752608) , ignore_index=True )
+
+
 sc_vs_quickness      
 
 
-ind1 = list(np.where((sc_vs_quickness["subject"] == "RID0454"  ) &(sc_vs_quickness["seizure"] == "1"  ) )[0])
-ind2 = list(np.where((sc_vs_quickness["subject"] == "RID0278"  ) &(sc_vs_quickness["seizure"] == "1"  ) )[0])
-ind3 = list(np.where((sc_vs_quickness["subject"] == "RID0365"  ))[0])
-ind4 = list(np.where((sc_vs_quickness["subject"] == "RID0522"  ))[0])
+ind1 = list(np.where((sc_vs_quickness["subject"] == "RID0454"  ) &(sc_vs_quickness["seizure"] == "1"  ) )[0]) #artifact seizure
+ind2 = list(np.where((sc_vs_quickness["subject"] == "RID0278"  ) &(sc_vs_quickness["seizure"] == "1"  ) )[0]) #artifact seizure
+ind3 = list(np.where((sc_vs_quickness["subject"] == "RID0365"  ))[0]) #a very clear outlier
 
 
-inds = ind1 + ind2 + ind3 
+ind4 = list(np.where((sc_vs_quickness["subject"] == "RID0522"  ))[0]) #not bilateral implant
+ind5 = list(np.where((sc_vs_quickness["subject"] == "RID0508"  ))[0]) #not bilateral implant
+ind6 = list(np.where((sc_vs_quickness["subject"] == "RID0572"  ))[0]) #not bilateral implant
+ind7 = list(np.where((sc_vs_quickness["subject"] == "RID0583"  ))[0]) #not bilateral implant
+ind8 = list(np.where((sc_vs_quickness["subject"] == "RID0595"  ))[0]) #not bilateral implant
+ind9 = list(np.where((sc_vs_quickness["subject"] == "RID0596"  ))[0]) #not bilateral implant
+ind10 = list(np.where((sc_vs_quickness["subject"] == "RID0648"  ))[0]) #not bilateral implant
+
+ind11 = list(np.where((sc_vs_quickness["subject"] == "RID0440"  ))[0]) #not bilateral implant
+ind12 = list(np.where((sc_vs_quickness["subject"] == "RID0679"  ))[0]) #not bilateral implant
+ind13 = list(np.where((sc_vs_quickness["subject"] == "RID0566"  ))[0]) #not bilateral implant
+ind14 = list(np.where((sc_vs_quickness["subject"] == "RID0529"  ))[0]) #not bilateral implant
+ind15 = list(np.where((sc_vs_quickness["subject"] == "RID0520"  ))[0]) #not bilateral implant
+#ind12 = list(np.where((sc_vs_quickness["subject"] == "RID0502"  ))[0]) 
+
+
+inds = ind1 +ind2 + ind4 +ind5 +ind6 +ind7  +ind9 +ind10  + ind11 + ind12 + ind13 + ind4 + ind15
+
 
 sc_vs_quickness_filt = sc_vs_quickness.drop(inds)  
+aaaaaa = copy.deepcopy(sc_vs_quickness_filt)
+
 
 
 sc_vs_quickness_filt["inverse_quickness"] = 1/sc_vs_quickness_filt["quickenss"]
 
+
 sc_vs_quickness_filt_group = sc_vs_quickness_filt.groupby(["subject"], as_index=False).median()
+aaaaa_group = copy.deepcopy(sc_vs_quickness_filt_group)
 
 sc_vs_quickness_filt_fill= sc_vs_quickness_filt.fillna(0)
 sc_vs_quickness_group_fill= sc_vs_quickness_filt_group.fillna(0)
+
+"""
+fig, axes = utils.plot_make(size_length=10)
+g = sns.regplot(data = sc_vs_quickness_filt_group, x = "sc_LR_mean", y= "quickenss", scatter_kws = dict( linewidth=0, s=100))
+x = sc_vs_quickness_filt_group["sc_LR_mean"]
+y = sc_vs_quickness_filt_group["quickenss"]
+y_nanremoved = y[~np.isnan(y)]
+x_nanremoved = x[~np.isnan(y)]
+corr = spearmanr(x_nanremoved,y_nanremoved)
+#axes.set(yscale='log') 
+
+corr_r = np.round(corr[0], 2)
+corr_p = np.round(corr[1], 8)
+axes.set_title(f"{corr_r}, p = {corr_p}")
+
+
+
+
+"""
+non_spreader_ind = np.where(np.isnan( sc_vs_quickness_filt_group["quickenss"])  )[0]
+spreader_ind = np.where(~np.isnan( sc_vs_quickness_filt_group["quickenss"])  )[0]
+
+non_spreaders = sc_vs_quickness_filt_group["sc_LR_mean"][non_spreader_ind]
+spreaders = sc_vs_quickness_filt_group["sc_LR_mean"][spreader_ind]
+non_spreaders_vs_spreaders =  stats.mannwhitneyu(  x = non_spreaders, y= spreaders)
+print(f"\n\n\nnon spreaders vs spreaders = \n{non_spreaders_vs_spreaders[1]}\n\n")
+
+df_non_spreaders_vs_spreaders = copy.deepcopy(sc_vs_quickness_filt_group)
+df_non_spreaders_vs_spreaders["spreaders"] = np.nan
+
+df_non_spreaders_vs_spreaders.loc[non_spreader_ind,"spreaders"]  = "non_spreaders"
+df_non_spreaders_vs_spreaders.loc[spreader_ind,"spreaders"]  = "spreaders"
+
+
+sns.boxplot(data = df_non_spreaders_vs_spreaders, x = "spreaders", y =  "sc_LR_mean", order= ["non_spreaders", "spreaders"] )
+sns.swarmplot(data = df_non_spreaders_vs_spreaders, x = "spreaders", y =  "sc_LR_mean", order= ["non_spreaders", "spreaders"] )
+
 
 #%
 
@@ -424,23 +754,73 @@ axes.set_title(f"{corr_r}, p = {corr_p}")
 #%
 fig, axes = utils.plot_make(size_length=5)
 g = sns.regplot(data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", scatter_kws = dict( linewidth=0, s=100), ci = None, line_kws=dict(lw = 7))
+
+#g = sns.regplot(data = sc_vs_quickness_group_fill[~np.isnan(sc_vs_quickness_filt_group["inverse_quickness"])], x = "sc_LR_mean", y= "inverse_quickness", scatter_kws = dict( linewidth=0, s=100), ci = None, line_kws=dict(lw = 7))
+#g = sns.scatterplot(data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", linewidth=0, s=100)
+
+
+sc_vs_quickness_group_fill_spreaders_only = sc_vs_quickness_group_fill[~np.isnan(sc_vs_quickness_filt_group["inverse_quickness"])]
+
 x = sc_vs_quickness_group_fill["sc_LR_mean"]
-y = sc_vs_quickness_group_fill["quickenss"]
+y = sc_vs_quickness_group_fill["inverse_quickness"]
 y_nanremoved = y[~np.isnan(y)]
 x_nanremoved = x[~np.isnan(y)]
 
-corr =spearmanr(x_nanremoved,y_nanremoved)
-corr =pearsonr(x_nanremoved,y_nanremoved)
+corr = spearmanr(x_nanremoved,y_nanremoved)
+corr = pearsonr(x_nanremoved,y_nanremoved)
 corr_r = np.round(corr[0], 2)
 corr_p = np.round(corr[1], 8)
-axes.set_title(f"{corr_r}, p = {corr_p}\n{names}")
-axes.set_ylim([-0.033,0.2])
+
+slope, intercept, r_value, p_value, std_err  = stats.linregress(x, y)
+r_value_round = np.round(r_value, 2)
+p_value_round = np.round(p_value, 5)
+
+
+axes.set_title(f"r: {r_value_round}, p = {p_value_round}\n{names}")
+#axes.set_ylim([-0.033,0.2])
 for i, tick in enumerate(axes.xaxis.get_major_ticks()):
     tick.label.set_fontsize(6)        
 axes.tick_params(width=4) 
 # change all spines
 for axis in ['top','bottom','left','right']:
     axes.spines[axis].set_linewidth(6)
+
+
+
+#%%
+
+from sklearn.linear_model import TweedieRegressor
+X = np.array(x).reshape(-1,1)
+Y = np.array(y)
+
+
+pr = TweedieRegressor(power = 1, alpha=0, fit_intercept=True)
+y_pred_pr = pr.fit(X, Y).predict(X)
+
+fig, axes = utils.plot_make(size_length=5)
+sns.scatterplot(data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", linewidth=0, s=100)
+sns.lineplot(x = X.flatten(), y = y_pred_pr)
+
+pr.score(X, Y)
+
+
+
+
+#%
+
+X2 = sm.add_constant(X)
+glm = sm.GLM(Y, X2, family=sm.families.Tweedie())
+glm_fit = glm.fit()
+print(glm_fit.summary())
+
+Y2 = glm.predict(glm_fit.params)
+fig, axes = utils.plot_make(size_length=5)
+sns.scatterplot(data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", linewidth=0, s=100)
+sns.lineplot(x = X.flatten(), y = Y2)
+
+
+
+
 
 #%%
 plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"connectivity", f"sc_vs_spread_time_patients_{names}.pdf"), bbox_inches='tight')     

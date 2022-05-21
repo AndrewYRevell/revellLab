@@ -1014,7 +1014,7 @@ palette2_clusters = {"0": "#5b1111", "1": "#9567BE", "2": "#c94849", "3": "#1F78
 
 cluster_order = ["3", "1", "4", "2", "0"]
 
-fig, axes = utils.plot_make(size_length=20)
+fig, axes = utils.plot_make(size_length=40)
 sns.boxplot(data = region_activation_class_avg_regions_active, x = "cluster", y = "num_regions", palette= palette2_light, order=cluster_order, width=0.5)
 sns.swarmplot(data = region_activation_class_avg_regions_active, x = "cluster", y = "num_regions", palette= palette2_clusters, order=cluster_order)
 
@@ -1034,8 +1034,12 @@ for i,artist in enumerate(axes.artists):
         
 for i, tick in enumerate(axes.xaxis.get_major_ticks()):
     tick.label.set_fontsize(6)        
-     
-plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "kmeans_clustering_number_of_regions.pdf"), bbox_inches='tight')       
+axes.tick_params(width=4) 
+# change all spines
+for axis in ['top','bottom','left','right']:
+    axes.spines[axis].set_linewidth(6)
+    
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "kmeans_clustering_number_of_regions_long4.pdf"), bbox_inches='tight')       
 #%%
 ###############################################
 ###############################################

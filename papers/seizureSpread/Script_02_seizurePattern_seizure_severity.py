@@ -71,7 +71,7 @@ kde_kws = {"bw_adjust": 2}
 #% 02 Paths and files
 fnameiEEGusernamePassword = paths.IEEG_USERNAME_PASSWORD
 metadataDir =  paths.METADATA
-fnameJSON = join(metadataDir, "iEEGdataRevell_seizure_severity.json")
+fnameJSON = join(metadataDir, "iEEGdataRevell_seizure_severity_joined.json")
 BIDS = paths.BIDS
 deepLearningModelsPath = paths.DEEP_LEARNING_MODELS
 datasetiEEG = "derivatives/seizure_spread/iEEG_data"
@@ -133,11 +133,13 @@ aspect = 50
 DataJson = dataclass_iEEG_metadata.dataclass_iEEG_metadata(jsonFile)
 patientsWithseizures = DataJson.get_patientsWithSeizuresAndInterictal()
 
-
+len(np.unique(patientsWithseizures["subject"]))
+print(f"number of patients: {len(np.unique(patientsWithseizures['subject']))}")
+print(f"number of seizures: {len(patientsWithseizures)}")
 #%% Plot some metadata 
 
 #plot distribution of seizures lengths
-axes = sns.histplot(patientsWithseizures.length, binwidth=10, kde = True )
+axes = sns.histplot(patientsWithseizures.length, binwidth=15, kde = True )
 #axes.set_xlim([300,700])
 #axes.set_ylim([0,1])
 

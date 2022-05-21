@@ -269,7 +269,7 @@ axes.tick_params(width=4)
 axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
 axes.set_xlim([0,1])
 
-plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"validation", "over_thresholds.pdf"), bbox_inches='tight')
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"validation", "over_thresholds.pdf"), bbox_inches='tight')
 
 find_lowest = soz_overlap_median.groupby(["model", "threshold"], as_index=False).median()
 for m in range(len(model_IDs)):
@@ -332,7 +332,7 @@ axes.set_xlabel("model",fontsize=20)
 sns.swarmplot(ax = axes,data = df, x = "model", y = "median_rank_percent" , order=model_IDs, palette=palette_dark)
 
 
-plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"validation", "boxplot_soz.pdf"), bbox_inches='tight')
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"validation", "boxplot_soz.pdf"), bbox_inches='tight')
 
 
 
@@ -415,8 +415,41 @@ for m in range(len(model_IDs)):
     axes[m].get_legend().remove()
     if m > 0:
         axes[m].set_ylabel("")
-plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"validation", "spread_over_time.pdf"), bbox_inches='tight')
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"validation", "spread_over_time.pdf"), bbox_inches='tight')
 
+#%%
+#get laterality
+
+bilateral = []
+unilateral = []
+
+for p in range(len(patients)):
+    
+    pt = patients[p]
+    regs = region[p]
+    
+    lefts = []
+    rights = []
+    for k in range(len(regs)):
+        r = regs[k][0]
+        if len( r) > 0:
+            if "Left" in r[0]:
+                lefts.append(1)
+            if "Right" in r[0]:
+                rights.append(1)
+    left_sum = np.sum(np.array(lefts))
+    right_sum = np.sum(np.array(rights))
+    
+    rid = RID_HUP["record_id"][np.where(int(pt[3:]) ==  RID_HUP["hupsubjno"])[0][0]]
+    RID = f"RID{rid:04d}"
+    if left_sum > 0 and right_sum >0:
+        bilateral.append(RID)
+    else:
+        unilateral.append(RID)
+
+#%%
+
+df = df[pd.DataFrame(df.subject.tolist()).isin(bilateral).any(1).values]
 #%%
 palette_outcome = dict(good = "#4d36da", poor = "#e89c14") 
 time_imit = 80
@@ -433,9 +466,13 @@ for m in range(len(model_IDs)):
     df_thresh = df[( df["threshold"]== thresh )]
     df_model =  df_thresh[( df_thresh["model"] ==model_ID )]
     
+ 
+    df_model = df_model[pd.DataFrame(df_model.subject.tolist()).isin(bilateral).any(1).values]
+
+    
     df_filtered =     df_model[(df_model[category] != "unknown") & (df_model["time"] <= time_imit)]
     df_filtered_sec = df_model[(df_model[category] != "unknown") & (df_model["time"] <= time_imit)]
-    ax = sns.lineplot(data = df_filtered_sec.fillna(np.nan), x = "time", y = "percent_active", hue = "Engel_24_mo_binary" , ci = 68, lw = 5, ax = axes[m], palette=palette_outcome)
+    ax = sns.lineplot(data = df_filtered_sec.fillna(np.nan), x = "time", y = "percent_active", hue = "Engel_24_mo_binary" , ci = 95, lw = 5, ax = axes[m], palette=palette_outcome)
     axes[m].get_legend().remove()
     axes[m].set_xlim([0,time_imit])
     axes[m].axvline(x=30, ls = '--', color = "#555555", lw = 4)
@@ -446,7 +483,7 @@ for m in range(len(model_IDs)):
     axes[m].tick_params(width=4)
     if m > 0:
         axes[m].set_ylabel("")
-plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"validation", "spread_over_time_good_vs_bad.pdf"), bbox_inches='tight')
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"validation", "spread_over_time_good_vs_bad.pdf"), bbox_inches='tight')
 
 
 
@@ -494,7 +531,7 @@ palette_outcome_dark = dict(good = "#2c1b93", poor = "#8e5f0c")
 
 
 fig, axes = utils.plot_make(size_length=10)
-sns.boxplot(ax = axes, data = sec, x = "model", y = "percent_active" , hue = "Engel_24_mo_binary" , order=model_IDs, fliersize=0, palette=palette_outcome, medianprops=dict(color="black", lw = 4))
+sns.boxplot(ax = axes, data = sec, x = "model", y = "percent_active" , hue = "Engel_24_mo_binary" , order=model_IDs, fliersize=0, palette=palette_outcome, medianprops=dict(color="black", lw = 4), hue_order=["good", "poor"])
 utils.adjust_box_widths(fig, 0.8)
 
 for i,artist in enumerate(axes.artists):
@@ -517,7 +554,7 @@ for i, tick in enumerate(axes.xaxis.get_major_ticks()):
         
 axes.set_xlabel("model",fontsize=20)
 
-sns.swarmplot(ax = axes,data = sec, x = "model", y = "percent_active" , hue = "Engel_24_mo_binary"  , order=model_IDs, palette=palette_outcome_dark, dodge=True, s=3)
+sns.swarmplot(ax = axes,data = sec, x = "model", y = "percent_active" , hue = "Engel_24_mo_binary"  , order=model_IDs, palette=palette_outcome_dark, dodge=True, s=3, hue_order=["good", "poor"])
 
 # change all spines
 for axis in ['top','bottom','left','right']:
@@ -527,7 +564,7 @@ for axis in ['top','bottom','left','right']:
 axes.tick_params(width=4)
 axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
 
-plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"validation", "spread_at_030s_good_vs_bad.pdf"), bbox_inches='tight')
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"validation", "spread_at_030s_good_vs_bad.pdf"), bbox_inches='tight')
 #%% Bootstrap
 
 s = 30
@@ -663,7 +700,7 @@ for m in range(len(model_IDs)):
     cohensd_plot_matrix_nanfill = scipy.ndimage.gaussian_filter(cohensd_plot_matrix_nanfill, sigma = 1.5)
     
     
-    sns.heatmap(cohensd_plot_matrix_nanfill.T, ax = axes[m], vmin= 0, vmax = cohensd_max)
+    sns.heatmap(cohensd_plot_matrix_nanfill.T, ax = axes[m], vmin= -0.2 , vmax = cohensd_max, cmap = "magma")
     
     axes[m].set_title(model_ID)
     axes[m].set_title(model_ID)
@@ -673,10 +710,16 @@ for m in range(len(model_IDs)):
         axes[m].set_ylim([47,100])
     if m == 2:
         axes[m].set_ylim([48,100])
-    axes[m].set_xlim([0,time_imit])
+    if m == 3:
+        axes[m].set_ylim([0,100])
+    if m == 4:
+        axes[m].set_ylim([0,100])
+    if m == 5:
+        axes[m].set_ylim([0,100])
+    axes[m].set_xlim([0,60])
  
 
-plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"validation", "cohensd_across_all.pdf"), bbox_inches='tight')
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"validation", "cohensd_across_all.pdf"), bbox_inches='tight')
     
 ########################################################################            
 ########################################################################            
@@ -856,3 +899,108 @@ utils.correct_pvalues_for_multiple_testing(list(quickness_comparison_filtered.pv
 
 
 #%% Caluclate specific contingency tables
+########################################################################            
+########################################################################            
+########################################################################            
+########################################################################            
+########################################################################            
+########################################################################            
+########################################################################            
+########################################################################            
+########################################################################            
+########################################################################            
+########################################################################  
+
+m = 0
+thr = [0.69, 0.96, 0.58, 0.08, 0.11, 0.01]
+co =60
+
+thresh = 0.59
+
+
+model_ID = model_IDs[m]
+
+threshold_hippocampus_spread = co #cutoff in seconds for time to spread
+
+hipp_spread = copy.deepcopy(soz_overlap_median_outcomes)
+hipp_spread_time = abs(soz_overlap_median_outcomes.hipp_left_mean - soz_overlap_median_outcomes.hipp_right_mean)
+hipp_spread["hipp_spread_time"] = hipp_spread_time
+
+hipp_spread_thresh = hipp_spread[( hipp_spread["threshold"]== thresh )]
+hipp_spread_model =  hipp_spread_thresh[( hipp_spread_thresh["model"] ==model_ID )]
+
+hipp_spread_model = hipp_spread_model[pd.DataFrame(hipp_spread_model.subject.tolist()).isin(bilateral).any(1).values]
+#hipp_spread_model = hipp_spread_model[pd.DataFrame(hipp_spread_model.subject.tolist()).isin(unilateral).any(1).values]
+
+good_len = len(hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "good")])
+poor_len = len(hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "poor")])
+
+hipp_spread_model_good = hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "good") & (hipp_spread_model["hipp_spread_time"] <= threshold_hippocampus_spread)]
+hipp_spread_model_poor = hipp_spread_model[(hipp_spread_model["Engel_24_mo_binary"] == "poor") & (hipp_spread_model["hipp_spread_time"] <= threshold_hippocampus_spread)]
+
+hipp_spread_model_good_len = len(hipp_spread_model_good)
+hipp_spread_model_poor_len = len(hipp_spread_model_poor)
+
+"""
+Contingency table
+      Hipp spread less than threshold   |    Never Spread
+good   hipp_spread_model_good_len             |    good_len - hipp_spread_model_good_len
+poor   hipp_spread_model_poor_len             |      poor_len - hipp_spread_model_poor_len
+
+
+
+
+                                    poor                             /     good
+Hipp spread less than threshold     hipp_spread_model_poor_len      /              hipp_spread_model_good_len  
+Never Spread                      poor_len - hipp_spread_model_poor_len        good_len - hipp_spread_model_good_len       
+
+
+
+"""
+
+
+sensitivity = (hipp_spread_model_poor_len)/(hipp_spread_model_poor_len +(poor_len - hipp_spread_model_poor_len ) )
+specificty = (good_len - hipp_spread_model_good_len)/ (hipp_spread_model_good_len   +   good_len - hipp_spread_model_good_len  )
+
+ppv = (hipp_spread_model_poor_len) /(hipp_spread_model_poor_len + (hipp_spread_model_good_len ))
+npv = (good_len - hipp_spread_model_good_len )/ ((poor_len - hipp_spread_model_poor_len )+ (good_len - hipp_spread_model_good_len ))
+
+contingency_table = [ [hipp_spread_model_good_len, good_len - hipp_spread_model_good_len] , [hipp_spread_model_poor_len,  poor_len - hipp_spread_model_poor_len]    ]
+
+correction = False
+N1 = sum(sum(np.array(contingency_table)))
+if hipp_spread_model_good_len == 0 and hipp_spread_model_poor_len ==0:
+    pval1 = 1
+    cramers_V1 = 0
+    odds_ratio1=1
+else:
+    chi2 = stats.chi2_contingency(contingency_table, correction=correction)[0]
+    pval1 = stats.chi2_contingency(contingency_table, correction=correction)[1]
+    cramers_V1= np.sqrt((stats.chi2_contingency(contingency_table, correction=correction)[0])/N1)
+    if contingency_table[0][1] == 0 or contingency_table[1][0] == 0:
+        odds_ratio1=1
+    else:
+        odds_ratio1 = (contingency_table[0][0]*contingency_table[1][1]) / (contingency_table[0][1]*contingency_table[1][0] )
+
+
+contingency_table = [ [ hipp_spread_model_poor_len, hipp_spread_model_good_len  ] , [ poor_len - hipp_spread_model_poor_len  , good_len - hipp_spread_model_good_len ]    ]
+
+
+print(f"contingency_table:          {contingency_table}")
+print(f"chi2:                       {chi2}")
+print( f"pval1:                      {pval1}")
+print(f"cramers_V1:                 {cramers_V1}")
+
+print(f"sensitivity:           {sensitivity}")
+print(f"specificty:            {specificty}")
+print(f"ppv:                   {ppv}")
+print(f"npv:                   {npv}")
+
+#utils.fdr2([0.0238, 0.0142, 0.0082, 0.04169, 0.22928])
+
+#utils.fdr2([0.03398, 0.0508, 0.0400, 0.1817, 0.777])
+
+utils.fdr2([0.01222, 0.02060, 0.0169, 0.095068, 0.5347])
+
+
+utils.fdr2([0.03398703558374248, 0.024920361016936534, 0.18174686425631253])

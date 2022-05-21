@@ -143,9 +143,7 @@ for cluster in range(5):
     pos = axes.imshow(masked_array, cmap=cmap, origin="lower", vmin = vmin, vmax = vmax)
     fig.colorbar(pos, ax=axes)
     axes.set_title(f"{slice_num}")
-
-
-plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", f"COLOR_cluster_atlas_{cluster}_slice_{slice_num}.pdf"), bbox_inches='tight')
+    plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", f"COLOR_cluster_atlas_{cluster}_slice_{slice_num}.pdf"), bbox_inches='tight')
     
 
 
