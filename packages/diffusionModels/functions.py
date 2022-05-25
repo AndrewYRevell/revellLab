@@ -240,6 +240,17 @@ def draw_networkx_weighted(G, pos = None, node_names = None, node_size = 300, no
                                 font_color='black', ax = ax)
 
 
+def format_axes(ax):
+    """Visualization options for the 3D axes."""
+    # Turn gridlines off
+    ax.grid(False)
+    # Suppress tick labels
+    for dim in (ax.xaxis, ax.yaxis, ax.zaxis):
+        dim.set_ticks([])
+    # Set axes labels
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
+    ax.set_zlabel("z")
 
 """
 

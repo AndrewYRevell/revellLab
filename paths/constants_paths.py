@@ -1,3 +1,15 @@
+#EXAMPLE DATA
+SUB01_AAL2 = "example_data/networks/sub-01_AAL2.txt"
+SUB01_AAL3 = "example_data/networks/sub-01_AAL3.txt"
+SUB01_BNA = "example_data/networks/sub-01_BNA.txt"
+SUB01_HO = "example_data/networks/sub-01_HO.txt"
+AAL_CENTROIDS = "tools/atlases/atlas_centroids/AAL_centroid.csv"
+AAL2_CENTROIDS = "tools/atlases/atlas_centroids/AAL2_centroid.csv"
+ATLAS_AAL2 = "tools/atlases/atlases/AAL2.nii.gz"
+ATLAS_BNA = "tools/atlases/atlases/BN_Atlas_246_1mm.nii.gz"
+ATLAS_HO = "tools/atlases/atlases/HarvardOxford-combined.nii.gz"
+ATLAS_CENTROIDS = "tools/atlases/atlas_centroids"
+
 #COMPUTER
 HOME = "/Users/arevell"
 FREESURFER_LICENSE = "$FREESURFER_HOME/license.txt"

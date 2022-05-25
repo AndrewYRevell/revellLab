@@ -80,6 +80,21 @@ for t in range(len(ax)):
     else:
         ax[t].axis('off')
 
+#%%
+node_xyz = np.array([pos[v] for v in sorted(G)])
+edge_xyz = np.array([(pos[u], pos[v]) for u, v in G.edges()])
+
+fig = plt.figure()
+ax = fig.add_subplot(111, projection="3d")
+ax.scatter(*node_xyz.T, s=100, ec="w")
+
+# Plot the edges
+for vizedge in edge_xyz:
+    ax.plot(*vizedge.T, color="tab:gray")
+
+dmf.format_axes(ax)
+
+
 #%% 3D layout
 spring_3D =nx.spring_layout(G,dim=3, seed=0)
 #we need to seperate the X,Y,Z coordinates for Plotly
@@ -127,16 +142,17 @@ trace_nodes = go.Scatter3d(x=x_nodes,
                         text=list(G.nodes()),
                         hoverinfo='text')
 
-axis = dict(showbackground=False,
-            showline=False,
+axis = dict(showbackground=True,
+            showline=True,
             zeroline=False,
-            showgrid=False,
+            showgrid=True,
             showticklabels=False,
             title='')
+
 camera = dict(
     up=dict(x=0, y=0, z=1),
     center=dict(x=0, y=0, z=0),
-    eye=dict(x=1, y=1.25, z=1.25)
+    eye=dict(x=1, y=1.25, z=0)
 )
 
 layout = go.Layout(title="",
@@ -166,11 +182,10 @@ def rotate_z(x, y, z, theta):
     w = x+1j*y
     return np.real(np.exp(1j*theta)*w), np.imag(np.exp(1j*theta)*w), z
 
-x_eye = -1.25
-y_eye = 2
-z_eye = 0.5
-for x in np.linspace(1,np.pi,10):
-    print(x)
+x_eye = 1
+y_eye = 1.25
+z_eye = 1.25
+for t in np.linspace(0,2*np.pi,20):
     xe, ye, ze = rotate_z(x_eye, y_eye, z_eye, -t)
     camera = dict(
         up=dict(x=0, y=0, z=1),
@@ -180,7 +195,6 @@ for x in np.linspace(1,np.pi,10):
     
     fig.update_layout(scene_camera=camera)
     fig.show()
-
 
 
 
