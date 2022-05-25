@@ -155,7 +155,7 @@ fname_iEEG = "HUP155_phaseII"
 fname_iEEG = "HUP224_phaseII"
 fname_iEEG = "HUP196_phaseII"
 fname_iEEG = "HUP189_phaseII"
-fname_iEEG = "HUP215_phaseII_D03"
+fname_iEEG = "HUP215_phaseII_D04"
 annotations, annotationsSeizure, annotationsUEOEEC = downloadiEEGorg.get_natus(username, password, fname_iEEG = fname_iEEG, annotationLayerName = "Imported Natus ENT annotations")
 
 #%% Get data

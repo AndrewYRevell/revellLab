@@ -196,10 +196,14 @@ def get_start_times(secondsBefore, skipWindow, fsds, channels, start, stop, prob
     print(np.array(channels)[channel_order])
     return spread_start, seizure_start, spread_start_loc, channel_order, channel_order_labels
 
+len(patientsWithseizures)
+len(np.unique(patientsWithseizures["subject"]))
+print(f"number of patients: {len(np.unique(patientsWithseizures['subject']))}")
+print(f"number of seizures: {len(patientsWithseizures)}")
 #%%
-i=0 
+i=0
 #for i in indexes[39]:#range(23,25):
-for i in range(267,268):
+for i in range(280,285):
 #for i in special_index:
 
     RID = np.array(patientsWithseizures["subject"])[i]
@@ -226,8 +230,12 @@ for i in range(267,268):
     #check if preproceed file exists, and if it does, load that instead of dowloading ieeg data and performing preprocessing on that
     if utils.checkIfFileExists( preprocessed_file, printBOOL=False ):
         print(f"\n{RID} {i} PREPROCESSED FILE EXISTS")
+        
         with open(preprocessed_file, 'rb') as f: [dataII_scaler, data_scaler, dataII_scalerDS, data_scalerDS, channels] = pickle.load(f)
         df, fs, ictalStartIndex, ictalStopIndex = DataJson.get_precitalIctalPostictal(RID, "Ictal", idKey, username, password,BIDS = BIDS, dataset= datasetiEEG, session = session, secondsBefore = secondsBefore, secondsAfter = secondsAfter)
+       
+        
+        #CHECKING IF MODEL FILES EXIST
         
         
     else:
@@ -247,7 +255,7 @@ for i in range(267,268):
         with open(preprocessed_file, 'wb') as f: pickle.dump(pickle_save, f)
     
         
-    
+   #%
     #data_ei = data_scaler[int(fs*170):-int(fs*170),:]
     
     #Epileptogenicity index
@@ -261,13 +269,14 @@ for i in range(267,268):
     ########################################
     #########################################
     #######################################
-    
     _, nchan = data_scalerDS.shape
     
-    np.unique(patientsWithseizures.subject) 
-    tmp = df.columns
-
+    spread_location = join(BIDS, datasetiEEG_spread, f"v{version:03d}", f"sub-{RID}" )
+    utils.checkPathAndMake( spread_location, spread_location, printBOOL=False)
     
+    spread_location_file_basename = f"{splitext(fname)[0]}_spread.pickle"
+    spread_location_file = join(spread_location, spread_location_file_basename)
+
     fpath_wavenet = join(deepLearningModelsPath, f"wavenet/v{version:03d}.hdf5")
     fpath_1dCNN = join(deepLearningModelsPath, f"1dCNN/v{version:03d}.hdf5")
     fpath_lstm = join(deepLearningModelsPath, f"lstm/v{version:03d}.hdf5")
@@ -279,18 +288,11 @@ for i in range(267,268):
     
 
     
-    #CHECKING IF MODEL FILES EXIST
-    
-    spread_location = join(BIDS, datasetiEEG_spread, f"v{version:03d}", f"sub-{RID}" )
-    utils.checkPathAndMake( spread_location, spread_location, printBOOL=False)
-    
-    spread_location_file_basename = f"{splitext(fname)[0]}_spread.pickle"
-    spread_location_file = join(spread_location, spread_location_file_basename)
-    
     if utils.checkIfFileExists( spread_location_file , printBOOL=False):
         print(f"\n{RID} {i} SPREAD FILE EXISTS")
-        #with open(spread_location_file, 'rb') as f:[probWN, probCNN, probLSTM, data_scalerDS, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
+        with open(spread_location_file, 'rb') as f:[probWN, probCNN, probLSTM, data_scalerDS, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
     else:
+        
         modelWN = load_model(fpath_wavenet)
         modelCNN= load_model(fpath_1dCNN)
         modelLSTM = load_model(fpath_lstm)
@@ -311,6 +313,7 @@ for i in range(267,268):
         with open(spread_location_file, 'wb') as f: pickle.dump(pickle_save, f)
             
         
+   
     
     ########################################### 
     #calculate absolute slope
@@ -326,7 +329,7 @@ for i in range(267,268):
     
     if utils.checkIfFileExists( spread_location_sf_file , printBOOL=False):
         print(f"\n{RID} {i} {feature_name} EXISTS")
-        #with open(spread_location_sf_file, 'rb') as f:[abs_slope_normalized, abs_slope_normalized_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
+        with open(spread_location_sf_file, 'rb') as f:[abs_slope_normalized, abs_slope_normalized_tanh, channels, window, skipWindow, secondsBefore, secondsAfter] = pickle.load(f)
     else:
         print(f"\n{RID} {i} {feature_name} CALCULATING ")
         abs_slope_all_windows = np.abs(np.divide(np.diff(data_scalerDS_X, axis=1), 1/fsds))
@@ -370,7 +373,7 @@ for i in range(267,268):
     #calculate Line Length
     ########################################### 
     
-    """
+    
     feature_name = "line_length"
     
     #CHECKING IF MODEL FILES EXIST
@@ -395,7 +398,8 @@ for i in range(267,268):
     
     #########
     
-    #%%
+    #%
+    """
     pic_name = splitext(spread_location_sf_file_basename)[0] + "_PICTURE_04_line_length.png"
     if not utils.checkIfFileExists( join(spread_location_sf, pic_name), printBOOL=False):
         THRESHOLD = 0.5
@@ -412,8 +416,8 @@ for i in range(267,268):
         
         plt.savefig(join(spread_location_sf, pic_name) )
         plt.show()
+    """
     
-    """    
         
     
     ########################################### 

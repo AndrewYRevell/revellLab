@@ -293,6 +293,10 @@ for k in range(len(outcomes)): #if poor outcome at 6 or 12 month, then propagate
 
 with open(paths.ATLAS_FILES_PATH) as f: atlas_files = json.load(f)
 
+
+len(np.unique(patientsWithseizures["subject"]))
+print(f"number of patients: {len(np.unique(patientsWithseizures['subject']))}")
+print(f"number of seizures: {len(patientsWithseizures)}")      
 #%%
 tanh = False
 
@@ -354,31 +358,7 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshol
         hup_int = hup_num_all[RID_keys.index(RID)]
         hup_int_pad = f"{hup_int:03d}" 
         
-        #i_patient = patients.index(f"HUP{hup_int_pad}")
-        #HUP = patients[i_patient]
-        #hup = int(HUP[3:])
-        
-    
-        
-        #channel_names = labels[i_patient]
-        #soz_ind = np.where(soz[i_patient] == 1)[0]
-        #soz_channel_names = np.array(channel_names)[soz_ind]
-        
-        #resected_ind = np.where(resect[i_patient] == 1)[0]
-        #resected_channel_names = np.array(channel_names)[resected_ind]
-        
-        #ignore_ind = np.where(ignore[i_patient] == 1)[0]
-        #ignore__channel_names = np.array(channel_names)[ignore_ind]
-        
-        #soz_channel_names = echobase.channel2std(soz_channel_names)
-        #resected_channel_names = echobase.channel2std(resected_channel_names)
-        #ignore__channel_names = echobase.channel2std(ignore__channel_names)
-        
 
-        #soz_channel_names = channel2std_ECoG(soz_channel_names)
-        #resected_channel_names = channel2std_ECoG(resected_channel_names)
-        #ignore__channel_names = channel2std_ECoG(ignore__channel_names)
-        #%
         THRESHOLD = threshold
         SMOOTHING = smoothing #in seconds
         
@@ -498,8 +478,8 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshol
 
             
             sc = utils.read_DSI_studio_Txt_files_SC(connectivity_loc_path)
-            sc = sc/sc.max()
-            #sc = utils.log_normalize_adj(sc)
+            #sc = sc/sc.max()
+            sc = utils.log_normalize_adj(sc)
             #sc=utils.log_normalize_adj(sc)
             sc_region_labels = utils.read_DSI_studio_Txt_files_SC_return_regions(connectivity_loc_path, atlas).astype(ind)
 
@@ -576,12 +556,12 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshol
                 axes.set_xlim([0,0.5])            
                 
                 """
+                
                 #get the average time each region was active
                 region_times = pd.DataFrame(columns = ["region", "time"])
                 for r in range(len(sc_region_labels)):
                     reg_num = sc_region_labels[r]
                     channels_in_reg = np.where(reg_num == atlas_localization[f"{atlas}_region_number"])[0]
-                    
                     reg_starts = []
                     if len(channels_in_reg) >0:
                         for ch in range(len(channels_in_reg)):
@@ -592,7 +572,13 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshol
                                     reg_starts.append(np.nan)
                                 else:
                                     reg_starts.append(spread_start[ch_in_spread[0]]*skipWindow )
-                        reg_mean = np.nanmean(reg_starts)
+                            else:
+                                reg_mean = np.nan
+                                    
+                        if len(reg_starts)>0:
+                            reg_mean = np.nanmean(reg_starts)
+                        else:
+                            reg_mean = np.nan
                     else:
                         reg_mean = np.nan
                     region_times = region_times.append(dict(region = reg_num, time = reg_mean), ignore_index=True)
@@ -621,7 +607,7 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshol
                 corr_r = np.round(corr[0], 3)
                 corr_p = np.round(corr[1], 8)
     
-                axes.set_title(f"r = {corr_r}, p = {corr_p}")
+                axes.set_title(f"{RID}\nr = {corr_r}, p = {corr_p}")
                 #axes.set_ylim([-0.033,0.2])
                 for l, tick in enumerate(axes.xaxis.get_major_ticks()):
                     tick.label.set_fontsize(6)        

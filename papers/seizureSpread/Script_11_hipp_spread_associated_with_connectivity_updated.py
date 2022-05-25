@@ -304,7 +304,9 @@ for k in range(len(outcomes)): #if poor outcome at 6 or 12 month, then propagate
 ########################################################################            
 ########################################################################            
 ########################################################################            
-                  
+len(np.unique(patientsWithseizures["subject"]))
+print(f"number of patients: {len(np.unique(patientsWithseizures['subject']))}")
+print(f"number of seizures: {len(patientsWithseizures)}")            
 
 #%%
 
@@ -320,9 +322,9 @@ by = 0.01
 #get connectivity matrices
 
 i=137
-m = 0
+m = 3
 thr = [0.69, 0.96, 0.58, 0.08, 0.11, 0.01]
-thr = [0.69, 0.96, 0.58, 0.21, 0.11, 0.01]
+thr = [0.7, 0.7, 0.6, 0.21, 0.5, 0.5]
 
 sc_vs_quickness = pd.DataFrame(columns =[ "subject", "seizure", "quickenss", "sc_LR_mean", "sc_temporal_mean" ])
 
@@ -338,7 +340,7 @@ for i in range(len(patientsWithseizures)):
     #atlas
     atlas = "BN_Atlas_246_1mm"
     atlas = "AAL3v1_1mm"
-    #atlas = "AAL2"
+    atlas = "AAL2"
     #atlas = "HarvardOxford-combined"
     
     
@@ -353,17 +355,18 @@ for i in range(len(patientsWithseizures)):
     
     #STRUCTURAL CONNECTIVITY
     temporal_regions = ["Hippocampus"]; names = "Hippocampus"
-    temporal_regions = ["Hippocampus", "Temporal"]; names = "Hippocampus, Temporal"
+    #temporal_regions = ["Hippocampus", "Temporal"]; names = "Hippocampus, Temporal"
     #temporal_regions = ["Temporal"]; names = "Temporal"
     #temporal_regions = ["Frontal"]; names = "Frontal"
-    #temporal_regions = ["Parietal"]; names = "Parietal"
+    temporal_regions = ["Parietal"]; names = "Parietal"
     #temporal_regions = ["Amygdala"]; names = "Amygdala"
-    #temporal_regions = ["Hippocampus", "Temporal", "Amygdala","Fusiform", "Insula"]; names = "Hippocampus, Temporal, Amygdala, Fusiform, Insula"
-    #temporal_regions = ["Insula", "Hippocampus", "ParaHippocampal", "Fusiform" ,"Heschl", "Temporal"]; names = "Insula, Hippocampus, ParaHippocampal, Fusiform ,Heschl, Temporal"
+    #temporal_regions = ["Hippocampus", "Temporal", "Amygdala","Fusiform", "Insula"]; names = "All temporal"
+    #temporal_regions = ["Insula", "Hippocampus", "ParaHippocampal", "Fusiform" ,"Heschl", "Temporal"]; names = "All temporal"
     
     #iEEG
     temporal_regions_spread = ["Hippocampus"]
-    temporal_regions_spread = ["Temporal"]
+    temporal_regions_spread = ["Hippocampus", "Temporal"]
+    #temporal_regions_spread = ["Temporal"]
     #temporal_regions_spread = ["Frontal"]
     #temporal_regions_spread = ["Parietal"]
     #temporal_regions_spread = ["Amygdala"]
@@ -371,7 +374,6 @@ for i in range(len(patientsWithseizures)):
     #temporal_regions_spread = ["Hippocampus",  "Temporal", "ParaHippocampal", "Fusiform" ,"Heschl" , "Insula"]
     #temporal_regions_spread = ["Hippocampus", "Temporal", "Amygdala", "Insula", "ParaHippocampal", "Fusiform" ,"Heschl"]
     #temporal_regions_spread = ["Hippocampus", "Amygdala","ParaHippocampal"]
-    temporal_regions_spread = ["Hippocampus", "Temporal"]
     
     #temporal_regions_spread = ["Parietal"]
     
@@ -641,8 +643,9 @@ for i in range(len(patientsWithseizures)):
             
         
         
-#%%
+#%
 np.unique(patientsWithseizures["subject"])
+"""
 sc_vs_quickness = sc_vs_quickness.append(dict( subject ="RID0646" , seizure = "1" , quickenss = 30, sc_LR_mean = 6.222475562257545, sc_temporal_mean = 230.98383312397252) , ignore_index=True )
 sc_vs_quickness = sc_vs_quickness.append(dict( subject ="RID0679" , seizure = "1" , quickenss = np.nan, sc_LR_mean = 7.838260215653406, sc_temporal_mean = 238.8341151214537) , ignore_index=True )
 sc_vs_quickness = sc_vs_quickness.append(dict( subject ="RID0566" , seizure = "1" , quickenss = np.nan, sc_LR_mean = 7.657777157996711, sc_temporal_mean = 228.95856120168494) , ignore_index=True )
@@ -650,36 +653,48 @@ sc_vs_quickness = sc_vs_quickness.append(dict( subject ="RID0529" , seizure = "1
 sc_vs_quickness = sc_vs_quickness.append(dict( subject ="RID0520" , seizure = "1" , quickenss = np.nan, sc_LR_mean = 6.274218047654939, sc_temporal_mean = 223.95286464225373) , ignore_index=True )
 
 sc_vs_quickness = sc_vs_quickness.append(dict( subject ="RID0394" , seizure = "1" , quickenss = 5, sc_LR_mean = 11.08268999550216, sc_temporal_mean = 261.9815342752608) , ignore_index=True )
-
-
+"""
+aaaaaaaaaaa_copy = copy.deepcopy(sc_vs_quickness)
 sc_vs_quickness      
 
-
-ind1 = list(np.where((sc_vs_quickness["subject"] == "RID0454"  ) &(sc_vs_quickness["seizure"] == "1"  ) )[0]) #artifact seizure
-ind2 = list(np.where((sc_vs_quickness["subject"] == "RID0278"  ) &(sc_vs_quickness["seizure"] == "1"  ) )[0]) #artifact seizure
-ind3 = list(np.where((sc_vs_quickness["subject"] == "RID0365"  ))[0]) #a very clear outlier
+unilateral_ids = ["RID0522", "RID0508" , "RID0572" , "RID0583"  , "RID0596" , "RID0648" , "RID0679" , "RID0566" , "RID0529" , "RID0520" , ]
 
 
-ind4 = list(np.where((sc_vs_quickness["subject"] == "RID0522"  ))[0]) #not bilateral implant
-ind5 = list(np.where((sc_vs_quickness["subject"] == "RID0508"  ))[0]) #not bilateral implant
-ind6 = list(np.where((sc_vs_quickness["subject"] == "RID0572"  ))[0]) #not bilateral implant
-ind7 = list(np.where((sc_vs_quickness["subject"] == "RID0583"  ))[0]) #not bilateral implant
-ind8 = list(np.where((sc_vs_quickness["subject"] == "RID0595"  ))[0]) #not bilateral implant
-ind9 = list(np.where((sc_vs_quickness["subject"] == "RID0596"  ))[0]) #not bilateral implant
-ind10 = list(np.where((sc_vs_quickness["subject"] == "RID0648"  ))[0]) #not bilateral implant
+ind1 = list(np.where((sc_vs_quickness["subject"] == "RID0278"  ) &(sc_vs_quickness["seizure"] == "1"  ) )[0]) #artifact seizure
+ind2 = list(np.where((sc_vs_quickness["subject"] == "RID0365"  )  )[0]) #artifact seizure
 
-ind11 = list(np.where((sc_vs_quickness["subject"] == "RID0440"  ))[0]) #not bilateral implant
-ind12 = list(np.where((sc_vs_quickness["subject"] == "RID0679"  ))[0]) #not bilateral implant
-ind13 = list(np.where((sc_vs_quickness["subject"] == "RID0566"  ))[0]) #not bilateral implant
-ind14 = list(np.where((sc_vs_quickness["subject"] == "RID0529"  ))[0]) #not bilateral implant
-ind15 = list(np.where((sc_vs_quickness["subject"] == "RID0520"  ))[0]) #not bilateral implant
+sc_vs_quickness.loc[(sc_vs_quickness["subject"] == "RID0454"  ) &(sc_vs_quickness["seizure"] == "1"  ), "quickenss"] = 70 #artifact seizure #453 asctually took 70 seconds to spread to right side. It was a very long seizure and a typical
+
+#ind4 = list(np.where((sc_vs_quickness["subject"] == "RID0522"  ))[0]) #not bilateral implant
+#ind5 = list(np.where((sc_vs_quickness["subject"] == "RID0508"  ))[0]) #not bilateral implant
+#ind6 = list(np.where((sc_vs_quickness["subject"] == "RID0572"  ))[0]) #not bilateral implant
+#ind7 = list(np.where((sc_vs_quickness["subject"] == "RID0583"  ))[0]) #not bilateral implant
+#ind8 = list(np.where((sc_vs_quickness["subject"] == "RID0595"  ))[0]) #not bilateral implant
+#ind9 = list(np.where((sc_vs_quickness["subject"] == "RID0596"  ))[0]) #not bilateral implant
+#ind10 = list(np.where((sc_vs_quickness["subject"] == "RID0648"  ))[0]) #not bilateral implant
+
+#ind11 = list(np.where((sc_vs_quickness["subject"] == "RID0440"  ))[0]) #not bilateral implant
+#ind12 = list(np.where((sc_vs_quickness["subject"] == "RID0679"  ))[0]) #not bilateral implant
+#ind13 = list(np.where((sc_vs_quickness["subject"] == "RID0566"  ))[0]) #not bilateral implant
+#ind14 = list(np.where((sc_vs_quickness["subject"] == "RID0529"  ))[0]) #not bilateral implant
+#ind15 = list(np.where((sc_vs_quickness["subject"] == "RID0520"  ))[0]) #not bilateral implant
+
+#ind16 = list(np.where((sc_vs_quickness["subject"] == "RID0646"  ))[0]) #not bilateral implant
+#ind3 = list(np.where((sc_vs_quickness["subject"] == "RID0365"  ))[0]) #a very clear outlier
 #ind12 = list(np.where((sc_vs_quickness["subject"] == "RID0502"  ))[0]) 
 
 
-inds = ind1 +ind2 + ind4 +ind5 +ind6 +ind7  +ind9 +ind10  + ind11 + ind12 + ind13 + ind4 + ind15
+sc_vs_quickness_unilateral = sc_vs_quickness[sc_vs_quickness["subject"].isin(unilateral_ids)     ]
 
+inds = ind1
+#inds = ind2 + ind4 +ind5 +ind6 +ind7  +ind9 +ind10  + ind11 + ind12 + ind13 + ind14 + ind15 + ind16
+#inds = ind1 +ind2 + ind4 +ind5 +ind6 +ind7  +ind9 +ind10  + ind11 + ind12 + ind13 + ind14 + ind15 + ind16
 
+sc_vs_quickness_filt = copy.deepcopy(sc_vs_quickness)
 sc_vs_quickness_filt = sc_vs_quickness.drop(inds)  
+sc_vs_quickness_filt.drop(sc_vs_quickness_filt[sc_vs_quickness_filt["subject"].isin(unilateral_ids)].index , inplace = True)
+
+#sc_vs_quickness_filt = sc_vs_quickness.drop(inds)  
 aaaaaa = copy.deepcopy(sc_vs_quickness_filt)
 
 
@@ -688,6 +703,7 @@ sc_vs_quickness_filt["inverse_quickness"] = 1/sc_vs_quickness_filt["quickenss"]
 
 
 sc_vs_quickness_filt_group = sc_vs_quickness_filt.groupby(["subject"], as_index=False).median()
+
 aaaaa_group = copy.deepcopy(sc_vs_quickness_filt_group)
 
 sc_vs_quickness_filt_fill= sc_vs_quickness_filt.fillna(0)
@@ -711,12 +727,13 @@ axes.set_title(f"{corr_r}, p = {corr_p}")
 
 
 """
+
 non_spreader_ind = np.where(np.isnan( sc_vs_quickness_filt_group["quickenss"])  )[0]
 spreader_ind = np.where(~np.isnan( sc_vs_quickness_filt_group["quickenss"])  )[0]
 
 non_spreaders = sc_vs_quickness_filt_group["sc_LR_mean"][non_spreader_ind]
 spreaders = sc_vs_quickness_filt_group["sc_LR_mean"][spreader_ind]
-non_spreaders_vs_spreaders =  stats.mannwhitneyu(  x = non_spreaders, y= spreaders)
+non_spreaders_vs_spreaders =  stats.mannwhitneyu(  non_spreaders, spreaders)
 print(f"\n\n\nnon spreaders vs spreaders = \n{non_spreaders_vs_spreaders[1]}\n\n")
 
 df_non_spreaders_vs_spreaders = copy.deepcopy(sc_vs_quickness_filt_group)
@@ -724,11 +741,21 @@ df_non_spreaders_vs_spreaders["spreaders"] = np.nan
 
 df_non_spreaders_vs_spreaders.loc[non_spreader_ind,"spreaders"]  = "non_spreaders"
 df_non_spreaders_vs_spreaders.loc[spreader_ind,"spreaders"]  = "spreaders"
+sc_vs_quickness_unilateral_group = sc_vs_quickness_unilateral.groupby(["subject"], as_index=False).median()
+sc_vs_quickness_unilateral_group["spreaders"] = "unilateral implant"
 
+df_non_spreaders_vs_spreaders_unilateral = pd.concat(  [df_non_spreaders_vs_spreaders, sc_vs_quickness_unilateral_group])
 
-sns.boxplot(data = df_non_spreaders_vs_spreaders, x = "spreaders", y =  "sc_LR_mean", order= ["non_spreaders", "spreaders"] )
-sns.swarmplot(data = df_non_spreaders_vs_spreaders, x = "spreaders", y =  "sc_LR_mean", order= ["non_spreaders", "spreaders"] )
+fig, axes = utils.plot_make(c = 3, size_length=15)
+sns.boxplot(ax = axes[0], data = df_non_spreaders_vs_spreaders_unilateral, x = "spreaders", y =  "sc_LR_mean", order= ["spreaders", "non_spreaders", "unilateral implant"] )
+sns.swarmplot(ax = axes[0],data = df_non_spreaders_vs_spreaders_unilateral, x = "spreaders", y =  "sc_LR_mean", order= ["spreaders", "non_spreaders", "unilateral implant"] )
 
+unilateral_sc = sc_vs_quickness_unilateral_group["sc_LR_mean"]
+non_spreaders_vs_unilateral =  stats.mannwhitneyu(  non_spreaders, unilateral_sc)
+spreaders_vs_unilateral =  stats.mannwhitneyu(  spreaders, unilateral_sc)
+
+utils.fdr2([non_spreaders_vs_spreaders[1] , non_spreaders_vs_unilateral[1],  spreaders_vs_unilateral[1] ])
+axes[0].set_title(f"SvsNS={non_spreaders_vs_spreaders[1]}\nNSvsUN={non_spreaders_vs_unilateral[1]}\nSvsUN={spreaders_vs_unilateral[1]}")
 
 #%
 
@@ -752,8 +779,7 @@ axes.set_title(f"{corr_r}, p = {corr_p}")
 """
 
 #%
-fig, axes = utils.plot_make(size_length=5)
-g = sns.regplot(data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", scatter_kws = dict( linewidth=0, s=100), ci = None, line_kws=dict(lw = 7))
+sns.regplot(ax = axes[1], data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", scatter_kws = dict( linewidth=0, s=100), ci = None, line_kws=dict(lw = 7))
 
 #g = sns.regplot(data = sc_vs_quickness_group_fill[~np.isnan(sc_vs_quickness_filt_group["inverse_quickness"])], x = "sc_LR_mean", y= "inverse_quickness", scatter_kws = dict( linewidth=0, s=100), ci = None, line_kws=dict(lw = 7))
 #g = sns.scatterplot(data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", linewidth=0, s=100)
@@ -776,47 +802,49 @@ r_value_round = np.round(r_value, 2)
 p_value_round = np.round(p_value, 5)
 
 
-axes.set_title(f"r: {r_value_round}, p = {p_value_round}\n{names}")
+axes[1].set_title(f"r: {r_value_round}, p = {p_value_round}\n{names}")
 #axes.set_ylim([-0.033,0.2])
-for i, tick in enumerate(axes.xaxis.get_major_ticks()):
+for i, tick in enumerate(axes[1].xaxis.get_major_ticks()):
     tick.label.set_fontsize(6)        
-axes.tick_params(width=4) 
+axes[1].tick_params(width=4) 
 # change all spines
 for axis in ['top','bottom','left','right']:
-    axes.spines[axis].set_linewidth(6)
-
-
-
-#%%
-
-from sklearn.linear_model import TweedieRegressor
-X = np.array(x).reshape(-1,1)
-Y = np.array(y)
-
-
-pr = TweedieRegressor(power = 1, alpha=0, fit_intercept=True)
-y_pred_pr = pr.fit(X, Y).predict(X)
-
-fig, axes = utils.plot_make(size_length=5)
-sns.scatterplot(data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", linewidth=0, s=100)
-sns.lineplot(x = X.flatten(), y = y_pred_pr)
-
-pr.score(X, Y)
-
+    axes[1].spines[axis].set_linewidth(6)
 
 
 
 #%
 
+POWER = 1.1
+from sklearn.linear_model import TweedieRegressor
+X = np.array(x).reshape(-1,1)
+Y = np.array(y)
+
+
+pr = TweedieRegressor(power = POWER, alpha=0, fit_intercept=True)
+X_new = np.linspace(X.min(), X.max()).reshape(-1,1)
+y_pred_pr = pr.fit(X, Y).predict(np.linspace(X.min(), X.max()).reshape(-1,1))
+
+
+
+
+sns.scatterplot(ax = axes[2], data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", linewidth=0, s=100)
+sns.lineplot(ax = axes[2],x = X_new.flatten(), y = y_pred_pr, lw = 5)
+
+pr.score(X, Y)
+
 X2 = sm.add_constant(X)
-glm = sm.GLM(Y, X2, family=sm.families.Tweedie())
+glm = sm.GLM(Y, X2, family=sm.families.Tweedie(var_power = POWER))
 glm_fit = glm.fit()
 print(glm_fit.summary())
 
-Y2 = glm.predict(glm_fit.params)
-fig, axes = utils.plot_make(size_length=5)
-sns.scatterplot(data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", linewidth=0, s=100)
-sns.lineplot(x = X.flatten(), y = Y2)
+axes[2].set_title(f"D = {pr.score(X, Y)}\np={glm_fit.pvalues[1]}")
+glm_fit.pvalues
+
+#Y2 = glm.predict(glm_fit.params)
+#fig, axes = utils.plot_make(size_length=5)
+#sns.scatterplot(data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", linewidth=0, s=100)
+#sns.lineplot(x = X.flatten(), y = Y2)
 
 
 

@@ -41,7 +41,7 @@ fnameJSON_old2 = join(metadataDir, "iEEGdataRevell_seizure_severity.json")
 RID_HUP = join(metadataDir, "RID_HUP.csv")
 
 
-#%%
+#%
 
 with open(fnameJSON_old1) as f: jsonFile1 = json.load(f)
 with open(fnameJSON_old2) as f: jsonFile2 = json.load(f)
