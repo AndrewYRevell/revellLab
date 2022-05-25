@@ -74,6 +74,32 @@ def LTM(adj, seed = 0, time_steps = 50, threshold = 0.2):
     node_state = node_state.astype(int)
     return node_state
 
+def LTM2(adj_hat, seed = 0, time_steps = 50, threshold = 0.2):
+    
+    N = len(adj_hat) #number of nodes
+    node_state = np.zeros(shape = (time_steps, N))
+    node_state[0, seed] = 1 #make seed active
+
+    #neighbor_sum_distribution = np.zeros(shape = (time_steps, N))
+    for t in range(1, time_steps):
+        #print(t)
+        for i in range(N): #loop thru all nodes
+            #find neighbors of node i
+            previous_state = node_state[t-1,i]
+            neighbors = np.where(adj_hat[i,:] > 0)
+            neighbors_weight = adj_hat[i,neighbors] 
+            neighbors_state = node_state[t-1, neighbors]
+            neighbors_sum = np.sum(neighbors_weight * neighbors_state)
+            strength = np.sum(neighbors_weight)
+            if neighbors_sum >= threshold: #if sum is greater than threshold, make that node active
+                node_state[t, i] = 1
+            if neighbors_sum < threshold:
+                node_state[t, i] = 0
+            if previous_state == 1:
+                node_state[t, i] = 1
+    node_state = node_state.astype(int)
+    return node_state
+
 def gradient_diffusion(adj, seed = 0, time_steps = 50, gradient = 0.1):
     
     N = len(adj) #number of nodes
@@ -95,9 +121,9 @@ def gradient_diffusion(adj, seed = 0, time_steps = 50, gradient = 0.1):
             if node_state[t, i] > 1: node_state[t, i] = 1
     return node_state
 
-def gradient_LTM(adj, seed = 0, time_steps = 50, gradient = 0.1, threshold = 0.2):
+def gradient_LTM(adj_hat, seed = 0, time_steps = 50, gradient = 0.1, threshold = 0.2):
     
-    N = len(adj) #number of nodes
+    N = len(adj_hat) #number of nodes
     node_state = np.zeros(shape = (time_steps, N))
     node_state[0, seed] = 1 #make seed active
 
@@ -106,8 +132,8 @@ def gradient_LTM(adj, seed = 0, time_steps = 50, gradient = 0.1, threshold = 0.2
         for i in range(N): #loop thru all nodes
             #find neighbors of node i
             previous_state = node_state[t-1,i]
-            neighbors = np.where(adj[i,:] > 0)
-            neighbors_weight = adj[i,neighbors] 
+            neighbors = np.where(adj_hat[i,:] > 0)
+            neighbors_weight = adj_hat[i,neighbors] 
             neighbors_state = node_state[t-1, neighbors]
             neighbors_sum = np.sum(neighbors_weight * neighbors_state * gradient)
         
@@ -199,7 +225,7 @@ def get_colors_from_activation_map_nodes(am, color_dict = {"0": "#1f78b4", "1": 
             colors[r][c] = color_dict[str(activity)]
     return colors
         
-def get_colors_from_activation_map_edsges(am, edge_list, color_dict = {"0": "#1f78b4", "1": "#9e2626"}):
+def get_colors_from_activation_map_edges(am, edge_list, color_dict = {"0": "#1f78b4", "1": "#9e2626"}):
     nrow, ncol = am.shape
     nedges = len(edge_list)
     colors= [[color_dict["0"]]*nedges for i in range(nrow)]
@@ -211,6 +237,20 @@ def get_colors_from_activation_map_edsges(am, edge_list, color_dict = {"0": "#1f
             n1, n2 = e
             if row[n1] == 1 and row[n2] == 1:
                 colors[r][i] = color_dict["1"]
+    return colors
+
+def get_colors_from_activation_map_edges_binary(am, edge_list, color_dict = {"0": "#1f78b4", "1": "#9e2626"}):
+    nrow, ncol = am.shape
+    nedges = len(edge_list)
+    colors= [[0]*nedges for i in range(nrow)]
+    
+    #turn colors between active nodes to different color 
+    for r in range(nrow):
+        row = am[r]
+        for i, e in enumerate(edge_list):
+            n1, n2 = e
+            if row[n1] == 1 and row[n2] == 1:
+                colors[r][i] = 1
     return colors
 
 
@@ -251,6 +291,13 @@ def format_axes(ax):
     ax.set_xlabel("x")
     ax.set_ylabel("y")
     ax.set_zlabel("z")
+
+
+def rotate_z(x, y, z, theta):
+    w = x+1j*y
+    return np.real(np.exp(1j*theta)*w), np.imag(np.exp(1j*theta)*w), z
+
+
 
 """
 

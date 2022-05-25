@@ -9,6 +9,11 @@ ATLAS_AAL2 = "tools/atlases/atlases/AAL2.nii.gz"
 ATLAS_BNA = "tools/atlases/atlases/BN_Atlas_246_1mm.nii.gz"
 ATLAS_HO = "tools/atlases/atlases/HarvardOxford-combined.nii.gz"
 ATLAS_CENTROIDS = "tools/atlases/atlas_centroids"
+BRAIN_TEMPLATE_B1 = "tools/visbrain_data/templates/B1.npz"
+BRAIN_TEMPLATE_B2 = "tools/visbrain_data/templates/B2.npz"
+BRAIN_TEMPLATE_B3 = "tools/visbrain_data/templates/B3.npz"
+BRAIN_TEMPLATE_INFLATED = "tools/visbrain_data/templates/inflated.npz"
+BRAIN_TEMPLATE_WHITE = "tools/visbrain_data/templates/white.npz"
 
 #COMPUTER
 HOME = "/Users/arevell"

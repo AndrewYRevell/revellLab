@@ -68,7 +68,8 @@ dmf.draw_networkx_weighted(G, pos = pos, edge_alpha = 0.6, draw_networkx_labels 
 adj = nx.to_numpy_array(G)
 am = dmf.LTM(adj, seed = 16, time_steps = time_steps_ltm, threshold = 0.2)
 am_colors_nodes = dmf.get_colors_from_activation_map_nodes(am)  
-am_colors_edges = dmf.get_colors_from_activation_map_edsges(am, list(G.edges))
+am_colors_edges = dmf.get_colors_from_activation_map_edges(am, list(G.edges))
+am_colors_edges_binary = dmf.get_colors_from_activation_map_edges_binary(am, list(G.edges))
 
 
 
