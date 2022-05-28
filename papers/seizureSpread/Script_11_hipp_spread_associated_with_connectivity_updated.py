@@ -194,7 +194,7 @@ with open(paths.ATLAS_FILES_PATH) as f: atlas_files = json.load(f)
 
 fname_patinet_localization = join(metadataDir, "patient_localization_final.mat")
 RID_HUP = join(metadataDir, "RID_HUP.csv")
-outcomes_fname = join(metadataDir, "patient_cohort_all_atlas.csv")
+outcomes_fname = join(metadataDir, "patient_cohort_all_atlas_update.csv")
 
 #% 03 Project parameters
 version = 11
@@ -322,9 +322,9 @@ by = 0.01
 #get connectivity matrices
 
 i=137
-m = 3
+m = 0
 thr = [0.69, 0.96, 0.58, 0.08, 0.11, 0.01]
-thr = [0.7, 0.7, 0.6, 0.21, 0.5, 0.5]
+thr = [0.70, 0.7, 0.6, 0.21, 0.5, 0.5]
 
 sc_vs_quickness = pd.DataFrame(columns =[ "subject", "seizure", "quickenss", "sc_LR_mean", "sc_temporal_mean" ])
 
@@ -356,9 +356,10 @@ for i in range(len(patientsWithseizures)):
     #STRUCTURAL CONNECTIVITY
     temporal_regions = ["Hippocampus"]; names = "Hippocampus"
     #temporal_regions = ["Hippocampus", "Temporal"]; names = "Hippocampus, Temporal"
-    #temporal_regions = ["Temporal"]; names = "Temporal"
+    temporal_regions = ["Temporal"]; names = "Temporal"
+
     #temporal_regions = ["Frontal"]; names = "Frontal"
-    temporal_regions = ["Parietal"]; names = "Parietal"
+    #temporal_regions = ["Parietal"]; names = "Parietal"
     #temporal_regions = ["Amygdala"]; names = "Amygdala"
     #temporal_regions = ["Hippocampus", "Temporal", "Amygdala","Fusiform", "Insula"]; names = "All temporal"
     #temporal_regions = ["Insula", "Hippocampus", "ParaHippocampal", "Fusiform" ,"Heschl", "Temporal"]; names = "All temporal"
@@ -643,7 +644,7 @@ for i in range(len(patientsWithseizures)):
             
         
         
-#%
+#%%
 np.unique(patientsWithseizures["subject"])
 """
 sc_vs_quickness = sc_vs_quickness.append(dict( subject ="RID0646" , seizure = "1" , quickenss = 30, sc_LR_mean = 6.222475562257545, sc_temporal_mean = 230.98383312397252) , ignore_index=True )
@@ -727,6 +728,9 @@ axes.set_title(f"{corr_r}, p = {corr_p}")
 
 
 """
+#%%
+palette_uni = dict(spreaders = "#e49090", non_spreaders="#90bae4" , unilateral_implant = "#9090e4")
+palette_uni_dark = dict(spreaders = "#8d2222", non_spreaders="#26629d" , unilateral_implant = "#1f1f7e")
 
 non_spreader_ind = np.where(np.isnan( sc_vs_quickness_filt_group["quickenss"])  )[0]
 spreader_ind = np.where(~np.isnan( sc_vs_quickness_filt_group["quickenss"])  )[0]
@@ -742,20 +746,25 @@ df_non_spreaders_vs_spreaders["spreaders"] = np.nan
 df_non_spreaders_vs_spreaders.loc[non_spreader_ind,"spreaders"]  = "non_spreaders"
 df_non_spreaders_vs_spreaders.loc[spreader_ind,"spreaders"]  = "spreaders"
 sc_vs_quickness_unilateral_group = sc_vs_quickness_unilateral.groupby(["subject"], as_index=False).median()
-sc_vs_quickness_unilateral_group["spreaders"] = "unilateral implant"
+sc_vs_quickness_unilateral_group["spreaders"] = "unilateral_implant"
 
 df_non_spreaders_vs_spreaders_unilateral = pd.concat(  [df_non_spreaders_vs_spreaders, sc_vs_quickness_unilateral_group])
 
-fig, axes = utils.plot_make(c = 3, size_length=15)
-sns.boxplot(ax = axes[0], data = df_non_spreaders_vs_spreaders_unilateral, x = "spreaders", y =  "sc_LR_mean", order= ["spreaders", "non_spreaders", "unilateral implant"] )
-sns.swarmplot(ax = axes[0],data = df_non_spreaders_vs_spreaders_unilateral, x = "spreaders", y =  "sc_LR_mean", order= ["spreaders", "non_spreaders", "unilateral implant"] )
+fig, ax = utils.plot_make(size_length=8)
+sns.boxplot(ax = ax, data = df_non_spreaders_vs_spreaders_unilateral, x = "spreaders", y =  "sc_LR_mean", order= ["spreaders", "non_spreaders", "unilateral_implant"] , palette = palette_uni, showfliers = False)
+sns.swarmplot(ax = ax,data = df_non_spreaders_vs_spreaders_unilateral, x = "spreaders", y =  "sc_LR_mean", order= ["spreaders", "non_spreaders", "unilateral_implant"] , palette = palette_uni_dark)
 
 unilateral_sc = sc_vs_quickness_unilateral_group["sc_LR_mean"]
 non_spreaders_vs_unilateral =  stats.mannwhitneyu(  non_spreaders, unilateral_sc)
 spreaders_vs_unilateral =  stats.mannwhitneyu(  spreaders, unilateral_sc)
 
 utils.fdr2([non_spreaders_vs_spreaders[1] , non_spreaders_vs_unilateral[1],  spreaders_vs_unilateral[1] ])
-axes[0].set_title(f"SvsNS={non_spreaders_vs_spreaders[1]}\nNSvsUN={non_spreaders_vs_unilateral[1]}\nSvsUN={spreaders_vs_unilateral[1]}")
+ax.set_title(f"SvsNS={non_spreaders_vs_spreaders[1]}\nNSvsUN={non_spreaders_vs_unilateral[1]}\nSvsUN={spreaders_vs_unilateral[1]}")
+
+utils.fix_axes(ax)
+utils.reformat_boxplot(ax)
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"speed_of_spread", f"spread_vs_non_spread_{names}.pdf"), bbox_inches='tight')
+
 
 #%
 
@@ -778,8 +787,10 @@ axes.set_title(f"{corr_r}, p = {corr_p}")
 #plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"connectivity", "sc_vs_spread_time_all_seizures.pdf"), bbox_inches='tight')     
 """
 
-#%
-sns.regplot(ax = axes[1], data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", scatter_kws = dict( linewidth=0, s=100), ci = None, line_kws=dict(lw = 7))
+#%%
+
+fig, ax = utils.plot_make(size_length=8)
+sns.regplot(ax = ax, data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", scatter_kws = dict( linewidth=0, s=100, color = "#22588d"), ci = None, line_kws=dict(lw = 7, color = "#22588d"))
 
 #g = sns.regplot(data = sc_vs_quickness_group_fill[~np.isnan(sc_vs_quickness_filt_group["inverse_quickness"])], x = "sc_LR_mean", y= "inverse_quickness", scatter_kws = dict( linewidth=0, s=100), ci = None, line_kws=dict(lw = 7))
 #g = sns.scatterplot(data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", linewidth=0, s=100)
@@ -802,18 +813,15 @@ r_value_round = np.round(r_value, 2)
 p_value_round = np.round(p_value, 5)
 
 
-axes[1].set_title(f"r: {r_value_round}, p = {p_value_round}\n{names}")
-#axes.set_ylim([-0.033,0.2])
-for i, tick in enumerate(axes[1].xaxis.get_major_ticks()):
-    tick.label.set_fontsize(6)        
-axes[1].tick_params(width=4) 
-# change all spines
-for axis in ['top','bottom','left','right']:
-    axes[1].spines[axis].set_linewidth(6)
+ax.set_title(f"r: {r_value_round}, p = {p_value_round}\n{names}")
+
+utils.fix_axes(ax)
+utils.reformat_boxplot(ax)
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"speed_of_spread", f"spread_vs_non_spread_reg_{names}.pdf"), bbox_inches='tight')
 
 
 
-#%
+#%%
 
 POWER = 1.1
 from sklearn.linear_model import TweedieRegressor
@@ -826,10 +834,10 @@ X_new = np.linspace(X.min(), X.max()).reshape(-1,1)
 y_pred_pr = pr.fit(X, Y).predict(np.linspace(X.min(), X.max()).reshape(-1,1))
 
 
+fig, ax = utils.plot_make(size_length=8)
 
-
-sns.scatterplot(ax = axes[2], data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", linewidth=0, s=100)
-sns.lineplot(ax = axes[2],x = X_new.flatten(), y = y_pred_pr, lw = 5)
+sns.scatterplot(ax = ax, data = sc_vs_quickness_group_fill, x = "sc_LR_mean", y= "inverse_quickness", linewidth=0, s=100,color = "#22588d", alpha = 0.8)
+sns.lineplot(ax = ax,x = X_new.flatten(), y = y_pred_pr, lw = 7, color = "#22588d")
 
 pr.score(X, Y)
 
@@ -838,8 +846,12 @@ glm = sm.GLM(Y, X2, family=sm.families.Tweedie(var_power = POWER))
 glm_fit = glm.fit()
 print(glm_fit.summary())
 
-axes[2].set_title(f"D = {pr.score(X, Y)}\np={glm_fit.pvalues[1]}")
+ax.set_title(f"D = {pr.score(X, Y)}\np={glm_fit.pvalues[1]}")
 glm_fit.pvalues
+utils.fix_axes(ax)
+utils.reformat_boxplot(ax)
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"speed_of_spread", f"spread_vs_non_spread_GLM_{names}.pdf"), bbox_inches='tight')
+
 
 #Y2 = glm.predict(glm_fit.params)
 #fig, axes = utils.plot_make(size_length=5)
@@ -860,6 +872,13 @@ utils.fdr2([0.029, 0.0389, 0.91])
 
 
 utils.fdr2([0.009, 0.0129, 0.91, 0.56, 0.63, 0.007, 0.025])
+
+
+utils.fdr2([0.010844, 0.7654, 0.6086, 0.0289])
+
+
+
+utils.fdr2([0.01099, 0.029408, 0.5094, 0.93])
 
 
 

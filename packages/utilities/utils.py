@@ -594,6 +594,32 @@ def adjust_box_widths(g, fac):
                 for l in ax.lines:
                     if np.all(l.get_xdata() == [xmin, xmax]):
                         l.set_xdata([xmin_new, xmax_new])
+                        
+                        
+                        
+def reformat_boxplot(ax):
+    for i,artist in enumerate(ax.artists):
+        # Set the linecolor on the artist to the facecolor, and set the facecolor to None
+        col = artist.get_facecolor()
+        artist.set_edgecolor(col)
+        #artist.set_facecolor('None')
+    
+        # Each box has 6 associated Line2D objects (to make the whiskers, fliers, etc.)
+        # Loop over them here, and use the same colour as above
+        for j in range(len(ax.lines)):
+            line = ax.lines[j]
+            #line.set_color(col)
+            line.set_mfc(col)
+            line.set_mec(col)
+            if j % (5 + (len(ax.artists)-2)) == 4:
+                line.set_color("black")
+           
+def fix_axes(ax):
+    for tp in ['top','bottom','left','right']:
+        ax.spines[tp].set_linewidth(6)
+    # increase tick width
+    ax.tick_params(width=4)
+    ax.legend(bbox_to_anchor=(1.05, 1), loc='upper right', borderaxespad=0)        
 #%% structural connectivity
 
 

@@ -23,6 +23,10 @@ from scipy.stats import pearsonr, spearmanr
 from os.path import join, splitext, basename
 import glob
 from revellLab.packages.utilities import utils
+import sklearn
+import scipy
+from skimage.metrics import structural_similarity as ssim
+from sewar.full_ref import mse, rmse, psnr, uqi, ssim, ergas, scc, rase, sam, msssim, vifp
 
 @dataclass
 class diffusionModels:
@@ -209,8 +213,8 @@ def get_diffusion_model_correlations(SC, SC_regions, spread, channels_spread, el
             
     if visualize == True and r_to_visualize == None:
         r_to_visualize = SC_regions[0]
-    if type(r_to_visualize) == int:
-        r_to_visualize = str(r_to_visualize)
+    #if type(r_to_visualize) == int:
+    #    r_to_visualize = str(r_to_visualize)
     
     print(f"\nModel:  {diffusion_model_type} (LTM=0;gDM=1;gLTM=2)\n\
               time_steps: {time_steps}\n\
@@ -218,6 +222,7 @@ def get_diffusion_model_correlations(SC, SC_regions, spread, channels_spread, el
               gradient: {gradient}\n\n\n")
     
     corrs = np.zeros(shape = (len(SC)))
+    sig = np.zeros(shape = (len(SC)))
     for r in range(len(corrs)):
         
         if diffusion_model_type == 0: #LTM
@@ -262,31 +267,38 @@ def get_diffusion_model_correlations(SC, SC_regions, spread, channels_spread, el
         #sns.heatmap(spreadMod_state, cbar=False)   
         if (node_state_mod_resample == 0).all():#if entire prediction is zero, make the correlation zero
             corrs[r] = 0
+            sig[r] = 0
         else:
             corrs[r] = spearmanr(node_state_mod_resample.flatten(), spreadMod_state.flatten())[0]
+            sig[r] = pearsonr(node_state_mod_resample.flatten(), spreadMod_state.flatten())[1]
+            
+            #corrs[r] = sam(node_state_mod_resample, spreadMod_state)
         top = SC_regions[np.where(corrs == np.max(corrs))[0][0]]
         
         top_region = get_region_name(atlas_label, top)
-        print(f"\r({np.round( np.max(corrs),2)}) {top}: {top_region}; {np.round( np.max(corrs),2)}; {np.round((r+1)/len(corrs)*100,2)}%                                       ", end = "\r")
+        print(f"\r({np.round( np.max(corrs),2)}) {top}: {top_region}; {np.round( np.max(corrs),2)}; {np.round((r+1)/len(corrs)*100,2)}% {SC_regions[r]}                                       ", end = "\r")
         
         SC_regions[np.where(corrs == np.max(corrs))[0][0]]
-        
+        #print(f"{visualize} {SC_regions[r]}   {r_to_visualize} 111111111111")
         #visualize:
         if visualize and SC_regions[r]== r_to_visualize:
-            fig, axes = utils.plot_make(r = 2, c = 2)
+            fig, axes = utils.plot_make(r = 3, c = 2)
             axes = axes.flatten()
             sns.heatmap(node_state.T, cbar=False, ax = axes[0])
             sns.heatmap(spread.T, cbar=False, ax = axes[1]) 
             sns.heatmap(node_state_mod_resample.T, cbar=False, ax = axes[2]) 
             sns.heatmap(spreadMod_state.T, cbar=False, ax = axes[3])   
-            axes[0].set_title(f"Model: {diffusion_model_type}, region = {SC_regions[r]}\n{get_region_name(atlas_label, SC_regions[r])}", size = 10)
+            sns.scatterplot(x = node_state_mod_resample.flatten(), y = spreadMod_state.flatten(), ax = axes[4])   
+            
+            axes[0].set_title(f"Model: {diffusion_model_type}, region = {SC_regions[r]}\n{get_region_name(atlas_label, SC_regions[r])}\n{corrs[r]:.3f}", size = 10)
             axes[1].set_title(f"Spread Pattern", size = 10)
             axes[2].set_title(f"Equalized Model, corr = {np.round(corrs[r],2)}", size = 10)
             axes[3].set_title(f"Equalized Spread", size = 10)
+            axes[4].set_title(f"dm vs spread", size = 10)
+            plt.show()
 
-        
     print("\n\n")
-    return corrs
+    return corrs, sig #UPDATEDS TO RETURN SIG
 
 
 def get_region_name(atlas_label, region_number):

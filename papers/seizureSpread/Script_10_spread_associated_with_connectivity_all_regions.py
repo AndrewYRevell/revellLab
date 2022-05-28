@@ -454,7 +454,7 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshol
         #atlas
         atlas = "BN_Atlas_246_1mm"
         atlas = "AAL3v1_1mm"
-        #atlas = "AAL2"
+        atlas = "AAL2"
         #atlas = "HarvardOxford-sub-ONLY_maxprob-thr25-1mm"
         
         
@@ -595,8 +595,59 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshol
                 #fig, axes = utils.plot_make()
                 #sns.scatterplot(data = sc_vs_time_reg, x = "sc", y = "time", linewidth = 0, s=5)
                 
-                fig, axes = utils.plot_make(size_length=5)
-                g = sns.regplot(data = sc_vs_time_reg, x = "sc", y= "time", scatter_kws = dict( linewidth=0, s=50), ci = None, line_kws=dict(lw = 7, color = "black"))
+                
+                sc_vs_time_reg["inverse_quickness"] = 1/sc_vs_time_reg["time"]
+                
+                sc_vs_time_reg["inverse_quickness"][np.where(sc_vs_time_reg["inverse_quickness"] > 4)[0]] = 0
+                sc_vs_time_reg= sc_vs_time_reg.fillna(0)
+                
+                
+                fig, ax = utils.plot_make(size_length=5)
+            
+                sns.scatterplot(ax = ax, data = sc_vs_time_reg, x = "sc", y= "inverse_quickness", linewidth=0, s=10,color = "#8d2223", alpha = 0.8)
+                
+                plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"connectivity_update", f"sc_vs_spread_time_SINGLE_PATIENT_{RID}_01.pdf"), bbox_inches='tight')     
+
+                #%%
+                
+                sc_vs_time_reg_drop = sc_vs_time_reg.dropna()
+                
+                
+                sc_vs_time_reg_drop.loc[sc_vs_time_reg_drop["inverse_quickness"]<0.5, "inverse_quickness"] = np.nan
+                
+                sc_vs_time_reg_drop = sc_vs_time_reg_drop.dropna()
+                
+                
+                sns.histplot(sc_vs_time_reg_drop["inverse_quickness"], bins = 20)
+                x = sc_vs_time_reg_drop["sc"]
+                y = sc_vs_time_reg_drop["inverse_quickness"]
+                
+                POWER = 1.1
+                from sklearn.linear_model import TweedieRegressor
+                X = np.array(x).reshape(-1,1)
+                Y = np.array(y)
+                
+                
+                pr = TweedieRegressor(power = POWER, alpha=0, fit_intercept=True)
+                X_new = np.linspace(X.min(), X.max()).reshape(-1,1)
+                y_pred_pr = pr.fit(X, Y).predict(np.linspace(X.min(), X.max()).reshape(-1,1))
+                
+                fig, ax = utils.plot_make(size_length=5)
+            
+                sns.scatterplot(ax = ax, data = sc_vs_time_reg, x = "sc", y= "inverse_quickness", linewidth=0, s=50,color = "#22588d", alpha = 0.8)
+                
+                sns.lineplot(ax = ax,x = X_new.flatten(), y = y_pred_pr, lw = 7, color = "#22588d")
+                
+                utils.fix_axes(ax)
+                
+                
+                #ax.set_title(f"{RID}\nr = {corr_r}, p = {corr_p}")
+                
+                
+                
+                
+                
+                sns.regplot(data = sc_vs_time_reg, x = "sc", y= "inverse_quickness", scatter_kws = dict( linewidth=0, s=50), ci = None, line_kws=dict(lw = 7, color = "black"))
            
                 x = sc_vs_time_reg["sc"]
                 y = sc_vs_time_reg["time"]
@@ -607,14 +658,7 @@ def calculate_mean_rank_deep_learning(i, patientsWithseizures, version, threshol
                 corr_r = np.round(corr[0], 3)
                 corr_p = np.round(corr[1], 8)
     
-                axes.set_title(f"{RID}\nr = {corr_r}, p = {corr_p}")
-                #axes.set_ylim([-0.033,0.2])
-                for l, tick in enumerate(axes.xaxis.get_major_ticks()):
-                    tick.label.set_fontsize(6)        
-                axes.tick_params(width=4) 
-                # change all spines
-                for axis in ['top','bottom','left','right']:
-                    axes.spines[axis].set_linewidth(6)
+                
                 
    #%%         
             plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"connectivity", f"sc_vs_spread_time_SINGLE_PATIENT_{RID}_01.pdf"), bbox_inches='tight')     

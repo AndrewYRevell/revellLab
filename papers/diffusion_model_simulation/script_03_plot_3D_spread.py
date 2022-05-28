@@ -165,12 +165,12 @@ rotation_per_frame = 2*np.pi/(3*30*6)
 
 frames = []
 #how many repeats the simulation is shown
-for repeat in range(3):
+for repeat in range(1):
     #t is the number of time steps gone through the activation map (am)
-    for t in range(30):
+    for t in range(20):
     
         #make X number of frames per time_step
-        for frame in range(6):
+        for frame in range(1):
         
             traces={}
             
@@ -340,7 +340,7 @@ for k in range(len(fig["frames"])):
 
 images_data = []
 #load X images
-for frame_count in range(306):
+for frame_count in range(540):
     if utils.checkIfFileExists(f"pics/animation/tmp/fig_{frame_count:03}.png", printBOOL=False):
         data = imageio.imread(f"pics/animation/tmp/fig_{frame_count:03}.png")
         images_data.append(data)

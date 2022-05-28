@@ -27,7 +27,8 @@ from matplotlib import gridspec
 from scipy import interpolate
 from scipy.integrate import simps
 from scipy.stats import pearsonr, spearmanr
-        
+import scipy.cluster.hierarchy as shc
+
 from sklearn.decomposition import PCA 
 from sklearn.cluster import KMeans
 from fuzzywuzzy import fuzz, process
@@ -42,7 +43,7 @@ from tensorflow.keras.models import load_model
 from tensorflow.keras.callbacks import ModelCheckpoint
 import sklearn.metrics as metrics
 import matplotlib.pyplot as plt
-
+import matplotlib
 #import custom
 from revellLab.packages.eeg.echobase import echobase
 from revellLab.packages.seizureSpread import echomodel
@@ -223,7 +224,7 @@ atlasLocalizationFunctionDirectory = join(revellLabPath, "packages", "atlasLocal
 
 fname_patinet_localization = join(metadataDir, "patient_localization_final.mat")
 RID_HUP = join(metadataDir, "RID_HUP.csv")
-outcomes_fname = join(metadataDir, "patient_cohort_all_atlas.csv")
+outcomes_fname = join(metadataDir, "patient_cohort_all_atlas_update.csv")
 
 #% 03 Project parameters
 version = 11
@@ -651,7 +652,7 @@ tanh = True
 model_IDs = ["WN","CNN","LSTM" , "absolute_slope", "line_length", "power_broadband"]
 m=0
 model_ID= model_IDs[m]
-threshold = 0.72
+threshold = 0.69
 #pd.DataFrame(columns = ["subject", "seizure"] +list( regions_unique) )
 #atlas
 
@@ -659,7 +660,7 @@ threshold = 0.72
 
 atlas = "BN_Atlas_246_1mm"
 atlas = "AAL2"
-#atlas = "AAL2"
+#atlas = "AAL3v1_1mm"
 #atlas = "HarvardOxford-combined"
 #atlas = "OASIS-TRT-20_jointfusion_DKT31_CMA_labels_in_MNI152_v2"
 atlas_name_to_use = atlas
@@ -686,14 +687,14 @@ region_activation_fillna = copy.deepcopy(region_activation.fillna(1))
 if atlas == "AAL3v1_1mm":
     indexes = [16,17, 94,95,96,97] + list(range(94,169))
     region_activation_fillna = region_activation_fillna.drop(region_activation.columns[indexes], axis = 1)
-    mask = np.ones(len(atlas_label_names), np.bool)
+    mask = np.ones(len(atlas_label_names), bool)
     mask[indexes] = 0
     atlas_label_names_new = atlas_label_names[mask]
     
 if atlas == "AAL2":
-    indexes = [16,17] + list(range(94,119))
+    indexes = [16,17] + list(range(94,120))
     region_activation_fillna = region_activation_fillna.drop(region_activation.columns[indexes], axis = 1)
-    mask = np.ones(len(atlas_label_names), np.bool)
+    mask = np.ones(len(atlas_label_names), bool)
     mask[indexes] = 0
     atlas_label_names_new = atlas_label_names[mask]
     
@@ -715,7 +716,7 @@ print(ind_same)
 SIZE = 300
 
 n_clusters = 5
-pca_nclusters = 20
+pca_nclusters = 30
 pca_activation = PCA(n_components=pca_nclusters)        
         
         
@@ -735,24 +736,54 @@ palette1 = palette[0:n_clusters]
 palette2 = {"0": "#D62728", "1": "#9567BE", "2": "#5b1111", "3": "#1F78B5", "4": "#84b2ec" , "5": "#00ff00", "6": "#ff0000", "7": "#ff00ff"}
 palette2 = {"0": "#5b1111", "1": "#9567BE", "2": "#c94849", "3": "#1F78B5", "4": "#84b2ec", "5": "#00ff00" , "6": "#ff0000", "7": "#ffff00"}
 
-palette2 = {"1": "#5b1111", "3": "#9567BE", "2": "#c94849", "4": "#1F78B5", "0": "#84b2ec", "5": "#00ff00" , "6": "#ff00ff", "7": "#ffff00", "8": "#666666"}
 
-kmeans = KMeans(init="random",n_clusters=n_clusters,n_init=10,max_iter=300,random_state=42)
+"""
+kmeans = KMeans(init="random",n_clusters=n_clusters, n_init=10,max_iter=300,random_state=6)
 
 kmeans.fit(x_data)
 
 kmeans.inertia_
 kmeans.n_iter_
 kmeans.cluster_centers_
-
 df["cluster"] = kmeans.labels_
 
 df["cluster"] = df["cluster"].astype(str)
+"""
+
+
+
+
+
+
+
+
+#%%
+
+palette2 = {"1": "#5b1111", "3": "#9567BE", "2": "#c94849", "4": "#1F78B5", "0": "#84b2ec", "5": "#00ff00" , "6": "#ff00ff", "7": "#ffff00", "8": "#666666"}
+#for sdc in range(0,20):
+Z = shc.linkage(principalComponents[:,0:6], method ='complete', optimal_ordering = True)
+fc_cluster = shc.fcluster(Z, t=5, criterion='maxclust' )-1
+df["cluster"] = fc_cluster
+df["cluster"] = df["cluster"].astype(str)
+
+
+palette2_light = {"1": "#9dbde3", "3": "#da8384", "2": "#2c94db", "4": "#be2323", "0": "#ba9dd5" }
+palette2_clusters = {"1": "#629ce6", "3": "#c94849", "2": "#1c6da5", "4": "#5b1111", "0": "#9567BE" }
+
+
+
+fig, axes = utils.plot_make(size_length=10, size_height=6)
+sns.scatterplot(ax = axes,data = df, x = "PC1", y = "PC2", s = SIZE, hue = "cluster" , palette = palette2_clusters , linewidth=0)
+
+#axes.set_title(sdc)
 
 #sns.scatterplot(data = df, x = "PC1", y = "PC2", s = 5, hue = "cluster" , palette = {"0":"#9b59b6", "1":"#3498db",   "2":"#95a5a6"}, linewidth=0)
-fig, axes = utils.plot_make(size_length=10, size_height=6)
-sns.scatterplot(data = df, x = "PC1", y = "PC2", s = SIZE, hue = "cluster" , palette = palette2 , linewidth=0)
+#fig, axes = utils.plot_make(size_length=10, size_height=6)
+#sns.scatterplot(ax = axes,data = df, x = "PC1", y = "PC2", s = SIZE, hue = "cluster" , palette = palette2 , linewidth=0)
 
+
+axes.set_yticks(np.arange(-1, 4, 1))
+#axes.yaxis.set_major_locator(matplotlib.ticker.LinearLocator(5))
 # change all spines
 for axis in ['top','bottom','left','right']:
     axes.spines[axis].set_linewidth(6)
@@ -760,20 +791,35 @@ for axis in ['top','bottom','left','right']:
 # increase tick width
 axes.tick_params(width=4)
 axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_minifig_big.pdf"), bbox_inches='tight')
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_clusters_big.pdf"), bbox_inches='tight')
+#plt.show()
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "clustering_minifig_big.pdf"), bbox_inches='tight')
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "clustering_clusters_big.pdf"), bbox_inches='tight')
+#%%Dendrogram
 
-region_activation_class_avg = copy.deepcopy(region_activation_fillna)
-region_activation_class_avg = region_activation_class_avg.replace(1, np.nan)
-region_activation_class_avg["cluster"] =  kmeans.labels_
+#turn patient RIDS to subject numbers 
+shc.set_link_color_palette(['#9567BE', '#629ce6', '#1c6da5', '#c94849', "#5b1111"])
+
+subs_unique = np.unique(patientsWithseizures["subject"])
+subs_ids = np.array(range(len(subs_unique)))+1
+
+subs_ids_vanilla = []
+for s in range(len(patientsWithseizures["subject"])):
+    su = patientsWithseizures["subject"][s]
+    ind = np.where(subs_unique ==su )[0][0]
+    subs_ids_vanilla.append(subs_ids[ind])
+    
+    
+    
+fig, ax = utils.plot_make(size_length=12, size_height=8)
+dend = shc.dendrogram(Z,  labels = np.array(subs_ids_vanilla), above_threshold_color='#000000', leaf_rotation = 270, leaf_font_size = 3)
+for axis in ['top','bottom','left','right']:
+    ax.spines[axis].set_linewidth(0)
+ax.set_yticks([])
+
+#%%PCA explained variance
 
 
-region_activation_fillna_about = copy.deepcopy(region_activation_fillna)
-region_activation_fillna_about["seizure"] = patientsWithseizures["idKey"]
-region_activation_fillna_about["subject"] = patientsWithseizures["subject"]
-region_activation_fillna_about["cluster"] =  kmeans.labels_
-#%%
-fig, axes = utils.plot_make(size_length=10, size_height=6)
+fig, axes = utils.plot_make(size_length=20, size_height=6)
 sns.lineplot(x = range(1,pca_nclusters+1), y = pca_activation.explained_variance_ratio_, lw = 8)
 for axis in ['top','bottom','left','right']:
     axes.spines[axis].set_linewidth(6)
@@ -781,7 +827,159 @@ axes.set_title("explained_variance_ratio")
 axes.set_ylabel("explained_variance_ratio")
 axes.set_xlabel("n components")
 axes.tick_params(width=4)
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "explained_variance_ratio.pdf"), bbox_inches='tight')
+axes.set_xlim([0,30])
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "explained_variance_ratio.pdf"), bbox_inches='tight')
+
+
+
+
+last = Z[-20:, 2]
+last_rev = last[::-1]
+idxs = np.arange(1, len(last) + 1)
+plt.plot(idxs, last_rev)
+
+
+
+
+
+
+dend = shc.dendrogram(Z,   truncate_mode = "level", p = 5, show_leaf_counts = True)
+
+
+
+fc_cluster[168]
+fc_cluster[60]
+fc_cluster[150]
+fc_cluster[183]
+
+fc_cluster[205]
+
+
+
+
+
+#%%
+
+region_activation_class_avg = copy.deepcopy(region_activation_fillna)
+region_activation_class_avg = region_activation_class_avg.replace(1, np.nan)
+region_activation_class_avg["cluster"] =  fc_cluster#kmeans.labels_
+
+
+region_activation_fillna_about = copy.deepcopy(region_activation_fillna)
+region_activation_fillna_about["seizure"] = patientsWithseizures["idKey"]
+region_activation_fillna_about["subject"] = patientsWithseizures["subject"]
+region_activation_fillna_about["cluster"] =  fc_cluster#kmeans.labels_
+
+region_activation_fillna_about.to_csv(join(paths.SEIZURE_SPREAD_DERIVATIVES_CLUSTERING, "Seizure_clusters.csv"))
+#%%
+
+############################################
+############################################
+############################################
+############################################
+#DO NOT RUN DO NOT RUN
+
+############################################
+############################################
+############################################
+############################################
+from scipy.cluster.hierarchy import dendrogram, linkage, fcluster
+
+linked = linkage(x_data)
+dendrogram(linked, orientation='top',distance_sort='descending',)
+
+labelList = range(1, 11)
+
+plt.figure(figsize=(10, 7))
+dendrogram(linked,
+            orientation='top',
+            labels=labelList,
+            distance_sort='descending',
+            show_leaf_counts=True)
+plt.show()
+
+import scipy.cluster.hierarchy as shc
+
+plt.figure(figsize=(10, 7))
+plt.title("Customer Dendograms")
+
+dend = shc.dendrogram(shc.linkage(x_data, method='complete'))
+
+
+from sklearn.cluster import AgglomerativeClustering
+
+model = AgglomerativeClustering(n_clusters = 5 , linkage = "single")
+model.fit_predict(x_data)
+
+df["cluster_ag"] = model.fit_predict(x_data)
+df["cluster_ag"] = df["cluster_ag"].astype(str)
+
+#sns.scatterplot(data = df, x = "PC1", y = "PC2", s = 5, hue = "cluster" , palette = {"0":"#9b59b6", "1":"#3498db",   "2":"#95a5a6"}, linewidth=0)
+fig, axes = utils.plot_make(size_length=10, size_height=6)
+sns.scatterplot(ax = axes,data = df, x = "PC1", y = "PC2", s = SIZE, hue = "cluster_ag" , palette = palette2 , linewidth=0)
+
+Dendrogram = shc.dendrogram((shc.linkage(x_data, method ='ward')))
+
+
+############################################
+############################################
+############################################
+############################################
+############################################
+############################################
+fc_cluster = fcluster(shc.linkage(principalComponents[:,0:5], method ='ward', optimal_ordering = True), t=5, criterion='maxclust' )-1
+df["cluster"] = fcluster(shc.linkage(principalComponents[:,0:5], method ='ward', optimal_ordering = True), t=5, criterion='maxclust' )-1
+df["cluster"] = df["cluster"].astype(str)
+fig, axes = utils.plot_make(size_length=10, size_height=6)
+sns.scatterplot(ax = axes,data = df, x = "PC1", y = "PC2", s = SIZE, hue = "cluster" , palette = palette2 , linewidth=0)
+
+############################################
+############################################
+############################################
+############################################
+############################################
+############################################
+############################################
+
+
+
+
+def extract_levels(row_clusters, labels):
+    clusters = {}
+    for row in range(row_clusters.shape[0]):
+        cluster_n = row + len(labels)
+        # which clusters / labels are present in this row
+        glob1, glob2 = row_clusters[row, 0], row_clusters[row, 1]
+
+        # if this is a cluster, pull the cluster
+        this_clust = []
+        for glob in [glob1, glob2]:
+            if glob > (len(labels)-1):
+                this_clust += clusters[glob]
+            # if it isn't, add the label to this cluster
+            else:
+                this_clust.append(glob)
+
+        clusters[cluster_n] = this_clust
+    return clusters
+
+tmp =extract_levels(linkage(x_data, method='ward')   , range(len(x_data)))
+
+
+ac2 = AgglomerativeClustering(n_clusters = 6)
+
+
+
+
+
+
+
+fig = plt.figure(dpi=300)
+ax = fig.add_subplot(projection='3d')
+ax.scatter(df["PC1"], df["PC2"], df["PC3"], cmap = palette2)
+
+
+my_cmap = plt.get_cmap('hsv')
 
 #%%
 palette = sns.color_palette("Set2")
@@ -791,14 +989,14 @@ df["seizure"] = patientsWithseizures["idKey"]
 #palette[0:len(subjects_to_plot)+1] 
 palette2 = {"RID0472": "#5b1111", "RID0278": "#9567BE", "RID0238": "#c94849", "RID0522": "#1F78B5", "RID0060": "#AEC8E9" , "other": "#CDCDCD" }
 palette2 = {"RID0472": "#9567BE", "RID0278": "#c94849", "RID0238": "#1F78B5", "RID0522": "#84b2ec", "RID0060": "#c98848" , "other": "#CDCDCD" }
-palette2 = {"RID0442": "#9567BE", "RID0278": "#c94849", "RID0238": "#1F78B5", "RID0522": "#84b2ec", "RID0060": "#c98848" , "other": "#CDCDCD" }
+palette2 = {"RID0472": "#9567BE", "RID0278": "#c94849", "RID0238": "#1F78B5", "RID0522": "#84b2ec", "RID0060": "#c98848" , "other": "#CDCDCD" }
 
 np.unique(patientsWithseizures["subject"])
 len(np.unique(patientsWithseizures["subject"]))
 
 subject_categories = []
 subjects_to_plot = ["RID0472", "RID0278", "RID0238", "RID0522", "RID0060" ]
-subjects_to_plot = ["RID0442", "RID0278", "RID0238", "RID0522", "RID0060" ]
+subjects_to_plot = ["RID0472", "RID0278", "RID0238", "RID0522", "RID0060" ]
 #subjects_to_plot = ["RID0442", "RID0309", "RID0365", "RID0472"]
 #subjects_to_plot = ["RID0055", "RID0024", "RID0021", "RID0020", "RID0014" ]
 for s in range(len(df)):
@@ -826,7 +1024,7 @@ for axis in ['top','bottom','left','right']:
 axes.tick_params(width=4)
 axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
 
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_patients_big.pdf"), bbox_inches='tight')
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "clustering_patients_big.pdf"), bbox_inches='tight')
 
 #%%
 df_outcome = pd.merge(df, outcomes, on='subject')
@@ -844,7 +1042,7 @@ for axis in ['top','bottom','left','right']:
 # increase tick width
 axes.tick_params(width=4)
 axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_outcome_big.pdf"), bbox_inches='tight')
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "clustering_outcome_big.pdf"), bbox_inches='tight')
 
 #%%
 target_categories = []
@@ -878,10 +1076,10 @@ for axis in ['top','bottom','left','right']:
 # increase tick width
 axes.tick_params(width=4)
 axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_target_category_big.pdf"), bbox_inches='tight')
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "clustering_target_category_big.pdf"), bbox_inches='tight')
 #%%
 fig, axes = utils.plot_make(size_length=10, size_height=6)
-sns.scatterplot(data = df_outcome, x = "PC1", y = "PC2", s = SIZE, hue = "Laterality"  , linewidth=0, palette= dict(L = "#a53132", R = "#151515") )
+sns.scatterplot(data = df_outcome, x = "PC1", y = "PC2", s = SIZE, hue = "Laterality"  , linewidth=0, palette= dict(L = "#a53132", R = "#151515", LR = "#a53132") )
 
 # change all spines
 for axis in ['top','bottom','left','right']:
@@ -890,7 +1088,7 @@ for axis in ['top','bottom','left','right']:
 # increase tick width
 axes.tick_params(width=4)
 axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_Laterality_big.pdf"), bbox_inches='tight')
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "clustering_Laterality_big.pdf"), bbox_inches='tight')
 #%%
 palette_implant = {"SEEG": "#d75253", "ECoG": "#458fd5" }
 palette_Lesion_status = {"Non-Lesional": "#2669a8", "Lesional": "#d58b45" }
@@ -904,7 +1102,7 @@ for axis in ['top','bottom','left','right']:
 # increase tick width
 axes.tick_params(width=4)
 axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_Implant_big.pdf"), bbox_inches='tight')
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "clustering_Implant_big.pdf"), bbox_inches='tight')
 
 
 
@@ -916,7 +1114,7 @@ for axis in ['top','bottom','left','right']:
 # increase tick width
 axes.tick_params(width=4)
 axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_Lesion_status_big.pdf"), bbox_inches='tight')
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "clustering_Lesion_status_big.pdf"), bbox_inches='tight')
 
 
 
@@ -929,7 +1127,7 @@ for axis in ['top','bottom','left','right']:
 # increase tick width
 axes.tick_params(width=4)
 axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_Gender_big.pdf"), bbox_inches='tight')
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "clustering_Gender_big.pdf"), bbox_inches='tight')
 
 
 
@@ -962,7 +1160,7 @@ for axis in ['top','bottom','left','right']:
 # increase tick width
 axes.tick_params(width=4)
 axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_seizure_length_big.pdf"), bbox_inches='tight')
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "clustering_seizure_length_big.pdf"), bbox_inches='tight')
 
 #%%
 
@@ -973,14 +1171,14 @@ kmeans_kwargs = {
     "random_state": 42,
 }
 sse = []
-kmeans_clusters_max = 25
+kmeans_clusters_max = 30
 for k in range(1, kmeans_clusters_max):
     kmeans_total = KMeans(n_clusters=k, **kmeans_kwargs)
     kmeans_total.fit(x_data)
     sse.append(kmeans_total.inertia_)
 
 
-fig, axes = utils.plot_make(size_length=10, size_height=6)
+fig, axes = utils.plot_make(size_length=20, size_height=6)
 sns.lineplot(x = range(1,kmeans_clusters_max), y = sse, lw = 8, color = "#8586e8")
 for axis in ['top','bottom','left','right']:
     axes.spines[axis].set_linewidth(6)
@@ -988,7 +1186,7 @@ axes.set_title("k means clustering")
 axes.set_xlabel("Number of Clusters")
 axes.set_ylabel("SSE")
 axes.tick_params(width=4)
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "kmeans_clustering.pdf"), bbox_inches='tight')
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "kmeans_clustering.pdf"), bbox_inches='tight')
 
 
 #%%
@@ -1026,10 +1224,14 @@ region_activation_class_avg_regions_active["num_regions"] = np.array(num_regions
 region_activation_class_avg_regions_active["cluster"] = region_activation_class_avg_regions_active["cluster"].astype(str)
 
 #%%
-palette2_light = {"1": "#be2323", "3": "#ba9dd5", "2": "#da8384", "4": "#2c94db", "0": "#bcd2ec" }
-palette2_clusters = {"1": "#5b1111", "3": "#9567BE", "2": "#c94849", "4": "#1F78B5", "0": "#84b2ec" }
+palette2_light = {"1": "#9dbde3", "3": "#da8384", "2": "#2c94db", "4": "#be2323", "0": "#ba9dd5" }
+palette2_clusters = {"1": "#629ce6", "3": "#c94849", "2": "#1c6da5", "4": "#5b1111", "0": "#9567BE" }
 
-cluster_order = ["4", "3", "0", "2", "1"]
+{"1": "#c94849", "3": "#5b1111", "2": "#1f78b5", "4": "#84b2ec", "0": "#9567BE" }
+{"1": "#be2323", "3": "#ba9dd5", "2": "#da8384", "4": "#2c94db", "0": "#bcd2ec" }
+
+
+cluster_order = ["2", "1", "0", "4", "3"]
 
 fig, axes = utils.plot_make(size_length=30)
 sns.boxplot(data = region_activation_class_avg_regions_active, x = "cluster", y = "num_regions", palette= palette2_light, order=cluster_order, width=0.5)
@@ -1048,15 +1250,12 @@ for i,artist in enumerate(axes.artists):
         #line.set_color(col)
         line.set_mfc(col)
         line.set_mec(col)
-        
-for i, tick in enumerate(axes.xaxis.get_major_ticks()):
-    tick.label.set_fontsize(20)        
-axes.tick_params(width=4) 
-# change all spines
-for axis in ['top','bottom','left','right']:
-    axes.spines[axis].set_linewidth(6)
+
+utils.fix_axes(axes)
+utils.reformat_boxplot(axes)
+
     
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "kmeans_clustering_number_of_regions_long4.pdf"), bbox_inches='tight')       
+plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "kmeans_clustering_number_of_regions_long4.pdf"), bbox_inches='tight')       
 #%%
 
 #Plot averages of atlas and clusters
@@ -1069,7 +1268,7 @@ for axis in ['top','bottom','left','right']:
 ###############################################
 ###############################################
 ###############################################
-#For the proper atlas regions
+
 ###############################################
 ###############################################
 ###############################################
@@ -1078,11 +1277,11 @@ for axis in ['top','bottom','left','right']:
 ###############################################
 ###############################################
 
-#For the proper atlas regions
+
 
      
         
-#%%
+#%
 
 #creating new localization
 atlas = atlas_name_to_use
@@ -1107,7 +1306,7 @@ shape = img_data.shape
 region_activation_class_avg = copy.deepcopy(region_activation_fillna)
 region_activation_class_avg = copy.deepcopy(region_activation)
 region_activation_class_avg = region_activation_class_avg.replace(1, np.nan)
-region_activation_class_avg["cluster"] =  kmeans.labels_
+region_activation_class_avg["cluster"] = fc_cluster #kmeans.labels_ ####################################################################
 
 
 region_activation_class_avg_group = region_activation_class_avg.groupby(["cluster"], as_index=False).mean()
@@ -1146,6 +1345,9 @@ for cluster in range(n_clusters):
 a1 = region_activation_fillna_about[["subject", "cluster"]]
 a2 = region_activation_fillna_about
 a3 = region_activation_class_avg_group
+
+region_activation_class_avg_group.to_csv(join(paths.SEIZURE_SPREAD_DERIVATIVES_CLUSTERING, "Seizure_clusters_average.csv"))
+
 #%%
 for cluster in range(5):
     print(f"\n {cluster}")
@@ -1170,7 +1372,7 @@ for cluster in range(5):
 
 #%%
 
-cluster = 1
+cluster = 3
 for cluster in range(5):
     
     cluster_path = join(BIDS, project_folder, f"atlases", f"more_patients_cluster_{cluster}.nii.gz" )
@@ -1179,17 +1381,22 @@ for cluster in range(5):
     img_data = img.get_fdata()
     img_data[np.where(img_data == 0)] = -1
     
+    #Right mesial  0.00, 0.8 , 110
+    #lateral temporal  0, 0.6, 110
+    #early bilateral   0.07, 0.5, 110
+    #left mesial  0.05, 0.6, 110
+    #FOCAL   -0.6, 0.6, 96
     
-    if cluster == 0: #Right mesial
-        vmin, vmax, slice_num = 0.00, 0.8, 110
-    if cluster == 1: #lateral temporal
-        vmin, vmax, slice_num  = 0, 0.6, 110    #vmin, vmax, slice_num  = 0, 0.6, 100
-    if cluster == 2: #early bilateral
-        vmin, vmax, slice_num = 0.07, 0.5, 110
-    if cluster == 3: #left mesial
+    if cluster == 0: 
         vmin, vmax, slice_num = 0.05, 0.6, 110
-    if cluster == 4:  #FOCAL
-        vmin, vmax, slice_num = -0.6, 0.6, 96
+    if cluster == 1: 
+        vmin, vmax, slice_num  =  0.07, 0.5, 110
+    if cluster == 2: 
+        vmin, vmax, slice_num =  -0.1, 0.6, 110
+    if cluster == 3: 
+        vmin, vmax, slice_num =  0, 0.6, 110
+    if cluster == 4:  #
+        vmin, vmax, slice_num = 0.00, 0.8 , 110
     
     #for slice_num in range(50,140):
     print(slice_num)
@@ -1215,13 +1422,39 @@ for cluster in range(5):
     
     
     
-    #plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", f"MORE_PATIENTS_COLOR_cluster_atlas_{cluster}_slice_{slice_num}.pdf"), bbox_inches='tight')
+    plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", f"MORE_PATIENTS_COLOR_cluster_atlas_{cluster}_slice_{slice_num}.pdf"), bbox_inches='tight')
     plt.show()
     
     
     
     
 #%%
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
+##########################################################################################
 ##########################################################################################
 ##########################################################################################
 ##########################################################################################
@@ -1474,8 +1707,8 @@ for axis in ['top','bottom','left','right']:
 # increase tick width
 axes.tick_params(width=4)
 axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_minifig_big.pdf"), bbox_inches='tight')
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_clusters_big.pdf"), bbox_inches='tight')
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "clustering_minifig_big.pdf"), bbox_inches='tight')
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "clustering_clusters_big.pdf"), bbox_inches='tight')
 
 #%%
    
@@ -1628,8 +1861,8 @@ for axis in ['top','bottom','left','right']:
 # increase tick width
 axes.tick_params(width=4)
 axes.legend(bbox_to_anchor=(1.05, 1), loc='upper left', borderaxespad=0)
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_minifig_big.pdf"), bbox_inches='tight')
-#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering", "clustering_clusters_big.pdf"), bbox_inches='tight')
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "clustering_minifig_big.pdf"), bbox_inches='tight')
+#plt.savefig(join(paths.SEIZURE_SPREAD_FIGURES,"clustering_update", "clustering_clusters_big.pdf"), bbox_inches='tight')
 
 
 controls = [285, 286, 287, 288, 289, 290, 292,292,297,505,599,600,602,603,604,615,682,683,815,816,817,818,819,820,826,827,830,833,854,855]
